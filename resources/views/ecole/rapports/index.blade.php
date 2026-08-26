@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 
 @section('title', 'Rapports des Étudiants - STAGILOG')
-@section('header_title', 'Rapports & PV de Stage')
+@section('header_title', 'Rapports')
 
 @section('dashboard_content')
 <div class="space-y-6">
@@ -45,7 +45,7 @@
                             <div class="text-[11px] text-slate-600 font-medium mt-0.5 search-target">{{ $etu->dossier->filiere }}</div>
                         </td>
                         <td class="py-4 px-6">
-                            <div class="font-bold text-slate-800">Dossier #{{ $etu->id_dossier }}</div>
+                            <div class="font-mono font-bold text-[#1B3A8C]">{{ $etu->dossier->code_dossier ?? ((auth()->user()->ecole?->sigle ?? 'STG') . '-' . ($etu->dossier->created_at ? $etu->dossier->created_at->format('dmYHi') : '')) }}</div>
                             <div class="text-[11px] text-emerald-600 font-semibold">Validé par TFG SARL</div>
                         </td>
                         <td class="py-4 px-6">

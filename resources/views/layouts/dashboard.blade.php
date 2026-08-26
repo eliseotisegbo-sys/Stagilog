@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/custom-datepicker.css') }}">
+@endpush
+
 @section('content')
 <div class="min-h-screen flex bg-[#F0F4FF]">
     
@@ -54,7 +58,7 @@
                         <svg class="w-5 h-5 flex-shrink-0 {{ request()->routeIs('admin.rapports.*') ? 'text-[#E8001D]' : 'text-blue-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
-                        <span>Rapports & PV</span>
+                        <span>Rapports</span>
                     </a>
 
                     <a href="{{ route('admin.filieres.index') }}" 
@@ -62,7 +66,7 @@
                         <svg class="w-5 h-5 flex-shrink-0 {{ request()->routeIs('admin.filieres.*') ? 'text-[#E8001D]' : 'text-blue-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                         </svg>
-                        <span>Filières & Cycles</span>
+                        <span>Filières &amp; Cycles</span>
                     </a>
 
                     <a href="{{ route('admin.parametres.index') }}" 
@@ -106,7 +110,7 @@
                         <svg class="w-5 h-5 flex-shrink-0 {{ request()->routeIs('ecole.rapports.*') ? 'text-[#E8001D]' : 'text-blue-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
-                        <span>Rapports des Étudiants</span>
+                        <span>Rapports</span>
                     </a>
 
                     <a href="{{ route('ecole.parametres.index') }}" 
@@ -120,13 +124,22 @@
             </nav>
         </div>
 
-        <!-- Bas de la Sidebar (Profil Utilisateur & Logout) -->
+        <!-- Bas de la Sidebar (Profil Utilisateur & Logout Modal Trigger) -->
         <div class="pt-6 border-t border-white/15">
             <div class="flex items-center justify-between p-3 bg-white/10 rounded-2xl border border-white/10">
                 <div class="flex items-center space-x-3 min-w-0">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#E8001D] to-orange-500 flex items-center justify-center text-white font-bold shadow-md flex-shrink-0">
-                        {{ strtoupper(substr(session('user_session_name', auth()->user()->name), 0, 2)) }}
-                    </div>
+                    @if(auth()->user()->photo_profil)
+                        <img src="{{ asset('uploads/avatars/' . auth()->user()->photo_profil) }}" alt="{{ auth()->user()->name }}"
+                             class="w-10 h-10 rounded-xl object-cover border-2 border-white/20 shadow-md flex-shrink-0">
+                    @elseif(auth()->user()->ecole && auth()->user()->ecole->logo)
+                        <img src="{{ asset('uploads/logos/' . auth()->user()->ecole->logo) }}" alt="{{ auth()->user()->ecole->nom_ecole }}"
+                             class="w-10 h-10 rounded-xl object-contain bg-white p-0.5 border-2 border-white/20 shadow-md flex-shrink-0">
+                    @else
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#E8001D] to-orange-500 flex items-center justify-center text-white font-bold shadow-md flex-shrink-0 text-xs">
+                            {{ strtoupper(substr(session('user_session_name', auth()->user()->name), 0, 2)) }}
+                        </div>
+                    @endif
+
                     <div class="truncate">
                         <p class="text-xs font-bold text-white truncate">{{ session('user_session_name', auth()->user()->name) }}</p>
                         <p class="text-[10px] text-blue-200 uppercase tracking-wider font-semibold">
@@ -135,14 +148,11 @@
                     </div>
                 </div>
                 
-                <form method="POST" action="{{ route('logout') }}" class="flex-shrink-0 ml-2">
-                    @csrf
-                    <button type="submit" title="Se déconnecter" class="p-2 text-blue-200 hover:text-white hover:bg-white/15 rounded-xl transition">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                        </svg>
-                    </button>
-                </form>
+                <button type="button" onclick="openLogoutModal()" title="Se déconnecter" class="p-2 text-blue-200 hover:text-white hover:bg-white/15 rounded-xl transition flex-shrink-0 ml-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    </svg>
+                </button>
             </div>
         </div>
     </aside>
@@ -150,7 +160,7 @@
     <!-- ZONE PRINCIPALE DE CONTENU -->
     <div class="flex-1 flex flex-col min-w-0 overflow-y-auto max-h-screen">
         
-        <!-- TOPBAR HEADER (Design Pro & Épuré) -->
+        <!-- TOPBAR HEADER -->
         <header class="bg-white/80 backdrop-blur-md sticky top-0 z-20 border-b border-slate-100 px-8 py-4 flex items-center justify-between">
             <div>
                 <h2 class="text-2xl font-black text-[#0D1B4B] tracking-tight">
@@ -165,7 +175,7 @@
                     <svg class="w-4 h-4 text-[#1B3A8C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
-                    <span>{{ now()->locale('fr')->isoFormat('D MMMM YYYY') }}</span>
+                    <span class="capitalize">{{ now()->locale('fr')->isoFormat('ddd. D MMMM YYYY') }}</span>
                 </div>
 
                 <!-- Notifications Button with Interactive Dropdown -->
@@ -195,9 +205,17 @@
 
                 <!-- Avatar Profile -->
                 <div class="flex items-center space-x-3 pl-2 border-l border-slate-200">
-                    <div class="w-10 h-10 rounded-xl bg-[#1B3A8C] text-white flex items-center justify-center font-bold text-sm shadow-md">
-                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                    </div>
+                    @if(auth()->user()->photo_profil)
+                        <img src="{{ asset('uploads/avatars/' . auth()->user()->photo_profil) }}" alt="{{ auth()->user()->name }}"
+                             class="w-10 h-10 rounded-xl object-cover border-2 border-slate-200 shadow-md">
+                    @elseif(auth()->user()->ecole && auth()->user()->ecole->logo)
+                        <img src="{{ asset('uploads/logos/' . auth()->user()->ecole->logo) }}" alt="{{ auth()->user()->ecole->nom_ecole }}"
+                             class="w-10 h-10 rounded-xl object-contain bg-white p-0.5 border-2 border-slate-200 shadow-md">
+                    @else
+                        <div class="w-10 h-10 rounded-xl bg-[#1B3A8C] text-white flex items-center justify-center font-bold text-sm shadow-md">
+                            {{ strtoupper(substr(session('user_session_name', auth()->user()->name), 0, 1)) }}
+                        </div>
+                    @endif
                 </div>
             </div>
         </header>
@@ -209,7 +227,47 @@
     </div>
 </div>
 
+<!-- ======================================================= -->
+<!-- MODAL DE CONFIRMATION DE DÉCONNEXION                   -->
+<!-- ======================================================= -->
+<div id="modal-logout-confirm" class="hidden fixed inset-0 z-[99999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full shadow-2xl border border-slate-100 p-6 text-center transform transition-all">
+        <div class="w-14 h-14 rounded-2xl bg-red-50 text-[#E8001D] flex items-center justify-center mx-auto mb-4 border border-red-100">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
+        </div>
+        
+        <h3 class="text-lg font-black text-[#0D1B4B]">Confirmation</h3>
+        <p class="text-xs text-slate-500 mt-2 mb-6">Êtes-vous sûr de vouloir vous déconnecter de votre session STAGILOG ?</p>
+        
+        <div class="flex items-center justify-center space-x-3">
+            <button type="button" onclick="closeLogoutModal()" 
+                    class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs transition">
+                Annuler
+            </button>
+            <form method="POST" action="{{ route('logout') }}" class="inline">
+                @csrf
+                <button type="submit" 
+                        class="px-6 py-2.5 rounded-xl bg-[#E8001D] hover:bg-red-700 text-white font-bold text-xs shadow-lg shadow-red-500/20 transition">
+                    Oui, me déconnecter
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script src="{{ asset('js/custom-datepicker.js') }}"></script>
 <script>
+function openLogoutModal() {
+    document.getElementById('modal-logout-confirm').classList.remove('hidden');
+}
+
+function closeLogoutModal() {
+    document.getElementById('modal-logout-confirm').classList.add('hidden');
+}
+
 // Gestionnaire interactif de notifications
 document.addEventListener('DOMContentLoaded', function() {
     const notifBtn = document.getElementById('notif-btn');
@@ -262,21 +320,20 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(err => console.log('Erreur chargement notifications', err));
     }
 
-    // Charger dès l'arrivée sur la page
     loadNotifications();
 
-    // Toggle Dropdown
-    notifBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        notifPanel.classList.toggle('hidden');
-        if (!notifPanel.classList.contains('hidden')) {
-            loadNotifications();
-        }
-    });
+    if (notifBtn) {
+        notifBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            notifPanel.classList.toggle('hidden');
+            if (!notifPanel.classList.contains('hidden')) {
+                loadNotifications();
+            }
+        });
+    }
 
-    // Fermer si clic ailleurs
     document.addEventListener('click', function(e) {
-        if (!document.getElementById('notif-dropdown-wrapper').contains(e.target)) {
+        if (notifPanel && !document.getElementById('notif-dropdown-wrapper')?.contains(e.target)) {
             notifPanel.classList.add('hidden');
         }
     });
@@ -298,4 +355,5 @@ function markAllNotificationsRead() {
     });
 }
 </script>
+@endpush
 @endsection

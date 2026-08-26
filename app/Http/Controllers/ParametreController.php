@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Ecole;
 use App\Models\User;
+use App\Models\ConnexionHistorique;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\File;
 
 class ParametreController extends Controller
 {
@@ -15,7 +17,13 @@ class ParametreController extends Controller
     public function adminIndex()
     {
         $user = auth()->user();
-        return view('admin.parametres.index', compact('user'));
+        $connexions = ConnexionHistorique::where('id_user', $user->id)
+            ->orWhere('email', $user->email)
+            ->latest()
+            ->take(10)
+            ->get();
+
+        return view('admin.parametres.index', compact('user', 'connexions'));
     }
 
     /**
@@ -28,12 +36,25 @@ class ParametreController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'photo_profil' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:4096',
             'current_password' => 'nullable|required_with:new_password',
             'new_password' => 'nullable|min:6|confirmed',
         ]);
 
         $user->name = $request->name;
         $user->email = $request->email;
+
+        // Upload Photo de Profil Admin
+        if ($request->hasFile('photo_profil')) {
+            $avatarDir = public_path('uploads/avatars');
+            if (!File::isDirectory($avatarDir)) {
+                File::makeDirectory($avatarDir, 0755, true, true);
+            }
+
+            $photoName = 'avatar_' . $user->id . '_' . time() . '.' . $request->file('photo_profil')->getClientOriginalExtension();
+            $request->file('photo_profil')->move($avatarDir, $photoName);
+            $user->photo_profil = $photoName;
+        }
 
         if ($request->filled('new_password')) {
             if (!Hash::check($request->current_password, $user->password)) {
@@ -44,7 +65,7 @@ class ParametreController extends Controller
 
         $user->save();
 
-        return back()->with('success', 'Vos paramètres administrateur ont été enregistrés avec succès.');
+        return back()->with('success', 'Vos paramètres administrateur et photo de profil ont été enregistrés avec succès.');
     }
 
     /**
@@ -55,7 +76,13 @@ class ParametreController extends Controller
         $user = auth()->user();
         $ecole = $user->ecole;
 
-        return view('ecole.parametres.index', compact('user', 'ecole'));
+        $connexions = ConnexionHistorique::where('id_user', $user->id)
+            ->orWhere('email', $user->email)
+            ->latest()
+            ->take(10)
+            ->get();
+
+        return view('ecole.parametres.index', compact('user', 'ecole', 'connexions'));
     }
 
     /**
@@ -80,8 +107,13 @@ class ParametreController extends Controller
 
         // Upload Logo École
         if ($request->hasFile('logo')) {
+            $logoDir = public_path('uploads/logos');
+            if (!File::isDirectory($logoDir)) {
+                File::makeDirectory($logoDir, 0755, true, true);
+            }
+
             $logoName = 'logo_' . $ecole->id_ecole . '_' . time() . '.' . $request->file('logo')->getClientOriginalExtension();
-            $request->file('logo')->move(public_path('uploads/logos'), $logoName);
+            $request->file('logo')->move($logoDir, $logoName);
             $ecole->logo = $logoName;
         }
 
@@ -129,8 +161,13 @@ class ParametreController extends Controller
 
         // Si logo fourni lors de la première connexion
         if ($request->hasFile('logo_ecole') && $user->ecole) {
+            $logoDir = public_path('uploads/logos');
+            if (!File::isDirectory($logoDir)) {
+                File::makeDirectory($logoDir, 0755, true, true);
+            }
+
             $logoName = 'logo_' . $user->ecole->id_ecole . '_' . time() . '.' . $request->file('logo_ecole')->getClientOriginalExtension();
-            $request->file('logo_ecole')->move(public_path('uploads/logos'), $logoName);
+            $request->file('logo_ecole')->move($logoDir, $logoName);
             $user->ecole->logo = $logoName;
             $user->ecole->save();
         }

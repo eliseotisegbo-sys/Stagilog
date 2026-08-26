@@ -1,7 +1,11 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Dossier #' . $dossier->id_dossier . ' - STAGILOG')
-@section('header_title', 'Dossier #' . $dossier->id_dossier . ' - ' . $dossier->filiere)
+@php
+    $codeDossier = $dossier->code_dossier ?? (auth()->user()->ecole?->sigle ?? 'STG') . '-' . ($dossier->created_at ? $dossier->created_at->format('dmYHi') : '');
+@endphp
+
+@section('title', 'Dossier ' . $codeDossier . ' - STAGILOG')
+@section('header_title', 'Dossier ' . $codeDossier . ' - ' . $dossier->filiere)
 
 @section('dashboard_content')
 <div class="max-w-5xl mx-auto space-y-8">
@@ -32,9 +36,17 @@
 
     <!-- Détails du Dossier -->
     <div class="bg-white rounded-3xl shadow-card border border-slate-100 p-8 space-y-6">
-        <div class="border-b border-slate-100 pb-6">
-            <h3 class="text-xl font-black text-[#0D1B4B]">{{ $dossier->filiere }}</h3>
-            <p class="text-xs text-slate-400 mt-1">Soumis le {{ $dossier->created_at->format('d/m/Y à H:i') }}</p>
+        <div class="border-b border-slate-100 pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+                <span class="font-mono text-xs font-bold text-[#1B3A8C] uppercase tracking-wider">{{ $codeDossier }}</span>
+                <h3 class="text-2xl font-black text-[#0D1B4B] mt-0.5">{{ $dossier->filiere }}</h3>
+                <p class="text-xs text-slate-400 mt-1">Soumis le {{ $dossier->created_at ? $dossier->created_at->locale('fr')->isoFormat('ddd. D MMMM YYYY [à] HH:mm') : '-' }}</p>
+            </div>
+            <div>
+                <span class="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
+                    Année : {{ $dossier->annee_academique }}
+                </span>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-xs">
@@ -48,23 +60,13 @@
                 <p class="text-sm font-bold text-slate-800 mt-1">{{ $dossier->type_stage ?? 'Stage professionnel' }}</p>
             </div>
 
-            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                <p class="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Période</p>
-                <p class="text-sm font-bold text-slate-800 mt-1">
-                    {{ $dossier->datedebut ? $dossier->datedebut->format('d/m/Y') : '-' }} &rarr; {{ $dossier->datefin ? $dossier->datefin->format('d/m/Y') : '-' }}
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 sm:col-span-2">
+                <p class="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Période Définie</p>
+                <p class="text-sm font-bold text-slate-800 mt-1 lowercase">
+                    {{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }}
+                    <span class="text-slate-400 mx-1">au</span>
+                    {{ $dossier->datefin ? $dossier->datefin->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }}
                 </p>
-            </div>
-
-            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                <p class="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Note de Demande</p>
-                @if($dossier->note_demande)
-                <a href="{{ asset('uploads/notes/' . $dossier->note_demande) }}" target="_blank" 
-                   class="text-xs font-bold text-[#1B3A8C] hover:underline mt-1 block truncate">
-                    Ouvrir fichier &rarr;
-                </a>
-                @else
-                <p class="text-xs text-slate-400 mt-1">Non transmise</p>
-                @endif
             </div>
         </div>
     </div>
@@ -81,8 +83,9 @@
                     <tr>
                         <th class="py-4 px-6">Nom & Prénom</th>
                         <th class="py-4 px-6">Email</th>
+                        <th class="py-4 px-6">Niveau & Date Naissance</th>
                         <th class="py-4 px-6">Curriculum Vitae</th>
-                        <th class="py-4 px-6 text-right">Rapport / PV</th>
+                        <th class="py-4 px-6 text-right">Rapports & Documents</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
@@ -93,6 +96,10 @@
                         </td>
                         <td class="py-4 px-6 text-slate-600">
                             {{ $etudiant->email_etu }}
+                        </td>
+                        <td class="py-4 px-6 text-slate-600">
+                            <div>{{ $etudiant->niveau_etude ?? '-' }}</div>
+                            <div class="text-[10px] text-slate-400">Né(e) le {{ $etudiant->date_naissance ? $etudiant->date_naissance->locale('fr')->isoFormat('D MMM YYYY') : '-' }}</div>
                         </td>
                         <td class="py-4 px-6">
                             @if($etudiant->cv)
@@ -106,14 +113,24 @@
                             @endif
                         </td>
                         <td class="py-4 px-6 text-right">
-                            @if($etudiant->rapport)
-                            <a href="{{ asset('uploads/rapports/' . $etudiant->rapport) }}" target="_blank" 
-                               class="inline-flex items-center space-x-1 px-3 py-1 bg-emerald-50 text-emerald-700 font-bold rounded-xl text-xs hover:bg-emerald-100 transition">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                                <span>Télécharger Rapport</span>
-                            </a>
+                            @if($etudiant->documents && $etudiant->documents->count() > 0)
+                                <div class="space-y-1">
+                                    @foreach($etudiant->documents as $doc)
+                                    <a href="{{ asset('uploads/rapports/' . $doc->fichier) }}" target="_blank"
+                                       class="inline-flex items-center space-x-1 text-xs font-bold text-[#1B3A8C] bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-xl transition">
+                                        <span>{{ $doc->nom_document }}</span>
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                    </a>
+                                    @endforeach
+                                </div>
+                            @elseif($etudiant->rapport)
+                                <a href="{{ asset('uploads/rapports/' . $etudiant->rapport) }}" target="_blank" 
+                                   class="inline-flex items-center space-x-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-3.5 py-1.5 rounded-xl transition">
+                                    <span>Rapport Disponible</span>
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                </a>
                             @else
-                            <span class="text-slate-400 italic">En attente de dépôt TFG</span>
+                                <span class="text-slate-400 italic">En cours</span>
                             @endif
                         </td>
                     </tr>
@@ -122,5 +139,6 @@
             </table>
         </div>
     </div>
+
 </div>
 @endsection

@@ -90,7 +90,7 @@
         <!-- Card 4: Rapports Déposés -->
         <div class="bg-white p-6 rounded-3xl shadow-card border border-slate-100/80 hover:shadow-hover transition-all duration-300">
             <div class="flex items-center justify-between mb-3">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Rapports & PV</span>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Rapports</span>
                 <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
             </div>
             <div class="flex items-end justify-between">
@@ -183,8 +183,10 @@
                         <td class="py-4 px-6">
                             <span class="font-semibold">{{ $dossier->etudiants->count() }} étudiant(s)</span>
                         </td>
-                        <td class="py-4 px-6 text-slate-600">
-                            {{ $dossier->datedebut ? $dossier->datedebut->format('d/m/Y') : '-' }} &rarr; {{ $dossier->datefin ? $dossier->datefin->format('d/m/Y') : '-' }}
+                        <td class="py-4 px-6 text-slate-600 text-xs lowercase">
+                            {{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }}
+                            <span class="text-slate-400 mx-1">au</span>
+                            {{ $dossier->datefin ? $dossier->datefin->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }}
                         </td>
                         <td class="py-4 px-6">
                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase {{ $dossier->statut_brouillon === 'soumis' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-700' }}">

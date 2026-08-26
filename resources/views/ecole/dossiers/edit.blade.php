@@ -155,20 +155,12 @@
 
             <!-- SECTION 2 : CANDIDATS / ÉTUDIANTS (DYNAMIQUE + RETOUR VISUEL COULEUR + NIVEAU) -->
             <div class="pt-6 border-t border-slate-100">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <h4 class="text-xs font-bold uppercase tracking-wider text-[#1B3A8C] flex items-center space-x-2">
-                            <span class="w-2 h-2 rounded-full bg-[#1B3A8C]"></span>
-                            <span>2. Liste des Étudiants</span>
-                        </h4>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Les fiches étudiants passent au vert dès que tous les champs requis sont saisis.</p>
-                    </div>
-                    
-                    <button type="button" onclick="addStudentCard()" 
-                            class="inline-flex items-center space-x-2 bg-blue-50 hover:bg-blue-100 text-[#1B3A8C] px-4 py-2 rounded-2xl text-xs font-bold transition shadow-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        <span>Ajouter un étudiant</span>
-                    </button>
+                <div class="mb-4">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-[#1B3A8C] flex items-center space-x-2">
+                        <span class="w-2 h-2 rounded-full bg-[#1B3A8C]"></span>
+                        <span>2. Liste des Candidats / Étudiants</span>
+                    </h4>
+                    <p class="text-[11px] text-slate-400 mt-0.5">Les fiches étudiants passent au vert dès que tous les champs requis sont saisis.</p>
                 </div>
 
                 <!-- Conteneur des cartes étudiants -->
@@ -264,9 +256,9 @@
                                 <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
                                     Date de Naissance (min. 16 ans)
                                 </label>
-                                <input type="date" name="etudiants[{{ $index }}][date_naissance]" value="{{ $etu['date_naissance'] ?? '' }}"
-                                       max="{{ $maxDate16 }}"
-                                       class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]">
+                                <input type="text" name="etudiants[{{ $index }}][date_naissance]" value="{{ $etu['date_naissance'] ?? '' }}"
+                                       placeholder="Date de naissance..."
+                                       class="datepicker-input w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]">
                             </div>
 
                             <div>
@@ -276,12 +268,23 @@
                                 <input type="file" name="etudiants[{{ $index }}][cv_file]" accept=".pdf,.doc,.docx"
                                        class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-[11px] file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-blue-50 file:text-[#1B3A8C]">
                                 @if(!empty($etu['existing_cv']))
-                                    <p class="text-[10px] text-emerald-600 mt-1 font-semibold truncate">CV actuel enregistré</p>
+                                    <p class="text-[10px] text-emerald-600 font-semibold mt-1">CV actuel conservé</p>
                                 @endif
                             </div>
                         </div>
                     </div>
                     @endforeach
+                </div>
+
+                <!-- BOUTON AJOUTER UN ÉTUDIANT (POSITIONNÉ EN BAS DU DERNIER ÉTUDIANT - STYLE CAPSULE) -->
+                <div class="mt-5 flex items-center">
+                    <button type="button" onclick="addStudentCard()" 
+                            class="inline-flex items-center space-x-2 bg-[#EEF4FF] hover:bg-blue-100 text-[#1B3A8C] px-6 py-3 rounded-full text-xs font-black transition-all duration-200 shadow-sm border border-blue-200/60 hover:shadow-md transform hover:-translate-y-0.5">
+                        <svg class="w-4 h-4 text-[#1B3A8C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        <span>Ajouter un étudiant</span>
+                    </button>
                 </div>
             </div>
 
@@ -500,8 +503,9 @@ function addStudentCard() {
                 <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
                     Date de Naissance (min. 16 ans)
                 </label>
-                <input type="date" name="etudiants[${newIndex}][date_naissance]" max="${maxDate16}"
-                       class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]">
+                <input type="text" name="etudiants[${newIndex}][date_naissance]"
+                       placeholder="Date de naissance..."
+                       class="datepicker-input w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]">
             </div>
 
             <div>
@@ -517,6 +521,9 @@ function addStudentCard() {
     container.appendChild(card);
     updateStudentNumbers();
     attachCardListeners();
+    if (window.initCustomDatepickers) {
+        window.initCustomDatepickers();
+    }
 }
 
 function removeStudentCard(btn) {

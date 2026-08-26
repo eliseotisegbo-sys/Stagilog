@@ -21,6 +21,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'photo_profil',
         'password',
         'id_ecole',
         'role',
@@ -75,5 +76,13 @@ class User extends Authenticatable
     public function isEcole()
     {
         return $this->role === 'ecole';
+    }
+
+    /**
+     * Relation: Historique des connexions de cet utilisateur
+     */
+    public function connexionsHistorique()
+    {
+        return $this->hasMany(ConnexionHistorique::class, 'id_user')->latest();
     }
 }

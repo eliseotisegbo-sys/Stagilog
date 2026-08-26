@@ -58,10 +58,10 @@
                                 {{ $dossier->etudiants->count() }} étudiant(s)
                             </span>
                         </td>
-                        <td class="py-4 px-6 text-slate-600 text-xs capitalize">
-                            {{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('ddd D MMM YYYY') : '-' }}
-                            <span class="text-slate-400 mx-0.5">au</span>
-                            {{ $dossier->datefin ? $dossier->datefin->locale('fr')->isoFormat('ddd D MMM YYYY') : '-' }}
+                        <td class="py-4 px-6 text-slate-600 text-xs lowercase">
+                            {{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }}
+                            <span class="text-slate-400 mx-1">au</span>
+                            {{ $dossier->datefin ? $dossier->datefin->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }}
                         </td>
                         <td class="py-4 px-6 text-center">
                             @if($dossier->statut_brouillon === 'brouillon')

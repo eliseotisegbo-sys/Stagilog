@@ -15,7 +15,7 @@
             <div>
                 <h3 class="text-xl font-black text-[#0D1B4B]">{{ $etudiant->nom_etudiant }} {{ $etudiant->prenom_etudiant }}</h3>
                 <p class="text-xs text-slate-500 font-medium">
-                    {{ $etudiant->dossier->ecole->nom_ecole ?? 'École' }} • {{ $etudiant->niveau_etude ?? $etudiant->dossier->filiere }} (Dossier #{{ $etudiant->id_dossier }})
+                    {{ $etudiant->dossier->ecole->nom_ecole ?? 'École' }} • {{ $etudiant->niveau_etude ?? $etudiant->dossier->filiere }} (Dossier <span class="font-mono font-bold text-[#1B3A8C]">{{ $etudiant->dossier->code_dossier ?? (($etudiant->dossier->ecole->sigle ?? 'STG') . '-' . ($etudiant->dossier->created_at ? $etudiant->dossier->created_at->format('dmYHi') : '')) }}</span>)
                 </p>
             </div>
         </div>
@@ -27,7 +27,7 @@
     <!-- Section 1 : Formulaire d'ajout de document avec Nom Personnalisé -->
     <div class="bg-white rounded-3xl shadow-card border border-slate-100 p-6 sm:p-8">
         <h4 class="text-sm font-extrabold text-[#0D1B4B] mb-1">Déposer un Nouveau Document</h4>
-        <p class="text-xs text-slate-400 mb-6">Précisez le nom du document (Rapport, PV, Attestation, Fiche d'évaluation...) et joignez le fichier.</p>
+        <p class="text-xs text-slate-400 mb-6">Précisez le nom du document (Rapport, Attestation, Fiche d'évaluation...) et joignez le fichier.</p>
 
         <form method="POST" action="{{ route('admin.rapports.depot.store', $etudiant->id_etudiant) }}" enctype="multipart/form-data" class="space-y-6">
             @csrf
@@ -40,7 +40,7 @@
                     </label>
                     <input type="text" name="nom_document" id="nom_document" required
                            class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white transition"
-                           placeholder="Ex: Rapport de Stage Final, Procès-Verbal, Attestation...">
+                           placeholder="Ex: Rapport de Stage Final, Attestation de stage...">
                     @error('nom_document') <p class="text-xs text-[#E8001D] mt-1">{{ $message }}</p> @enderror
                 </div>
 

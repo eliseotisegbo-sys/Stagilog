@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Rapports & PV - STAGILOG')
-@section('header_title', 'Rapports & PV de Stage')
+@section('title', 'Rapports - STAGILOG')
+@section('header_title', 'Rapports')
 
 @section('dashboard_content')
 <div class="space-y-6">
@@ -47,7 +47,7 @@
                         </td>
                         <td class="py-4 px-6">
                             <div class="font-bold text-slate-800 search-target">{{ $etu->dossier->ecole->nom_ecole ?? 'N/A' }}</div>
-                            <div class="text-[11px] text-slate-400">Dossier #{{ $etu->id_dossier }} (Validé)</div>
+                            <div class="text-[11px] text-[#1B3A8C] font-mono font-bold">{{ $etu->dossier->code_dossier ?? (($etu->dossier->ecole->sigle ?? 'STG') . '-' . ($etu->dossier->created_at ? $etu->dossier->created_at->format('dmYHi') : '')) }}</div>
                         </td>
                         <td class="py-4 px-6">
                             @if($etu->documents->count() > 0)

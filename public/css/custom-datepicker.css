@@ -1,0 +1,118 @@
+/* STAGILOG CUSTOM DATEPICKER (Conforme au design minimaliste et cinématique) */
+.custom-datepicker-popup {
+    position: absolute;
+    z-index: 99999;
+    background: #FFFFFF;
+    border-radius: 28px;
+    box-shadow: 0 20px 45px -10px rgba(13, 27, 75, 0.18), 0 0 0 1px rgba(13, 27, 75, 0.06);
+    padding: 24px;
+    width: 320px;
+    font-family: inherit;
+    animation: datepickerPop 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    user-select: none;
+}
+
+@keyframes datepickerPop {
+    from { opacity: 0; transform: translateY(-8px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.custom-datepicker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding: 0 4px;
+}
+
+.custom-datepicker-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #0D1B4B;
+    letter-spacing: -0.5px;
+}
+
+.custom-datepicker-nav-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid #F1F5F9;
+    background: #FFFFFF;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.custom-datepicker-nav-btn:hover {
+    background: #F8FAFC;
+    color: #1B3A8C;
+    border-color: #CBD5E1;
+    transform: scale(1.08);
+}
+
+.custom-datepicker-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748B;
+    margin-bottom: 12px;
+}
+
+.custom-datepicker-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    text-align: center;
+}
+
+.custom-datepicker-day {
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #0D1B4B;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.custom-datepicker-day:hover:not(.empty):not(.disabled) {
+    background: #EEF4FF;
+    color: #1B3A8C;
+    font-weight: 700;
+}
+
+.custom-datepicker-day.other-month {
+    color: #CBD5E1;
+    font-weight: 500;
+}
+
+.custom-datepicker-day.other-month:hover {
+    background: #F8FAFC;
+    color: #94A3B8;
+}
+
+.custom-datepicker-day.selected {
+    background: #1B3A8C !important;
+    color: #FFFFFF !important;
+    font-weight: 900 !important;
+    box-shadow: 0 4px 12px rgba(27, 58, 140, 0.3);
+}
+
+.custom-datepicker-day.today:not(.selected) {
+    border: 2px solid #E8001D;
+    color: #E8001D;
+    font-weight: 800;
+}
+
+.custom-datepicker-day.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}

@@ -1,13 +1,13 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Paramètres - STAGILOG')
+@section('title', 'Paramètres Établissement - STAGILOG')
 @section('header_title', 'Paramètres')
 
 @section('dashboard_content')
 <div class="max-w-5xl mx-auto space-y-8">
 
     <!-- En-tête profil école -->
-    <div class="bg-white rounded-3xl shadow-card border border-slate-100 p-8 flex items-center space-x-6">
+    <div class="bg-white rounded-3xl shadow-card border border-slate-100 p-8 flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6">
         <!-- Logo de l'école -->
         <div class="relative flex-shrink-0">
             @if($ecole && $ecole->logo)
@@ -18,16 +18,16 @@
                     <span class="text-3xl font-black text-white">{{ strtoupper(substr($ecole->sigle ?? $ecole->nom_ecole ?? 'E', 0, 2)) }}</span>
                 </div>
             @endif
-            <div class="absolute -bottom-2 -right-2 w-7 h-7 rounded-xl bg-emerald-500 border-2 border-white flex items-center justify-center">
+            <div class="absolute -bottom-2 -right-2 w-7 h-7 rounded-xl bg-emerald-500 border-2 border-white flex items-center justify-center shadow-md">
                 <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
             </div>
         </div>
-        <div>
+        <div class="text-center sm:text-left">
             <h2 class="text-2xl font-black text-[#0D1B4B]">{{ $ecole->nom_ecole ?? 'Mon École' }}</h2>
-            @if($ecole->sigle)
+            @if($ecole && $ecole->sigle)
                 <span class="inline-flex items-center px-3 py-1 bg-blue-50 text-[#1B3A8C] rounded-full text-xs font-mono font-bold border border-blue-100 mt-1">{{ $ecole->sigle }}</span>
             @endif
-            <p class="text-xs text-slate-500 mt-1">{{ $user->email }}</p>
+            <p class="text-xs text-slate-500 mt-1">Compte officiel : <span class="font-bold text-slate-700">{{ $user->email }}</span></p>
         </div>
     </div>
 
@@ -125,7 +125,7 @@
                     </label>
                     <input type="file" name="logo" id="logo" accept="image/png,image/jpeg,image/jpg,image/svg+xml,image/webp"
                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#1B3A8C] file:text-white hover:file:bg-[#142B6B] transition">
-                    @if($ecole->logo)
+                    @if($ecole && $ecole->logo)
                     <p class="text-[10px] text-slate-400 mt-1">Logo actuel : <strong>{{ $ecole->logo }}</strong></p>
                     @endif
                 </div>
@@ -177,6 +177,64 @@
             </button>
         </div>
     </form>
+
+    <!-- Historique des connexions récentes -->
+    <div class="bg-white rounded-3xl shadow-card border border-slate-100 p-8">
+        <h3 class="text-sm font-extrabold text-[#0D1B4B] uppercase tracking-wider mb-2 flex items-center space-x-2">
+            <svg class="w-4 h-4 text-[#1B3A8C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>Historique des Connexions Récentes</span>
+        </h3>
+        <p class="text-[11px] text-slate-400 mb-6">Journal des 10 dernières connexions à votre compte école.</p>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-bold border-b border-slate-100">
+                    <tr>
+                        <th class="py-3 px-4">Date & Heure</th>
+                        <th class="py-3 px-4">Adresse IP</th>
+                        <th class="py-3 px-4">Navigateur & Appareil</th>
+                        <th class="py-3 px-4 text-right">Statut</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
+                    @forelse($connexions as $conn)
+                    <tr class="hover:bg-slate-50/70 transition">
+                        <td class="py-3.5 px-4 font-mono font-bold text-[#0D1B4B]">
+                            {{ $conn->created_at ? $conn->created_at->locale('fr')->isoFormat('ddd. D MMMM YYYY [à] HH:mm') : '-' }}
+                        </td>
+                        <td class="py-3.5 px-4 font-mono text-slate-500">
+                            {{ $conn->ip_address ?? '127.0.0.1' }}
+                        </td>
+                        <td class="py-3.5 px-4">
+                            <div class="font-bold text-slate-800">{{ $conn->navigateur ?? 'Navigateur Web' }}</div>
+                            <div class="text-[10px] text-slate-400">{{ $conn->appareil ?? 'Ordinateur' }}</div>
+                        </td>
+                        <td class="py-3.5 px-4 text-right">
+                            @if($conn->statut === 'succes')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">
+                                    Connexion Réussie
+                                </span>
+                            @elseif($conn->statut === 'deconnexion')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">
+                                    Déconnexion
+                                </span>
+                            @else
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700">
+                                    Échec / OTP
+                                </span>
+                            @endif
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="4" class="py-6 text-center text-slate-400">Aucune activité enregistrée.</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 </div>
 
 <script>

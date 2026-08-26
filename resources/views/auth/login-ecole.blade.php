@@ -29,7 +29,7 @@
                         Gérez vos stages académiques en toute simplicité
                     </h2>
                     <p class="text-sm text-blue-200/90 leading-relaxed">
-                        Accédez au portail sécurisé pour soumettre vos dossiers d'étudiants, suivre l'état de validation et récupérer les rapports et PV de stage validés par <strong>TFG SARL</strong>.
+                        Accédez au portail sécurisé pour soumettre vos dossiers d'étudiants, suivre l'état de validation et récupérer les rapports de stage validés par <strong>TFG SARL</strong>.
                     </p>
                 </div>
             </div>

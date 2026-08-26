@@ -50,9 +50,9 @@
             <h4 class="text-sm font-extrabold text-emerald-900">Dossier Validé par la Direction</h4>
             <p class="text-xs text-emerald-700 mt-0.5">
                 Les stagiaires de cette promotion peuvent démarrer leur stage directement à partir du 
-                <strong>{{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('dddd D MMMM YYYY') : '-' }}</strong> 
+                <strong>{{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }}</strong> 
                 au 
-                <strong>{{ $dossier->datefin ? $dossier->datefin->locale('fr')->isoFormat('dddd D MMMM YYYY') : '-' }}</strong>.
+                <strong>{{ $dossier->datefin ? $dossier->datefin->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }}</strong>.
             </p>
         </div>
     </div>
@@ -99,10 +99,10 @@
 
                 <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 sm:col-span-2">
                     <p class="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Période de Stage Définie</p>
-                    <p class="text-sm font-bold text-slate-800 mt-1 capitalize">
-                        {{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('dddd D MMMM YYYY') : '-' }} 
-                        au 
-                        {{ $dossier->datefin ? $dossier->datefin->locale('fr')->isoFormat('dddd D MMMM YYYY') : '-' }}
+                    <p class="text-sm font-bold text-slate-800 mt-1 lowercase">
+                        {{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }} 
+                        <span class="text-slate-400 mx-1">au</span>
+                        {{ $dossier->datefin ? $dossier->datefin->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }}
                     </p>
                 </div>
 
@@ -143,7 +143,7 @@
 
             <div class="pt-6 border-t border-slate-100 text-xs text-slate-500">
                 <p>Identifiant dossier : <strong class="font-mono text-[#1B3A8C]">{{ $codeDossier }}</strong></p>
-                <p class="mt-1">Créé le : {{ $dossier->created_at ? $dossier->created_at->format('d/m/Y à H:i') : '-' }}</p>
+                <p class="mt-1">Créé le : {{ $dossier->created_at ? $dossier->created_at->locale('fr')->isoFormat('ddd. D MMMM YYYY [à] HH:mm') : '-' }}</p>
             </div>
         </div>
     </div>
@@ -157,7 +157,7 @@
             </div>
             @if($dossier->statut === 'valide')
             <a href="{{ route('admin.rapports.index') }}" class="text-xs font-bold text-[#1B3A8C] hover:underline">
-                Déposer un PV / Rapport &rarr;
+                Déposer un Rapport &rarr;
             </a>
             @endif
         </div>

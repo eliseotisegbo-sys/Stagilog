@@ -32,6 +32,11 @@ Route::prefix('auth')->group(function () {
     // Login Admin (URL privée)
     Route::get('/admin/login', [LoginController::class, 'showAdminLoginForm'])->name('login.admin');
     Route::post('/admin/login', [LoginController::class, 'loginAdmin'])->name('login.admin.submit');
+
+    // Vérification de sécurité (Code 6 chiffres OTP par email)
+    Route::get('/verify-code', [LoginController::class, 'showVerifyCodeForm'])->name('login.verify-code');
+    Route::post('/verify-code', [LoginController::class, 'verifyCode'])->name('login.verify-code.submit');
+    Route::post('/verify-code/resend', [LoginController::class, 'resendCode'])->name('login.verify-code.resend');
     
     // First Time Setup (Admin seulement)
     Route::get('/first-time-setup', [FirstTimeSetupController::class, 'show'])
