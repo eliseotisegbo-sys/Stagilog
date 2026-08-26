@@ -23,6 +23,9 @@ class User extends Authenticatable
         'email',
         'password',
         'id_ecole',
+        'role',
+        'first_login',
+        'first_login_at',
     ];
 
     /**
@@ -45,6 +48,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'first_login' => 'boolean',
+            'first_login_at' => 'datetime',
         ];
     }
 
@@ -53,6 +58,22 @@ class User extends Authenticatable
      */
     public function ecole()
     {
-        return $this->belongsTo(ecoles::class, 'id_ecole', 'id_ecole');
+        return $this->belongsTo(Ecole::class, 'id_ecole', 'id_ecole');
+    }
+    
+    /**
+     * Vérifier si l'utilisateur est admin
+     */
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+    
+    /**
+     * Vérifier si l'utilisateur est une école
+     */
+    public function isEcole()
+    {
+        return $this->role === 'ecole';
     }
 }

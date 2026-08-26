@@ -1,0 +1,121 @@
+@extends('layouts.dashboard')
+
+@section('title', 'Rapports des Étudiants - STAGILOG')
+@section('header_title', 'Rapports & PV de Stage')
+
+@section('dashboard_content')
+<div class="space-y-6">
+    
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <!-- Live Search Instantané -->
+        <div class="relative max-w-md w-full">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </div>
+            <input type="text" id="live-search-ecole-rapports"
+                   placeholder="Rechercher par nom d'étudiant, email..." 
+                   class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-2xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] shadow-sm">
+        </div>
+    </div>
+
+    <!-- Tableau -->
+    <div class="bg-white rounded-3xl shadow-card border border-slate-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs" id="ecole-rapports-table">
+                <thead class="bg-slate-50/80 text-slate-500 uppercase tracking-wider font-bold border-b border-slate-100">
+                    <tr>
+                        <th class="py-4 px-6">Stagiaire Admis</th>
+                        <th class="py-4 px-6">Niveau & Filière</th>
+                        <th class="py-4 px-6">Dossier Associé</th>
+                        <th class="py-4 px-6">Documents & Livrables TFG SARL</th>
+                        <th class="py-4 px-6 text-right">Statut</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
+                    @forelse($etudiants as $etu)
+                    <tr class="hover:bg-slate-50/70 transition search-row">
+                        <td class="py-4 px-6">
+                            <div class="font-bold text-[#0D1B4B] text-sm search-target">{{ $etu->nom_etudiant }} {{ $etu->prenom_etudiant }}</div>
+                            <div class="text-[11px] text-slate-400 search-target">{{ $etu->email_etu }}</div>
+                        </td>
+                        <td class="py-4 px-6">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-blue-50 text-[#1B3A8C] font-bold text-[10px] uppercase">
+                                {{ $etu->niveau_etude ?? $etu->dossier->filiere }}
+                            </span>
+                            <div class="text-[11px] text-slate-600 font-medium mt-0.5 search-target">{{ $etu->dossier->filiere }}</div>
+                        </td>
+                        <td class="py-4 px-6">
+                            <div class="font-bold text-slate-800">Dossier #{{ $etu->id_dossier }}</div>
+                            <div class="text-[11px] text-emerald-600 font-semibold">Validé par TFG SARL</div>
+                        </td>
+                        <td class="py-4 px-6">
+                            @if($etu->documents->count() > 0)
+                                <div class="space-y-1.5">
+                                    @foreach($etu->documents as $doc)
+                                    <a href="{{ asset('uploads/rapports/' . $doc->fichier) }}" target="_blank" 
+                                       class="inline-flex items-center space-x-2 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-[#1B3A8C] rounded-xl font-bold text-xs border border-blue-100 transition shadow-sm">
+                                        <svg class="w-4 h-4 text-[#1B3A8C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                        <span>{{ $doc->nom_document }}</span>
+                                        <span class="text-[10px] text-slate-400 font-normal">({{ $doc->taille_fichier }})</span>
+                                    </a>
+                                    @endforeach
+                                </div>
+                            @elseif($etu->rapport)
+                                <a href="{{ asset('uploads/rapports/' . $etu->rapport) }}" target="_blank" 
+                                   class="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-xl font-bold text-xs">
+                                    <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                    <span>Télécharger Rapport</span>
+                                </a>
+                            @else
+                                <span class="text-slate-400 italic text-xs">En cours de stage (aucun livrable déposé)</span>
+                            @endif
+                        </td>
+                        <td class="py-4 px-6 text-right">
+                            @if($etu->documents->count() > 0 || $etu->rapport)
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px]">
+                                Livrables Disponibles
+                            </span>
+                            @else
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 font-bold text-[10px]">
+                                En Cours
+                            </span>
+                            @endif
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="5" class="py-12 text-center text-slate-400">
+                            Aucun stagiaire validé pour le moment. Les étudiants apparaîtront dès la validation de leur dossier.
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        @if($etudiants->hasPages())
+        <div class="p-4 border-t border-slate-100 bg-slate-50">
+            {{ $etudiants->links() }}
+        </div>
+        @endif
+    </div>
+</div>
+
+@push('scripts')
+<script>
+document.getElementById('live-search-ecole-rapports').addEventListener('input', function(e) {
+    const term = e.target.value.toLowerCase().trim();
+    const rows = document.querySelectorAll('#ecole-rapports-table tbody tr.search-row');
+    
+    rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        if (text.includes(term)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+</script>
+@endpush
+@endsection

@@ -10,10 +10,11 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->foreignId('id_ecole')
+                ->nullable()
                 ->after('password')
                 ->constrained('ecoles', 'id_ecole')
                 ->cascadeOnUpdate()
-                ->restrictOnDelete();
+                ->nullOnDelete();
         });
     }
 
