@@ -63,13 +63,13 @@ class DossierController extends Controller
             'datefin' => 'required|date|after:datedebut',
             'note_demande_file' => 'required|file|mimes:pdf|max:10240',
             
-            // Validation des étudiants avec niveau individuel et âge >= 16 ans
+            // Validation des étudiants avec niveau individuel (CV et date de naissance totalement optionnels et non restreints)
             'etudiants' => 'required|array|min:1',
             'etudiants.*.nom' => 'required|string|max:255',
             'etudiants.*.prenom' => 'required|string|max:255',
             'etudiants.*.email' => 'required|email|max:255',
             'etudiants.*.niveau_etude' => 'required|string|max:100',
-            'etudiants.*.date_naissance' => 'nullable|date|before_or_equal:' . $maxBirthDate,
+            'etudiants.*.date_naissance' => 'nullable|date',
             'etudiants.*.cv_file' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
         ], [
             'note_demande_file.required' => 'La note de demande officielle de l\'établissement en format PDF est obligatoire.',
@@ -79,7 +79,6 @@ class DossierController extends Controller
             'etudiants.*.prenom.required' => 'Le prénom de l\'étudiant est obligatoire.',
             'etudiants.*.email.required' => 'L\'email de l\'étudiant est obligatoire.',
             'etudiants.*.niveau_etude.required' => 'Le niveau d\'étude est obligatoire pour chaque étudiant.',
-            'etudiants.*.date_naissance.before_or_equal' => 'Chaque étudiant doit être âgé d\'au moins 16 ans révolus.',
             'datefin.after' => 'La date de fin doit être postérieure à la date de début.',
         ]);
 
@@ -206,12 +205,11 @@ class DossierController extends Controller
             'etudiants.*.prenom' => 'required|string|max:255',
             'etudiants.*.email' => 'required|email|max:255',
             'etudiants.*.niveau_etude' => 'required|string|max:100',
-            'etudiants.*.date_naissance' => 'nullable|date|before_or_equal:' . $maxBirthDate,
+            'etudiants.*.date_naissance' => 'nullable|date',
             'etudiants.*.cv_file' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
         ], [
             'etudiants.min' => 'Vous devez renseigner au moins un étudiant.',
             'etudiants.*.niveau_etude.required' => 'Le niveau d\'étude est obligatoire pour chaque étudiant.',
-            'etudiants.*.date_naissance.before_or_equal' => 'Chaque étudiant doit être âgé d\'au moins 16 ans révolus.',
         ]);
 
         $filiereObj = Filiere::find($request->id_filiere);

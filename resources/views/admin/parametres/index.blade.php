@@ -28,10 +28,6 @@
                 </div>
                 <h2 class="text-2xl font-black text-[#0D1B4B]">{{ $user->name }}</h2>
                 <p class="text-xs text-slate-500 mt-0.5">{{ $user->email }} &bull; Technology Forever Group SARL</p>
-                <div class="flex items-center space-x-2 mt-3 text-[11px] text-slate-400">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                    <span>Session active (10 Heures de validité)</span>
-                </div>
             </div>
         </div>
 
@@ -261,7 +257,7 @@
         <div class="p-6 sm:p-8 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
                 <h3 class="text-lg font-extrabold text-[#0D1B4B]">Historique de Connexion</h3>
-                <p class="text-xs font-medium text-slate-400">Journal d'audit de sécurité des sessions et déconnexions (Sessions actives 10H)</p>
+                <p class="text-xs font-medium text-slate-400">Journal d'audit de sécurité des sessions et déconnexions.</p>
             </div>
             <span class="text-xs font-bold text-[#1B3A8C] bg-blue-50 px-3.5 py-1.5 rounded-full border border-blue-100">
                 Audit de Connexion STAGILOG
@@ -275,9 +271,10 @@
                         <th class="py-4 px-6">Date</th>
                         <th class="py-4 px-6">Heure Connecté</th>
                         <th class="py-4 px-6">Heure Déconnecté</th>
-                        <th class="py-4 px-6">IP / Navigateur / Appareil</th>
-                        <th class="py-4 px-6">Nom de l'Utilisateur</th>
-                        <th class="py-4 px-6 text-right">Statut</th>
+                        <th class="py-4 px-6">Adresse IP</th>
+                        <th class="py-4 px-6">Navigateur &amp; Appareil</th>
+                        <th class="py-4 px-6">Nom et Prénom</th>
+                        <th class="py-4 px-6 text-right">Statut Session</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
@@ -304,26 +301,31 @@
                             @elseif($c->statut === 'succes')
                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
-                                    En session (ou 10h)
+                                    En session
                                 </span>
                             @else
                                 <span class="text-slate-400">-</span>
                             @endif
                         </td>
 
-                        <!-- IP / Navigateur / Appareil -->
-                        <td class="py-4 px-6">
-                            <div class="font-bold text-[#0D1B4B]">{{ $c->navigateur ?? 'Navigateur standard' }}</div>
-                            <div class="text-[10px] text-slate-400">{{ $c->ip_address ?? '127.0.0.1' }} &bull; {{ $c->appareil ?? 'Ordinateur' }}</div>
+                        <!-- Adresse IP Séparée -->
+                        <td class="py-4 px-6 font-mono font-semibold text-slate-700">
+                            {{ $c->ip_address ?? '127.0.0.1' }}
                         </td>
 
-                        <!-- Nom de l'utilisateur -->
+                        <!-- Navigateur & Appareil Séparé -->
+                        <td class="py-4 px-6">
+                            <div class="font-bold text-[#0D1B4B]">{{ $c->navigateur ?? 'Navigateur Web' }}</div>
+                            <div class="text-[10px] text-slate-400">{{ $c->appareil ?? 'Ordinateur' }}</div>
+                        </td>
+
+                        <!-- Nom et Prénom -->
                         <td class="py-4 px-6">
                             <div class="font-bold text-[#0D1B4B]">{{ $c->nom ?? ($c->user->name ?? $c->email) }}</div>
                             <div class="text-[10px] text-slate-400">{{ $c->email }} @if($c->role) ({{ strtoupper($c->role) }}) @endif</div>
                         </td>
 
-                        <!-- Statut -->
+                        <!-- Statut Session -->
                         <td class="py-4 px-6 text-right">
                             @if($c->statut === 'succes')
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -342,7 +344,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="py-12 text-center text-slate-400">
+                        <td colspan="7" class="py-12 text-center text-slate-400">
                             Aucun enregistrement d'historique de connexion pour le moment.
                         </td>
                     </tr>

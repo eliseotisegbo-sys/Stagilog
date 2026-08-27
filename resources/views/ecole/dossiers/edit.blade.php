@@ -254,16 +254,16 @@
 
                             <div>
                                 <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
-                                    Date de Naissance (min. 16 ans)
+                                    Date de Naissance (Optionnelle)
                                 </label>
                                 <input type="text" name="etudiants[{{ $index }}][date_naissance]" value="{{ $etu['date_naissance'] ?? '' }}"
-                                       placeholder="Date de naissance..."
-                                       class="datepicker-input w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]">
+                                       placeholder="Sélectionner la date..."
+                                       class="birth-datepicker-input w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]">
                             </div>
 
                             <div>
                                 <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
-                                    Curriculum Vitae (PDF - Optionnel)
+                                    Curriculum Vitae (Optionnel)
                                 </label>
                                 <input type="file" name="etudiants[{{ $index }}][cv_file]" accept=".pdf,.doc,.docx"
                                        class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-[11px] file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-blue-50 file:text-[#1B3A8C]">
@@ -354,10 +354,25 @@ document.addEventListener('DOMContentLoaded', function() {
         calculateDuration();
     }
 
+    // Initialiser les datepickers pour les dates de naissance
+    initBirthDatepickers();
+
     // Activer l'écoute des fiches étudiants
     attachCardListeners();
     checkAllCardsStatus();
 });
+
+function initBirthDatepickers() {
+    if (typeof flatpickr !== 'undefined') {
+        flatpickr(".birth-datepicker-input", {
+            dateFormat: "Y-m-d",
+            altInput: true,
+            altFormat: "j F Y",
+            allowInput: true,
+            maxDate: "today"
+        });
+    }
+}
 
 function calculateDuration() {
     const d1Val = document.getElementById('datedebut').value;
@@ -501,16 +516,16 @@ function addStudentCard() {
 
             <div>
                 <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
-                    Date de Naissance (min. 16 ans)
+                    Date de Naissance (Optionnelle)
                 </label>
                 <input type="text" name="etudiants[${newIndex}][date_naissance]"
-                       placeholder="Date de naissance..."
-                       class="datepicker-input w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]">
+                       placeholder="Sélectionner la date..."
+                       class="birth-datepicker-input w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]">
             </div>
 
             <div>
                 <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
-                    Curriculum Vitae (PDF - Optionnel)
+                    Curriculum Vitae (Optionnel)
                 </label>
                 <input type="file" name="etudiants[${newIndex}][cv_file]" accept=".pdf,.doc,.docx"
                        class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-[11px] file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-blue-50 file:text-[#1B3A8C]">
@@ -521,9 +536,7 @@ function addStudentCard() {
     container.appendChild(card);
     updateStudentNumbers();
     attachCardListeners();
-    if (window.initCustomDatepickers) {
-        window.initCustomDatepickers();
-    }
+    initBirthDatepickers();
 }
 
 function removeStudentCard(btn) {

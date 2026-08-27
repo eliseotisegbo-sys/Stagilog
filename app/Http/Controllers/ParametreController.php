@@ -232,4 +232,109 @@ class ParametreController extends Controller
 
         return redirect()->route('dashboard.ecole')->with('success', "Bienvenue, {$nom} !");
     }
+
+    /**
+     * Modification du mot de passe par l'école avec ancien mot de passe
+     */
+    public function ecoleUpdatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|min:6|confirmed',
+        ], [
+            'current_password.required' => 'L\'ancien mot de passe est obligatoire.',
+            'new_password.required' => 'Le nouveau mot de passe est obligatoire.',
+            'new_password.min' => 'Le nouveau mot de passe doit comporter au moins 6 caractères.',
+            'new_password.confirmed' => 'La confirmation du mot de passe ne correspond pas.',
+        ]);
+
+        $user = auth()->user();
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->with('error', 'L\'ancien mot de passe saisi est incorrect.');
+        }
+
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return back()->with('success', 'Votre mot de passe a été mis à jour avec succès !');
+    }
+
+    /**
+     * Envoi du code OTP pour réinitialisation de mot de passe (Mot de passe oublié)
+     */
+    public function ecoleSendResetOtp(Request $request)
+    {
+        $user = auth()->user();
+        $email = $request->email ?? $user->email;
+
+        // Génération d'un code OTP à 6 chiffres
+        $otp = random_int(100000, 999999);
+
+        session([
+            'ecole_reset_otp' => (string)$otp,
+            'ecole_reset_otp_expires_at' => now()->addMinutes(15),
+            'ecole_reset_email' => $email,
+        ]);
+
+        try {
+            Mail::to($email)->send(new \App\Mail\VerificationCodeMail($otp, $user->name));
+            return response()->json([
+                'success' => true,
+                'message' => "Un code de sécurité à 6 chiffres a été envoyé à l'adresse {$email}."
+            ]);
+        } catch (\Exception $e) {
+            \Log::error("Erreur envoi OTP réinitialisation mot de passe école: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => "Impossible d'envoyer l'email. Veuillez réessayer ou contacter le support."
+            ], 500);
+        }
+    }
+
+    /**
+     * Vérification du code OTP et enregistrement du nouveau mot de passe
+     */
+    public function ecoleVerifyResetOtp(Request $request)
+    {
+        $request->validate([
+            'otp_code' => 'required|string|size:6',
+            'new_password' => 'required|min:6|confirmed',
+        ], [
+            'otp_code.required' => 'Le code de vérification à 6 chiffres est obligatoire.',
+            'otp_code.size' => 'Le code de vérification doit comporter exactement 6 chiffres.',
+            'new_password.required' => 'Le nouveau mot de passe est obligatoire.',
+            'new_password.min' => 'Le nouveau mot de passe doit comporter au moins 6 caractères.',
+            'new_password.confirmed' => 'La confirmation du mot de passe ne correspond pas.',
+        ]);
+
+        $sessionOtp = session('ecole_reset_otp');
+        $expiresAt = session('ecole_reset_otp_expires_at');
+
+        if (!$sessionOtp || !$expiresAt || now()->isAfter($expiresAt)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Le code de vérification a expiré. Veuillez demander un nouveau code.'
+            ], 422);
+        }
+
+        if (trim($request->otp_code) !== trim($sessionOtp)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Le code de vérification à 6 chiffres saisi est incorrect.'
+            ], 422);
+        }
+
+        $user = auth()->user();
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        // Nettoyage session
+        session()->forget(['ecole_reset_otp', 'ecole_reset_otp_expires_at', 'ecole_reset_email']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Votre mot de passe a été réinitialisé avec succès !'
+        ]);
+    }
 }

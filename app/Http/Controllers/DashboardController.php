@@ -36,7 +36,7 @@ class DashboardController extends Controller
             try {
                 $startDate = Carbon::createFromFormat('Y-m-d', $request->start_date)->startOfDay();
                 $endDate   = Carbon::createFromFormat('Y-m-d', $request->end_date)->endOfDay();
-                $periodLabel = $startDate->locale('fr')->isoFormat('D MMM YYYY') . ' → ' . $endDate->locale('fr')->isoFormat('D MMM YYYY');
+                $periodLabel = 'Du ' . $startDate->locale('fr')->isoFormat('D MMM YYYY') . ' au ' . $endDate->locale('fr')->isoFormat('D MMM YYYY');
             } catch (\Exception $e) {
                 $startDate = null;
                 $endDate   = null;
@@ -142,7 +142,7 @@ class DashboardController extends Controller
             try {
                 $startDate = Carbon::createFromFormat('Y-m-d', $request->start_date)->startOfDay();
                 $endDate   = Carbon::createFromFormat('Y-m-d', $request->end_date)->endOfDay();
-                $periodLabel = $startDate->locale('fr')->isoFormat('D MMM YYYY') . ' → ' . $endDate->locale('fr')->isoFormat('D MMM YYYY');
+                $periodLabel = 'Du ' . $startDate->locale('fr')->isoFormat('D MMM YYYY') . ' au ' . $endDate->locale('fr')->isoFormat('D MMM YYYY');
             } catch (\Exception $e) {
                 $startDate = null;
                 $endDate   = null;

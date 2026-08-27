@@ -97,6 +97,9 @@ Route::middleware(['auth', 'first.login', 'role:ecole'])->prefix('ecole')->name(
     // Paramètres Espace École
     Route::get('/parametres', [ParametreController::class, 'ecoleIndex'])->name('parametres.index');
     Route::post('/parametres', [ParametreController::class, 'ecoleUpdate'])->name('parametres.update');
+    Route::post('/parametres/password', [ParametreController::class, 'ecoleUpdatePassword'])->name('parametres.password.update');
+    Route::post('/parametres/password/send-otp', [ParametreController::class, 'ecoleSendResetOtp'])->name('parametres.password.send-otp');
+    Route::post('/parametres/password/verify-otp', [ParametreController::class, 'ecoleVerifyResetOtp'])->name('parametres.password.verify-otp');
 
     // Saisie du nom du responsable connecté (intercepteur connexion)
     Route::post('/set-session-user', [ParametreController::class, 'setSessionUser'])->name('set-session-user');
