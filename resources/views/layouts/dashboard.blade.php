@@ -49,8 +49,8 @@
         
         <!-- Haut de la Sidebar -->
         <div>
-            <!-- Brand / Logo TFG + Bouton Hamburger 3 Barres -->
-            <div class="sidebar-brand flex items-center justify-between px-2 py-3 mb-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/15">
+            <!-- Brand / Logo TFG -->
+            <div class="sidebar-brand flex items-center px-2 py-3 mb-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/15">
                 <div class="flex items-center space-x-3 min-w-0">
                     <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center p-1.5 shadow-md flex-shrink-0">
                         <img src="{{ asset('images/logo-tfg.png') }}" alt="TFG SARL" class="w-full h-full object-contain">
@@ -60,15 +60,6 @@
                         <p class="text-[10px] text-blue-200 uppercase font-semibold tracking-wider truncate">TFG SARL</p>
                     </div>
                 </div>
-
-                <!-- Bouton 3 Barres Hamburger pour rabattre / ouvrir le menu -->
-                <button type="button" onclick="toggleSidebar()" 
-                        class="sidebar-toggle-btn p-2 rounded-xl bg-white/15 hover:bg-white/25 text-white transition flex-shrink-0 shadow-sm"
-                        title="Ouvrir ou rabattre le menu latéral">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-                    </svg>
-                </button>
             </div>
 
             <!-- Navigation Links (Icônes parfaitement centrées) -->

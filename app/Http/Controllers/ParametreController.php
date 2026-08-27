@@ -8,6 +8,8 @@ use App\Models\ConnexionHistorique;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\CredentialsUpdatedMail;
 
 class ParametreController extends Controller
 {
@@ -108,7 +110,13 @@ class ParametreController extends Controller
             $newAdmin->save();
         }
 
-        return back()->with('success', "Le compte administrateur pour {$newAdmin->name} a été créé avec succès.");
+        try {
+            Mail::to($newAdmin->email)->send(new CredentialsUpdatedMail($newAdmin, $request->password));
+        } catch (\Exception $e) {
+            \Log::warning("Erreur envoi email création compte admin : " . $e->getMessage());
+        }
+
+        return back()->with('success', "Le compte administrateur pour {$newAdmin->name} a été créé avec succès et un email lui a été envoyé.");
     }
 
     /**

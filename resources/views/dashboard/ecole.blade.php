@@ -27,6 +27,52 @@
         </div>
     </div>
 
+    <!-- SÉLECTEUR DE PÉRIODE -->
+    <div class="bg-white rounded-3xl border border-slate-100 shadow-card p-5">
+        <form method="GET" action="{{ route('dashboard.ecole') }}" id="period-form" class="flex flex-col sm:flex-row items-center gap-4">
+            <div class="flex items-center gap-2 flex-shrink-0">
+                <div class="w-8 h-8 rounded-xl bg-[#EEF4FF] flex items-center justify-center">
+                    <svg class="w-4 h-4 text-[#1B3A8C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                </div>
+                <span class="text-xs font-bold text-[#0D1B4B] whitespace-nowrap">Filtrer par période</span>
+            </div>
+            <div class="flex-1 flex flex-col sm:flex-row items-center gap-3 w-full">
+                <div class="relative flex-1 w-full">
+                    <input type="text" id="start_date_display" placeholder="Date de début"
+                        class="w-full pl-3 pr-3 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-[#0D1B4B] focus:ring-2 focus:ring-[#1B3A8C] focus:border-transparent outline-none cursor-pointer bg-slate-50 transition"
+                        readonly>
+                    <input type="hidden" name="start_date" id="start_date" value="{{ request('start_date') }}">
+                </div>
+                <span class="text-slate-400 font-bold text-xs hidden sm:block">→</span>
+                <div class="relative flex-1 w-full">
+                    <input type="text" id="end_date_display" placeholder="Date de fin"
+                        class="w-full pl-3 pr-3 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-[#0D1B4B] focus:ring-2 focus:ring-[#1B3A8C] focus:border-transparent outline-none cursor-pointer bg-slate-50 transition"
+                        readonly>
+                    <input type="hidden" name="end_date" id="end_date" value="{{ request('end_date') }}">
+                </div>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+                <button type="submit" class="inline-flex items-center gap-1.5 bg-[#1B3A8C] hover:bg-[#142B6B] text-white px-4 py-2.5 rounded-xl text-xs font-bold transition shadow-md">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/></svg>
+                    Filtrer
+                </button>
+                @if(request('start_date'))
+                <a href="{{ route('dashboard.ecole') }}" class="inline-flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2.5 rounded-xl text-xs font-bold transition">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    Réinitialiser
+                </a>
+                @endif
+            </div>
+            @if($periodLabel !== 'Toutes les périodes')
+            <div class="flex items-center gap-2 ml-auto">
+                <span class="inline-flex items-center gap-1.5 bg-[#EEF4FF] text-[#1B3A8C] text-[11px] font-bold px-3 py-1.5 rounded-full border border-[#BFDBFE]">
+                    {{ $periodLabel }}
+                </span>
+            </div>
+            @endif
+        </form>
+    </div>
+
     <!-- 4 KPI CARDS (Vraies valeurs de la base de données) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         
@@ -115,7 +161,13 @@
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <div>
                     <h3 class="text-lg font-extrabold text-[#0D1B4B]">Activité des Soumissions</h3>
-                    <p class="text-xs font-medium text-slate-400">Dossiers déposés par votre établissement au cours des derniers mois</p>
+                    <p class="text-xs font-medium text-slate-400">
+                        @if($periodLabel !== 'Toutes les périodes')
+                            Période : <span class="text-[#1B3A8C] font-bold">{{ $periodLabel }}</span>
+                        @else
+                            Dossiers déposés par votre établissement (6 derniers mois)
+                        @endif
+                    </p>
                 </div>
             </div>
 
@@ -217,8 +269,41 @@
 </div>
 
 @push('scripts')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+    .flatpickr-calendar { font-family: 'Plus Jakarta Sans', sans-serif !important; border-radius: 16px !important; box-shadow: 0 20px 60px rgba(13,27,75,0.15) !important; border: 1px solid #E2E8F0 !important; }
+    .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange { background: #1B3A8C !important; border-color: #1B3A8C !important; }
+    .flatpickr-day.inRange { background: #EEF4FF !important; border-color: #EEF4FF !important; color: #1B3A8C !important; }
+    .flatpickr-months .flatpickr-month { background: #0D1B4B !important; border-radius: 16px 16px 0 0 !important; }
+    .flatpickr-current-month, .flatpickr-monthDropdown-months, .flatpickr-weekday { color: white !important; }
+    .flatpickr-day:hover { background: #EEF4FF !important; color: #1B3A8C !important; }
+</style>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    var startPicker = flatpickr('#start_date_display', {
+        locale: 'fr',
+        dateFormat: 'Y-m-d',
+        altInput: true,
+        altFormat: 'D j M Y',
+        maxDate: 'today',
+        defaultDate: document.getElementById('start_date').value || null,
+        onChange: function(selectedDates, dateStr) {
+            document.getElementById('start_date').value = dateStr;
+            endPicker.set('minDate', dateStr);
+        }
+    });
+    var endPicker = flatpickr('#end_date_display', {
+        locale: 'fr',
+        dateFormat: 'Y-m-d',
+        altInput: true,
+        altFormat: 'D j M Y',
+        maxDate: 'today',
+        defaultDate: document.getElementById('end_date').value || null,
+        onChange: function(selectedDates, dateStr) {
+            document.getElementById('end_date').value = dateStr;
+        }
+    });
+
     var options = {
         series: [{
             name: 'Dossiers',
@@ -268,7 +353,8 @@ document.addEventListener('DOMContentLoaded', function() {
     chart.render();
 });
 </script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://npmcdn.com/flatpickr/dist/l10n/fr.js"></script>
 @endpush
 
 @endsection
-

@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use App\Mail\CredentialsUpdatedMail;
 
 class EcoleController extends Controller
 {
@@ -238,7 +239,14 @@ class EcoleController extends Controller
 
         $ecoleName = $user->ecole->nom_ecole ?? 'l\'établissement';
 
-        return redirect()->route('admin.ecoles.index')->with('success', "Le mot de passe pour {$user->name} ({$ecoleName}) a été mis à jour avec succès.");
+        // Envoi d'email pour informer de la mise à jour des coordonnées
+        try {
+            Mail::to($user->email)->send(new CredentialsUpdatedMail($user, $request->password));
+        } catch (\Exception $e) {
+            \Log::warning("Erreur envoi email mise à jour mot de passe : " . $e->getMessage());
+        }
+
+        return redirect()->route('admin.ecoles.index')->with('success', "Le mot de passe pour {$user->name} ({$ecoleName}) a été mis à jour avec succès et un email contenant les nouveaux identifiants a été envoyé.");
     }
 
     /**
