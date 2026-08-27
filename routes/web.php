@@ -107,14 +107,17 @@ Route::middleware(['auth', 'first.login', 'role:ecole'])->prefix('ecole')->name(
 // ============================================
 Route::middleware(['auth', 'first.login', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     
-    // Gestion des Écoles & Comptes
+    // Gestion des Écoles & Multi-Comptes Utilisateurs
     Route::resource('ecoles', AdminEcoleController::class);
     Route::post('/ecoles/{id}/creer-compte', [AdminEcoleController::class, 'creerCompte'])->name('ecoles.creer-compte');
+    Route::post('/ecoles/{id}/ajouter-utilisateur', [AdminEcoleController::class, 'ajouterUtilisateur'])->name('ecoles.ajouter-utilisateur');
+    Route::delete('/ecoles/utilisateur/{id}', [AdminEcoleController::class, 'supprimerUtilisateur'])->name('ecoles.supprimer-utilisateur');
     Route::post('/ecoles/{id}/update-password', [AdminEcoleController::class, 'updatePassword'])->name('ecoles.update-password');
 
     // Gestion des Dossiers de Stage
     Route::get('/dossiers', [AdminDossierController::class, 'index'])->name('dossiers.index');
     Route::get('/dossiers/{id}', [AdminDossierController::class, 'show'])->name('dossiers.show');
+    Route::post('/dossiers/{id}/modifier-periode', [AdminDossierController::class, 'modifierPeriode'])->name('dossiers.modifier-periode');
     Route::post('/dossiers/{id}/valider', [AdminDossierController::class, 'valider'])->name('dossiers.valider');
     Route::post('/dossiers/{id}/refuser', [AdminDossierController::class, 'refuser'])->name('dossiers.refuser');
     Route::delete('/dossiers/{id}', [AdminDossierController::class, 'destroy'])->name('dossiers.destroy');
@@ -136,7 +139,9 @@ Route::middleware(['auth', 'first.login', 'role:admin'])->prefix('admin')->name(
     Route::post('/cycles', [AdminFiliereController::class, 'storeCycle'])->name('cycles.store');
     Route::delete('/cycles/{id}', [AdminFiliereController::class, 'destroyCycle'])->name('cycles.destroy');
 
-    // Paramètres Espace Admin
+    // Profil & Paramètres Espace Admin (Gestion multi-administrateurs & Historique)
     Route::get('/parametres', [ParametreController::class, 'adminIndex'])->name('parametres.index');
     Route::post('/parametres', [ParametreController::class, 'adminUpdate'])->name('parametres.update');
+    Route::post('/parametres/admin-user', [ParametreController::class, 'storeAdminUser'])->name('parametres.admin-user.store');
+    Route::delete('/parametres/admin-user/{id}', [ParametreController::class, 'destroyAdminUser'])->name('parametres.admin-user.destroy');
 });

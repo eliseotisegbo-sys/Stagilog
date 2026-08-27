@@ -7,6 +7,7 @@ use App\Models\Dossier;
 use App\Models\Ecole;
 use App\Mail\DossierValideMail;
 use App\Mail\DossierRefuseMail;
+use App\Mail\EtudiantStageValideMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
@@ -61,6 +62,28 @@ class DossierController extends Controller
     }
 
     /**
+     * Modifier la durée / dates de stage par l'administrateur
+     */
+    public function modifierPeriode(Request $request, $id)
+    {
+        $request->validate([
+            'datedebut' => 'required|date',
+            'datefin' => 'required|date|after:datedebut',
+        ], [
+            'datedebut.required' => 'La date de début est obligatoire.',
+            'datefin.required' => 'La date de fin est obligatoire.',
+            'datefin.after' => 'La date de fin doit être postérieure à la date de début.',
+        ]);
+
+        $dossier = Dossier::findOrFail($id);
+        $dossier->datedebut = $request->datedebut;
+        $dossier->datefin = $request->datefin;
+        $dossier->save();
+
+        return back()->with('success', 'La période de stage a été mise à jour avec succès par l\'administrateur.');
+    }
+
+    /**
      * Valider le dossier
      */
     public function valider($id)
@@ -82,18 +105,29 @@ class DossierController extends Controller
             $dossier->id_ecole
         );
 
-        // 2. Envoi réel d'email de validation via stagilogtfg@gmail.com
+        // 2. Envoi réel d'email de validation à l'école via stagilogtfg@gmail.com
         if ($dossier->ecole && ($dossier->ecole->email || $dossier->ecole->mail)) {
             $destEmail = $dossier->ecole->email ?? $dossier->ecole->mail;
             try {
                 Mail::to($destEmail)->send(new DossierValideMail($dossier));
             } catch (\Exception $e) {
-                Log::warning("Erreur envoi email validation dossier ({$codeDossier}) : " . $e->getMessage());
+                Log::warning("Erreur envoi email validation dossier école ({$codeDossier}) : " . $e->getMessage());
+            }
+        }
+
+        // 3. Envoi réel d'email automatique à CHAQUE étudiant du dossier
+        foreach ($dossier->etudiants as $etudiant) {
+            if ($etudiant->email_etu && filter_var($etudiant->email_etu, FILTER_VALIDATE_EMAIL)) {
+                try {
+                    Mail::to($etudiant->email_etu)->send(new EtudiantStageValideMail($dossier, $etudiant));
+                } catch (\Exception $e) {
+                    Log::warning("Erreur envoi email validation étudiant ({$etudiant->email_etu}) : " . $e->getMessage());
+                }
             }
         }
 
         return redirect()->route('admin.dossiers.show', $id)
-            ->with('success', "Le dossier {$codeDossier} ({$dossier->filiere}) a été VALIDÉ avec succès ! Un email de confirmation a été transmis à l'école.");
+            ->with('success', "Le dossier {$codeDossier} ({$dossier->filiere}) a été VALIDÉ avec succès ! Un email de confirmation a été transmis à l'école et à tous les étudiants candidats.");
     }
 
     /**

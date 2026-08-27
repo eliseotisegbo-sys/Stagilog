@@ -12,22 +12,23 @@ use Illuminate\Support\Facades\File;
 class ParametreController extends Controller
 {
     /**
-     * Paramètres Espace Admin
+     * Profil & Gestion Multi-Admins + Historique des Connexions
      */
     public function adminIndex()
     {
         $user = auth()->user();
-        $connexions = ConnexionHistorique::where('id_user', $user->id)
-            ->orWhere('email', $user->email)
-            ->latest()
-            ->take(10)
-            ->get();
+        
+        // Liste de tous les comptes Administrateurs TFG SARL
+        $admins = User::where('role', 'admin')->latest()->get();
 
-        return view('admin.parametres.index', compact('user', 'connexions'));
+        // Historique complet des connexions / déconnexions
+        $connexions = ConnexionHistorique::latest()->paginate(25);
+
+        return view('admin.parametres.index', compact('user', 'admins', 'connexions'));
     }
 
     /**
-     * Mise à jour Paramètres Admin
+     * Mise à jour du Profil Admin connecté
      */
     public function adminUpdate(Request $request)
     {
@@ -64,12 +65,71 @@ class ParametreController extends Controller
         }
 
         $user->save();
+        session(['user_session_name' => $user->name]);
 
-        return back()->with('success', 'Vos paramètres administrateur et photo de profil ont été enregistrés avec succès.');
+        return back()->with('success', 'Votre profil administrateur a été mis à jour avec succès.');
     }
 
     /**
-     * Paramètres Espace École
+     * Créer un nouvel administrateur TFG SARL (Multi-comptes admin)
+     */
+    public function storeAdminUser(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => 'required|string|min:6|confirmed',
+            'photo_profil' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:4096',
+        ], [
+            'name.required' => 'Le nom complet de l\'administrateur est obligatoire.',
+            'email.required' => 'L\'adresse email est obligatoire.',
+            'email.unique' => 'Cette adresse email est déjà attribuée à un compte.',
+            'password.required' => 'Le mot de passe est obligatoire.',
+            'password.confirmed' => 'La confirmation du mot de passe ne correspond pas.',
+        ]);
+
+        $newAdmin = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => 'admin',
+            'first_login' => false,
+        ]);
+
+        if ($request->hasFile('photo_profil')) {
+            $avatarDir = public_path('uploads/avatars');
+            if (!File::isDirectory($avatarDir)) {
+                File::makeDirectory($avatarDir, 0755, true, true);
+            }
+
+            $photoName = 'avatar_' . $newAdmin->id . '_' . time() . '.' . $request->file('photo_profil')->getClientOriginalExtension();
+            $request->file('photo_profil')->move($avatarDir, $photoName);
+            $newAdmin->photo_profil = $photoName;
+            $newAdmin->save();
+        }
+
+        return back()->with('success', "Le compte administrateur pour {$newAdmin->name} a été créé avec succès.");
+    }
+
+    /**
+     * Supprimer un compte administrateur
+     */
+    public function destroyAdminUser($id)
+    {
+        $current = auth()->user();
+        if ($current->id == $id) {
+            return back()->with('error', 'Vous ne pouvez pas supprimer votre propre compte actif.');
+        }
+
+        $adminToDelete = User::where('role', 'admin')->findOrFail($id);
+        $name = $adminToDelete->name;
+        $adminToDelete->delete();
+
+        return back()->with('success', "Le compte administrateur de {$name} a été supprimé.");
+    }
+
+    /**
+     * Profil Espace École
      */
     public function ecoleIndex()
     {
@@ -79,14 +139,14 @@ class ParametreController extends Controller
         $connexions = ConnexionHistorique::where('id_user', $user->id)
             ->orWhere('email', $user->email)
             ->latest()
-            ->take(10)
+            ->take(15)
             ->get();
 
         return view('ecole.parametres.index', compact('user', 'ecole', 'connexions'));
     }
 
     /**
-     * Mise à jour Paramètres École
+     * Mise à jour Profil & Informations École
      */
     public function ecoleUpdate(Request $request)
     {
@@ -101,12 +161,10 @@ class ParametreController extends Controller
             'telephone' => 'nullable|string|max:50',
             'adresse_ecole' => 'nullable|string|max:255',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,svg,webp|max:4096',
-            'current_password' => 'nullable|required_with:new_password',
-            'new_password' => 'nullable|min:6|confirmed',
         ]);
 
         // Upload Logo École
-        if ($request->hasFile('logo')) {
+        if ($request->hasFile('logo') && $ecole) {
             $logoDir = public_path('uploads/logos');
             if (!File::isDirectory($logoDir)) {
                 File::makeDirectory($logoDir, 0755, true, true);
@@ -117,27 +175,21 @@ class ParametreController extends Controller
             $ecole->logo = $logoName;
         }
 
-        $ecole->nom_ecole = $request->nom_ecole;
-        $ecole->sigle = strtoupper($request->sigle);
-        $ecole->email = $request->email;
-        $ecole->mail = $request->email;
-        $ecole->telephone = $request->telephone;
-        $ecole->adresse_ecole = $request->adresse_ecole;
-        $ecole->save();
-
-        $user->name = $request->nom_responsable;
-        session(['user_session_name' => $request->nom_responsable]);
-
-        if ($request->filled('new_password')) {
-            if (!Hash::check($request->current_password, $user->password)) {
-                return back()->with('error', 'Le mot de passe actuel est incorrect.');
-            }
-            $user->password = Hash::make($request->new_password);
+        if ($ecole) {
+            $ecole->nom_ecole = $request->nom_ecole;
+            $ecole->sigle = strtoupper($request->sigle);
+            $ecole->email = $request->email;
+            $ecole->mail = $request->email;
+            $ecole->telephone = $request->telephone;
+            $ecole->adresse_ecole = $request->adresse_ecole;
+            $ecole->save();
         }
 
+        $user->name = $request->nom_responsable;
         $user->save();
+        session(['user_session_name' => $request->nom_responsable]);
 
-        return back()->with('success', 'Les paramètres de votre établissement et de votre profil ont été mis à jour.');
+        return back()->with('success', 'Les coordonnées de votre établissement et de votre profil ont été mises à jour.');
     }
 
     /**
@@ -155,11 +207,9 @@ class ParametreController extends Controller
         session(['user_session_name' => $nom]);
         session(['session_identified' => true]);
 
-        // Mettre à jour le nom de l'utilisateur
         $user->name = $nom;
         $user->save();
 
-        // Si logo fourni lors de la première connexion
         if ($request->hasFile('logo_ecole') && $user->ecole) {
             $logoDir = public_path('uploads/logos');
             if (!File::isDirectory($logoDir)) {

@@ -174,8 +174,8 @@ class LoginController extends Controller
         // Initialiser le nom de session pour les écoles
         session(['user_session_name' => $user->name]);
 
-        // Enregistrer la connexion réussie
-        ConnexionHistorique::logConnexion($user, $request, 'succes');
+        // Enregistrer la connexion réussie avec le nom
+        ConnexionHistorique::logConnexion($user, $request, 'succes', $user->name);
 
         if ($user->isAdmin()) {
             if ($user->first_login) {
@@ -223,7 +223,7 @@ class LoginController extends Controller
     {
         $user = Auth::user();
         if ($user) {
-            ConnexionHistorique::logConnexion($user, $request, 'deconnexion');
+            ConnexionHistorique::logDeconnexion($user, $request);
         }
 
         Auth::logout();

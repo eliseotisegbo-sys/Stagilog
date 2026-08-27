@@ -49,7 +49,7 @@
         
         <!-- Haut de la Sidebar -->
         <div>
-            <!-- Brand / Logo TFG + Bouton Hamburger Desktop/Mobile -->
+            <!-- Brand / Logo TFG + Bouton Hamburger 3 Barres -->
             <div class="sidebar-brand flex items-center justify-between px-2 py-3 mb-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/15">
                 <div class="flex items-center space-x-3 min-w-0">
                     <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center p-1.5 shadow-md flex-shrink-0">
@@ -61,18 +61,18 @@
                     </div>
                 </div>
 
-                <!-- Bouton toggle replier sidebar -->
+                <!-- Bouton 3 Barres Hamburger pour rabattre / ouvrir le menu -->
                 <button type="button" onclick="toggleSidebar()" 
-                        class="sidebar-toggle-btn p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-blue-200 hover:text-white transition flex-shrink-0 ml-1"
-                        title="Replier / Déplier le menu">
-                    <svg class="w-4 h-4 transform transition-transform duration-300" id="sidebar-toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+                        class="sidebar-toggle-btn p-2 rounded-xl bg-white/15 hover:bg-white/25 text-white transition flex-shrink-0 shadow-sm"
+                        title="Ouvrir ou rabattre le menu latéral">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
                     </svg>
                 </button>
             </div>
 
-            <!-- Navigation Links -->
-            <nav class="space-y-1.5">
+            <!-- Navigation Links (Icônes parfaitement centrées) -->
+            <nav class="space-y-1.5 flex flex-col items-stretch">
                 @if(auth()->user()->isAdmin())
                     <!-- Liens Administrateur -->
                     <div class="sidebar-heading px-3 pb-1.5 text-[10px] font-extrabold uppercase tracking-wider text-blue-300/80">Menu Principal</div>
@@ -122,13 +122,14 @@
                         <span class="sidebar-text truncate">Filières &amp; Cycles</span>
                     </a>
 
+                    <!-- Changé Paramètres par Profil -->
                     <a href="{{ route('admin.parametres.index') }}" 
-                       data-title="Paramètres"
+                       data-title="Profil & Administrateurs"
                        class="sidebar-link-item relative flex items-center space-x-3.5 px-3.5 py-3 rounded-2xl font-semibold text-xs transition-all duration-200 {{ request()->routeIs('admin.parametres.*') ? 'bg-white text-[#1B3A8C] shadow-lg font-bold' : 'text-blue-100 hover:bg-white/10 hover:text-white' }}">
                         <svg class="w-5 h-5 flex-shrink-0 {{ request()->routeIs('admin.parametres.*') ? 'text-[#E8001D]' : 'text-blue-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
-                        <span class="sidebar-text truncate">Paramètres</span>
+                        <span class="sidebar-text truncate">Profil</span>
                     </a>
 
                 @else
@@ -171,30 +172,31 @@
                         <span class="sidebar-text truncate">Rapports</span>
                     </a>
 
+                    <!-- Changé Paramètres par Profil -->
                     <a href="{{ route('ecole.parametres.index') }}" 
-                       data-title="Paramètres"
+                       data-title="Mon Profil"
                        class="sidebar-link-item relative flex items-center space-x-3.5 px-3.5 py-3 rounded-2xl font-semibold text-xs transition-all duration-200 {{ request()->routeIs('ecole.parametres.*') ? 'bg-white text-[#1B3A8C] shadow-lg font-bold' : 'text-blue-100 hover:bg-white/10 hover:text-white' }}">
                         <svg class="w-5 h-5 flex-shrink-0 {{ request()->routeIs('ecole.parametres.*') ? 'text-[#E8001D]' : 'text-blue-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
-                        <span class="sidebar-text truncate">Paramètres</span>
+                        <span class="sidebar-text truncate">Profil</span>
                     </a>
                 @endif
             </nav>
         </div>
 
-        <!-- Bas de la Sidebar (Profil Utilisateur & Logout Modal Trigger) -->
+        <!-- Bas de la Sidebar (Photo de Profil + Nom de celui qui est connecté bien visibles) -->
         <div class="pt-4 border-t border-white/15">
             <div class="sidebar-user-box flex items-center justify-between p-2.5 bg-white/10 rounded-2xl border border-white/10">
-                <div class="flex items-center space-x-2.5 min-w-0">
+                <div class="flex items-center space-x-3 min-w-0">
                     @if(auth()->user()->photo_profil)
                         <img src="{{ asset('uploads/avatars/' . auth()->user()->photo_profil) }}" alt="{{ auth()->user()->name }}"
-                             class="w-9 h-9 rounded-xl object-cover border-2 border-white/20 shadow-md flex-shrink-0">
+                             class="w-10 h-10 rounded-2xl object-cover border-2 border-white/30 shadow-md flex-shrink-0">
                     @elseif(auth()->user()->ecole && auth()->user()->ecole->logo)
                         <img src="{{ asset('uploads/logos/' . auth()->user()->ecole->logo) }}" alt="{{ auth()->user()->ecole->nom_ecole }}"
-                             class="w-9 h-9 rounded-xl object-contain bg-white p-0.5 border-2 border-white/20 shadow-md flex-shrink-0">
+                             class="w-10 h-10 rounded-2xl object-contain bg-white p-0.5 border-2 border-white/30 shadow-md flex-shrink-0">
                     @else
-                        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#E8001D] to-orange-500 flex items-center justify-center text-white font-bold shadow-md flex-shrink-0 text-xs">
+                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#E8001D] to-orange-500 flex items-center justify-center text-white font-bold shadow-md flex-shrink-0 text-xs">
                             {{ strtoupper(substr(session('user_session_name', auth()->user()->name), 0, 2)) }}
                         </div>
                     @endif
@@ -220,14 +222,14 @@
     <div class="flex-1 flex flex-col min-w-0 overflow-y-auto max-h-screen relative">
         
         <!-- TOPBAR HEADER -->
-        <header class="bg-white/85 backdrop-blur-md sticky top-0 z-20 border-b border-slate-100 px-6 sm:px-8 py-3.5 flex items-center justify-between shadow-sm">
+        <header class="bg-white/90 backdrop-blur-md sticky top-0 z-20 border-b border-slate-100 px-6 sm:px-8 py-3.5 flex items-center justify-between shadow-sm">
             <div class="flex items-center space-x-3 sm:space-x-4">
-                <!-- Hamburger Button Topbar (Mobile & Desktop) -->
+                <!-- 3 Barres Hamburger Button Topbar (Mobile & Desktop) -->
                 <button type="button" onclick="toggleSidebar()" 
-                        class="p-2 rounded-xl bg-slate-100 hover:bg-[#EEF4FF] text-slate-700 hover:text-[#1B3A8C] border border-slate-200/80 transition shadow-sm focus:outline-none"
-                        title="Ouvrir / Fermer le menu latéral">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/>
+                        class="p-2.5 rounded-2xl bg-slate-100 hover:bg-[#EEF4FF] text-[#0D1B4B] hover:text-[#1B3A8C] border border-slate-200/80 transition shadow-sm focus:outline-none"
+                        title="Ouvrir / Rabattre le menu latéral">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
                     </svg>
                 </button>
 
@@ -236,7 +238,7 @@
                 </h2>
             </div>
 
-            <!-- Actions Header -->
+            <!-- Actions Header (Notifications + Photo Profil & Nom connecté) -->
             <div class="flex items-center space-x-3 sm:space-x-4">
                 <!-- Date badge -->
                 <div class="hidden md:flex items-center space-x-2 text-xs font-semibold text-slate-500 bg-slate-100/90 px-3.5 py-2 rounded-xl border border-slate-200/60">
@@ -249,7 +251,7 @@
                 <!-- Notifications Button with Interactive Dropdown -->
                 <div class="relative" id="notif-dropdown-wrapper">
                     <button id="notif-btn" type="button" 
-                            class="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-600 flex items-center justify-center hover:bg-slate-50 hover:text-[#1B3A8C] transition shadow-sm relative">
+                            class="w-10 h-10 rounded-2xl bg-white border border-slate-200 text-slate-600 flex items-center justify-center hover:bg-slate-50 hover:text-[#1B3A8C] transition shadow-sm relative">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                         </svg>
@@ -271,16 +273,23 @@
                     </div>
                 </div>
 
-                <!-- Avatar Profile -->
+                <!-- Avatar Profile + Nom de celui qui est connecté (Image 3) -->
                 <div class="flex items-center space-x-3 pl-2 border-l border-slate-200">
+                    <div class="hidden sm:block text-right">
+                        <p class="text-xs font-bold text-[#0D1B4B] truncate max-w-[140px]">{{ session('user_session_name', auth()->user()->name) }}</p>
+                        <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
+                            {{ auth()->user()->isAdmin() ? 'Super Admin' : (auth()->user()->ecole ? (auth()->user()->ecole->sigle ?? 'École') : 'École') }}
+                        </p>
+                    </div>
+
                     @if(auth()->user()->photo_profil)
                         <img src="{{ asset('uploads/avatars/' . auth()->user()->photo_profil) }}" alt="{{ auth()->user()->name }}"
-                             class="w-10 h-10 rounded-xl object-cover border-2 border-slate-200 shadow-md">
+                             class="w-10 h-10 rounded-2xl object-cover border-2 border-slate-200 shadow-md">
                     @elseif(auth()->user()->ecole && auth()->user()->ecole->logo)
                         <img src="{{ asset('uploads/logos/' . auth()->user()->ecole->logo) }}" alt="{{ auth()->user()->ecole->nom_ecole }}"
-                             class="w-10 h-10 rounded-xl object-contain bg-white p-0.5 border-2 border-slate-200 shadow-md">
+                             class="w-10 h-10 rounded-2xl object-contain bg-white p-0.5 border-2 border-slate-200 shadow-md">
                     @else
-                        <div class="w-10 h-10 rounded-xl bg-[#1B3A8C] text-white flex items-center justify-center font-bold text-sm shadow-md">
+                        <div class="w-10 h-10 rounded-2xl bg-[#1B3A8C] text-white flex items-center justify-center font-black text-sm shadow-md">
                             {{ strtoupper(substr(session('user_session_name', auth()->user()->name), 0, 1)) }}
                         </div>
                     @endif
@@ -337,7 +346,6 @@
 function toggleSidebar() {
     const sidebar = document.getElementById('main-sidebar');
     const backdrop = document.getElementById('mobile-sidebar-backdrop');
-    const icon = document.getElementById('sidebar-toggle-icon');
     const isMobile = window.innerWidth < 1024;
 
     if (isMobile) {
@@ -356,12 +364,10 @@ function toggleSidebar() {
         if (isExpanded) {
             sidebar.classList.remove('sidebar-expanded');
             sidebar.classList.add('sidebar-collapsed');
-            if (icon) icon.style.transform = 'rotate(180deg)';
             localStorage.setItem('stagilog_sidebar_state', 'collapsed');
         } else {
             sidebar.classList.remove('sidebar-collapsed');
             sidebar.classList.add('sidebar-expanded');
-            if (icon) icon.style.transform = 'rotate(0deg)';
             localStorage.setItem('stagilog_sidebar_state', 'expanded');
         }
     }
@@ -371,12 +377,10 @@ function toggleSidebar() {
 document.addEventListener('DOMContentLoaded', function() {
     const savedState = localStorage.getItem('stagilog_sidebar_state');
     const sidebar = document.getElementById('main-sidebar');
-    const icon = document.getElementById('sidebar-toggle-icon');
 
     if (window.innerWidth >= 1024 && savedState === 'collapsed' && sidebar) {
         sidebar.classList.remove('sidebar-expanded');
         sidebar.classList.add('sidebar-collapsed');
-        if (icon) icon.style.transform = 'rotate(180deg)';
     }
 });
 
@@ -444,7 +448,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     notifBadge.classList.add('hidden');
                 }
 
-                // Si de nouvelles notifications arrivent, déclencher le toast rapide de 5s
                 if (previousUnreadCount !== null && data.unread_count > previousUnreadCount && data.notifications.length > 0) {
                     const latest = data.notifications[0];
                     showQuickToast(latest.titre, latest.message, latest.type);
@@ -486,8 +489,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     loadNotifications(true);
-
-    // Polling doux des notifications toutes les 30s
     setInterval(() => loadNotifications(), 30000);
 
     if (notifBtn) {

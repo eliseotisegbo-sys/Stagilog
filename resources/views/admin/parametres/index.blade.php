@@ -1,32 +1,47 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Paramètres Administrateur - STAGILOG')
-@section('header_title', 'Paramètres')
+@section('title', 'Profil Administrateur & Sécurité - STAGILOG')
+@section('header_title', 'Profil & Administrateurs')
 
 @section('dashboard_content')
-<div class="max-w-4xl mx-auto space-y-8">
+<div class="space-y-8">
 
-    <!-- En-tête avec Avatar Admin -->
-    <div class="bg-white rounded-3xl shadow-card border border-slate-100 p-8 flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6">
-        <div class="relative flex-shrink-0">
-            @if($user->photo_profil)
-                <img src="{{ asset('uploads/avatars/' . $user->photo_profil) }}" alt="{{ $user->name }}"
-                     class="w-24 h-24 rounded-3xl object-cover border-4 border-white shadow-xl bg-slate-100">
-            @else
-                <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-[#1B3A8C] to-[#0D1B4B] text-white flex items-center justify-center font-black text-3xl shadow-xl">
-                    {{ strtoupper(substr($user->name, 0, 2)) }}
+    <!-- En-tête avec Profil Super Admin -->
+    <div class="bg-white rounded-3xl shadow-card border border-slate-100 p-8 flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6">
+        <div class="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6">
+            <div class="relative flex-shrink-0">
+                @if($user->photo_profil)
+                    <img src="{{ asset('uploads/avatars/' . $user->photo_profil) }}" alt="{{ $user->name }}"
+                         class="w-24 h-24 rounded-3xl object-cover border-4 border-white shadow-xl bg-slate-100">
+                @else
+                    <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-[#1B3A8C] to-[#0D1B4B] text-white flex items-center justify-center font-black text-3xl shadow-xl">
+                        {{ strtoupper(substr($user->name, 0, 2)) }}
+                    </div>
+                @endif
+                <div class="absolute -bottom-2 -right-2 w-7 h-7 rounded-xl bg-emerald-500 border-2 border-white flex items-center justify-center shadow-md">
+                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                 </div>
-            @endif
-            <div class="absolute -bottom-2 -right-2 w-7 h-7 rounded-xl bg-emerald-500 border-2 border-white flex items-center justify-center shadow-md">
-                <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+            </div>
+            <div class="text-center sm:text-left">
+                <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-red-100 text-[#E8001D] mb-2">
+                    Super Administrateur
+                </div>
+                <h2 class="text-2xl font-black text-[#0D1B4B]">{{ $user->name }}</h2>
+                <p class="text-xs text-slate-500 mt-0.5">{{ $user->email }} &bull; Technology Forever Group SARL</p>
+                <div class="flex items-center space-x-2 mt-3 text-[11px] text-slate-400">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span>Session active (10 Heures de validité)</span>
+                </div>
             </div>
         </div>
-        <div class="text-center sm:text-left">
-            <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-red-100 text-[#E8001D] mb-2">
-                Super Administrateur
-            </div>
-            <h2 class="text-2xl font-black text-[#0D1B4B]">{{ $user->name }}</h2>
-            <p class="text-xs text-slate-500 mt-0.5">{{ $user->email }} &bull; Technology Forever Group SARL</p>
+
+        <div class="flex items-center space-x-3">
+            <a href="#section-admins" class="px-4 py-2.5 rounded-2xl bg-blue-50 text-[#1B3A8C] hover:bg-blue-100 text-xs font-bold transition">
+                Gérer les Administrateurs ({{ $admins->count() }})
+            </a>
+            <a href="#section-historique" class="px-4 py-2.5 rounded-2xl bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-bold transition">
+                Historique des Connexions
+            </a>
         </div>
     </div>
 
@@ -44,153 +59,303 @@
     </div>
     @endif
 
-    <form method="POST" action="{{ route('admin.parametres.update') }}" enctype="multipart/form-data" class="space-y-6">
-        @csrf
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- SECTION 1 : MODIFIER MON PROFIL ADMIN (7 cols) -->
+        <div class="lg:col-span-7 space-y-6">
+            <form method="POST" action="{{ route('admin.parametres.update') }}" enctype="multipart/form-data" class="space-y-6">
+                @csrf
 
-        <!-- Informations du profil + Photo -->
-        <div class="bg-white rounded-3xl shadow-card border border-slate-100 p-8">
-            <h3 class="text-sm font-extrabold text-[#0D1B4B] uppercase tracking-wider mb-6 flex items-center space-x-2">
-                <span class="w-2 h-2 rounded-full bg-[#1B3A8C]"></span>
-                <span>Informations du Compte & Photo</span>
-            </h3>
+                <!-- Informations du profil + Photo -->
+                <div class="bg-white rounded-3xl shadow-card border border-slate-100 p-8">
+                    <h3 class="text-sm font-extrabold text-[#0D1B4B] uppercase tracking-wider mb-6 flex items-center space-x-2">
+                        <span class="w-2 h-2 rounded-full bg-[#1B3A8C]"></span>
+                        <span>Modifier Mon Profil & Photo</span>
+                    </h3>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <!-- Nom complet -->
-                <div>
-                    <label for="name" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                        Nom complet <span class="text-[#E8001D]">*</span>
-                    </label>
-                    <input type="text" name="name" id="name" value="{{ old('name', $user->name) }}" required
-                           class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white transition"
-                           placeholder="Votre nom complet">
-                    @error('name') <p class="text-xs text-[#E8001D] mt-1">{{ $message }}</p> @enderror
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <!-- Nom complet -->
+                        <div>
+                            <label for="name" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                                Nom complet <span class="text-[#E8001D]">*</span>
+                            </label>
+                            <input type="text" name="name" id="name" value="{{ old('name', $user->name) }}" required
+                                   class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white transition"
+                                   placeholder="Votre nom complet">
+                            @error('name') <p class="text-xs text-[#E8001D] mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <!-- Adresse Email -->
+                        <div>
+                            <label for="email" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                                Adresse Email <span class="text-[#E8001D]">*</span>
+                            </label>
+                            <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}" required
+                                   class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white transition"
+                                   placeholder="admin@tfg-sarl.com">
+                            @error('email') <p class="text-xs text-[#E8001D] mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <!-- Photo de Profil (Upload) -->
+                        <div class="sm:col-span-2">
+                            <label for="photo_profil" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                                Photo de Profil (PNG, JPG, WEBP - Max. 4MB)
+                            </label>
+                            <input type="file" name="photo_profil" id="photo_profil" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
+                                   class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#1B3A8C] file:text-white hover:file:bg-[#142B6B] transition">
+                            <p class="text-[10px] text-slate-400 mt-1.5">Cette photo est affichée sur votre tableau de bord, dans l'en-tête et dans le menu.</p>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Adresse Email -->
-                <div>
-                    <label for="email" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                        Adresse Email <span class="text-[#E8001D]">*</span>
-                    </label>
-                    <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}" required
-                           class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white transition"
-                           placeholder="admin@tfg-sarl.com">
-                    @error('email') <p class="text-xs text-[#E8001D] mt-1">{{ $message }}</p> @enderror
+                <!-- Changement de mot de passe -->
+                <div class="bg-white rounded-3xl shadow-card border border-slate-100 p-8">
+                    <h3 class="text-sm font-extrabold text-[#0D1B4B] uppercase tracking-wider mb-2 flex items-center space-x-2">
+                        <span class="w-2 h-2 rounded-full bg-[#E8001D]"></span>
+                        <span>Modifier Mon Mot de Passe</span>
+                    </h3>
+                    <p class="text-[11px] text-slate-400 mb-6">Laissez ces champs vides si vous ne souhaitez pas modifier votre mot de passe.</p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <!-- Mot de passe actuel -->
+                        <div class="sm:col-span-2">
+                            <label for="current_password" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                                Mot de passe actuel
+                            </label>
+                            <input type="password" name="current_password" id="current_password"
+                                   class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white transition"
+                                   placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;">
+                            @error('current_password') <p class="text-xs text-[#E8001D] mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <!-- Nouveau mot de passe -->
+                        <div>
+                            <label for="new_password" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                                Nouveau mot de passe (min. 6 caractères)
+                            </label>
+                            <input type="password" name="new_password" id="new_password"
+                                   class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white transition"
+                                   placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;">
+                            @error('new_password') <p class="text-xs text-[#E8001D] mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <!-- Confirmation nouveau mot de passe -->
+                        <div>
+                            <label for="new_password_confirmation" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                                Confirmer le nouveau mot de passe
+                            </label>
+                            <input type="password" name="new_password_confirmation" id="new_password_confirmation"
+                                   class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white transition"
+                                   placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;">
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Photo de Profil (Upload) -->
-                <div class="sm:col-span-2">
-                    <label for="photo_profil" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                        Photo de Profil Administrateur (PNG, JPG, WEBP - Max. 4MB)
-                    </label>
-                    <input type="file" name="photo_profil" id="photo_profil" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
-                           class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#1B3A8C] file:text-white hover:file:bg-[#142B6B] transition">
-                    <p class="text-[10px] text-slate-400 mt-1.5">Cette photo sera affichée sur votre tableau de bord ainsi que dans l'espace des écoles partenaires en tant que représentant TFG SARL.</p>
+                <!-- Bouton Enregistrer -->
+                <div class="flex justify-end">
+                    <button type="submit" 
+                            class="inline-flex items-center space-x-2 bg-[#1B3A8C] hover:bg-[#142B6B] text-white px-8 py-4 rounded-2xl font-bold text-xs shadow-xl hover:shadow-blue-900/20 transition transform hover:-translate-y-0.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        <span>Enregistrer les Modifications de Mon Profil</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- SECTION 2 : GESTION DES COMPTES ADMINISTRATEURS (5 cols) -->
+        <div class="lg:col-span-5 space-y-6" id="section-admins">
+            
+            <!-- Formulaire Ajouter un Administrateur -->
+            <div class="bg-white rounded-3xl shadow-card border border-slate-100 p-6 sm:p-8">
+                <h3 class="text-sm font-extrabold text-[#0D1B4B] uppercase tracking-wider mb-2 flex items-center space-x-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span>Créer un Compte Administrateur</span>
+                </h3>
+                <p class="text-xs text-slate-400 mb-6">Ajouter un autre collaborateur avec les privilèges d'administration TFG SARL.</p>
+
+                <form method="POST" action="{{ route('admin.parametres.admin-user.store') }}" enctype="multipart/form-data" class="space-y-4">
+                    @csrf
+                    <div>
+                        <label for="admin_name" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Nom & Prénom <span class="text-[#E8001D]">*</span></label>
+                        <input type="text" name="name" id="admin_name" required placeholder="Ex: M. Paul Ndiaye"
+                               class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]">
+                    </div>
+
+                    <div>
+                        <label for="admin_email" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Email <span class="text-[#E8001D]">*</span></label>
+                        <input type="email" name="email" id="admin_email" required placeholder="collaborateur@tfg-sarl.com"
+                               class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]">
+                    </div>
+
+                    <div>
+                        <label for="admin_password" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Mot de Passe <span class="text-[#E8001D]">*</span></label>
+                        <input type="password" name="password" id="admin_password" required minlength="6" placeholder="Min. 6 caractères"
+                               class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]">
+                    </div>
+
+                    <div>
+                        <label for="admin_password_confirmation" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Confirmation Mot de Passe <span class="text-[#E8001D]">*</span></label>
+                        <input type="password" name="password_confirmation" id="admin_password_confirmation" required minlength="6" placeholder="Confirmer mot de passe"
+                               class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]">
+                    </div>
+
+                    <div>
+                        <label for="admin_photo" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Photo de Profil (Optionnelle)</label>
+                        <input type="file" name="photo_profil" id="admin_photo" accept="image/*"
+                               class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-[#1B3A8C] file:text-white">
+                    </div>
+
+                    <button type="submit" 
+                            class="w-full py-3 bg-[#1B3A8C] hover:bg-[#142B6B] text-white rounded-xl font-bold text-xs shadow-md transition">
+                        Créer le Compte Administrateur
+                    </button>
+                </form>
+            </div>
+
+            <!-- Liste des Administrateurs existants -->
+            <div class="bg-white rounded-3xl shadow-card border border-slate-100 p-6 sm:p-8">
+                <h4 class="text-xs font-extrabold text-[#0D1B4B] uppercase tracking-wider mb-4 flex items-center justify-between">
+                    <span>Administrateurs TFG SARL</span>
+                    <span class="px-2 py-0.5 rounded-full bg-blue-50 text-[#1B3A8C] font-bold text-[10px]">{{ $admins->count() }} admins</span>
+                </h4>
+
+                <div class="space-y-3">
+                    @foreach($admins as $adm)
+                    <div class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-100 text-xs">
+                        <div class="flex items-center space-x-3 min-w-0">
+                            @if($adm->photo_profil)
+                                <img src="{{ asset('uploads/avatars/' . $adm->photo_profil) }}" alt="{{ $adm->name }}" class="w-9 h-9 rounded-xl object-cover border border-slate-200 flex-shrink-0">
+                            @else
+                                <div class="w-9 h-9 rounded-xl bg-[#1B3A8C] text-white flex items-center justify-center font-black text-xs flex-shrink-0">
+                                    {{ strtoupper(substr($adm->name, 0, 2)) }}
+                                </div>
+                            @endif
+                            <div class="truncate">
+                                <span class="font-bold text-[#0D1B4B] block truncate">{{ $adm->name }}</span>
+                                <span class="text-[10px] text-slate-400 block truncate">{{ $adm->email }}</span>
+                            </div>
+                        </div>
+
+                        @if($adm->id !== $user->id)
+                        <form action="{{ route('admin.parametres.admin-user.destroy', $adm->id) }}" method="POST" class="inline flex-shrink-0 ml-2" onsubmit="return confirm('Supprimer cet administrateur ?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="p-1.5 text-slate-400 hover:text-[#E8001D] hover:bg-red-50 rounded-lg transition" title="Supprimer">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            </button>
+                        </form>
+                        @else
+                        <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100 flex-shrink-0">Vous</span>
+                        @endif
+                    </div>
+                    @endforeach
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Changement de mot de passe -->
-        <div class="bg-white rounded-3xl shadow-card border border-slate-100 p-8">
-            <h3 class="text-sm font-extrabold text-[#0D1B4B] uppercase tracking-wider mb-2 flex items-center space-x-2">
-                <span class="w-2 h-2 rounded-full bg-[#E8001D]"></span>
-                <span>Changer le Mot de Passe</span>
-            </h3>
-            <p class="text-[11px] text-slate-400 mb-6">Laissez ces champs vides si vous ne souhaitez pas modifier votre mot de passe.</p>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div class="sm:col-span-2">
-                    <label for="current_password" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                        Mot de passe actuel
-                    </label>
-                    <input type="password" name="current_password" id="current_password"
-                           class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white transition"
-                           placeholder="Votre mot de passe actuel">
-                </div>
-
-                <div>
-                    <label for="new_password" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                        Nouveau mot de passe
-                    </label>
-                    <input type="password" name="new_password" id="new_password"
-                           class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white transition"
-                           placeholder="Minimum 6 caractères">
-                </div>
-
-                <div>
-                    <label for="new_password_confirmation" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                        Confirmer le nouveau mot de passe
-                    </label>
-                    <input type="password" name="new_password_confirmation" id="new_password_confirmation"
-                           class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white transition"
-                           placeholder="Confirmer le nouveau mot de passe">
-                </div>
+    <!-- ======================================================= -->
+    <!-- SECTION 3 : HISTORIQUE COMPLET DES CONNEXIONS (Tableau 1:1) -->
+    <!-- ======================================================= -->
+    <div class="bg-white rounded-3xl shadow-card border border-slate-100 overflow-hidden" id="section-historique">
+        <div class="p-6 sm:p-8 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h3 class="text-lg font-extrabold text-[#0D1B4B]">Historique de Connexion</h3>
+                <p class="text-xs font-medium text-slate-400">Journal d'audit de sécurité des sessions et déconnexions (Sessions actives 10H)</p>
             </div>
+            <span class="text-xs font-bold text-[#1B3A8C] bg-blue-50 px-3.5 py-1.5 rounded-full border border-blue-100">
+                Audit de Connexion STAGILOG
+            </span>
         </div>
-
-        <div class="flex justify-end">
-            <button type="submit"
-                    class="px-8 py-3.5 bg-[#1B3A8C] hover:bg-[#142B6B] text-white rounded-2xl font-bold text-sm shadow-xl hover:shadow-blue-900/20 transition transform hover:-translate-y-0.5">
-                Enregistrer les modifications
-            </button>
-        </div>
-    </form>
-
-    <!-- Historique des connexions récentes -->
-    <div class="bg-white rounded-3xl shadow-card border border-slate-100 p-8">
-        <h3 class="text-sm font-extrabold text-[#0D1B4B] uppercase tracking-wider mb-2 flex items-center space-x-2">
-            <svg class="w-4 h-4 text-[#1B3A8C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <span>Historique des Connexions Récentes</span>
-        </h3>
-        <p class="text-[11px] text-slate-400 mb-6">Journal des 10 dernières tentatives d'accès à votre compte administrateur.</p>
 
         <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
-                <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-bold border-b border-slate-100">
+                <thead class="bg-slate-50/80 text-slate-500 uppercase tracking-wider font-bold border-b border-slate-100">
                     <tr>
-                        <th class="py-3 px-4">Date & Heure</th>
-                        <th class="py-3 px-4">Adresse IP</th>
-                        <th class="py-3 px-4">Navigateur & Appareil</th>
-                        <th class="py-3 px-4 text-right">Statut</th>
+                        <th class="py-4 px-6">Date</th>
+                        <th class="py-4 px-6">Heure Connecté</th>
+                        <th class="py-4 px-6">Heure Déconnecté</th>
+                        <th class="py-4 px-6">IP / Navigateur / Appareil</th>
+                        <th class="py-4 px-6">Nom de l'Utilisateur</th>
+                        <th class="py-4 px-6 text-right">Statut</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
-                    @forelse($connexions as $conn)
+                    @forelse($connexions as $c)
                     <tr class="hover:bg-slate-50/70 transition">
-                        <td class="py-3.5 px-4 font-mono font-bold text-[#0D1B4B]">
-                            {{ $conn->created_at ? $conn->created_at->locale('fr')->isoFormat('ddd. D MMMM YYYY [à] HH:mm') : '-' }}
+                        <!-- Date -->
+                        <td class="py-4 px-6 font-bold text-[#0D1B4B]">
+                            {{ $c->created_at ? $c->created_at->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }}
                         </td>
-                        <td class="py-3.5 px-4 font-mono text-slate-500">
-                            {{ $conn->ip_address ?? '127.0.0.1' }}
+                        
+                        <!-- Heure connecté -->
+                        <td class="py-4 px-6">
+                            <span class="font-mono font-bold text-[#1B3A8C] bg-blue-50 px-2 py-1 rounded-md">
+                                {{ $c->created_at ? $c->created_at->format('H:i:s') : '-' }}
+                            </span>
                         </td>
-                        <td class="py-3.5 px-4">
-                            <div class="font-bold text-slate-800">{{ $conn->navigateur ?? 'Navigateur Web' }}</div>
-                            <div class="text-[10px] text-slate-400">{{ $conn->appareil ?? 'Ordinateur' }}</div>
-                        </td>
-                        <td class="py-3.5 px-4 text-right">
-                            @if($conn->statut === 'succes')
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">
-                                    Connexion Réussie
+
+                        <!-- Heure déconnecté -->
+                        <td class="py-4 px-6">
+                            @if($c->deconnecte_at)
+                                <span class="font-mono text-slate-600 bg-slate-100 px-2 py-1 rounded-md">
+                                    {{ $c->deconnecte_at->format('H:i:s') }}
                                 </span>
-                            @elseif($conn->statut === 'deconnexion')
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">
-                                    Déconnexion
+                            @elseif($c->statut === 'succes')
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
+                                    En session (ou 10h)
                                 </span>
                             @else
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700">
-                                    Échec / OTP
+                                <span class="text-slate-400">-</span>
+                            @endif
+                        </td>
+
+                        <!-- IP / Navigateur / Appareil -->
+                        <td class="py-4 px-6">
+                            <div class="font-bold text-[#0D1B4B]">{{ $c->navigateur ?? 'Navigateur standard' }}</div>
+                            <div class="text-[10px] text-slate-400">{{ $c->ip_address ?? '127.0.0.1' }} &bull; {{ $c->appareil ?? 'Ordinateur' }}</div>
+                        </td>
+
+                        <!-- Nom de l'utilisateur -->
+                        <td class="py-4 px-6">
+                            <div class="font-bold text-[#0D1B4B]">{{ $c->nom ?? ($c->user->name ?? $c->email) }}</div>
+                            <div class="text-[10px] text-slate-400">{{ $c->email }} @if($c->role) ({{ strtoupper($c->role) }}) @endif</div>
+                        </td>
+
+                        <!-- Statut -->
+                        <td class="py-4 px-6 text-right">
+                            @if($c->statut === 'succes')
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    Succès
+                                </span>
+                            @elseif($c->statut === 'deconnexion')
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-slate-100 text-slate-600">
+                                    Déconnecté
+                                </span>
+                            @else
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-red-50 text-[#E8001D] border border-red-200">
+                                    Échec
                                 </span>
                             @endif
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="4" class="py-6 text-center text-slate-400">Aucune activité enregistrée.</td>
+                        <td colspan="6" class="py-12 text-center text-slate-400">
+                            Aucun enregistrement d'historique de connexion pour le moment.
+                        </td>
                     </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
-    </div>
 
+        @if($connexions->hasPages())
+        <div class="p-4 border-t border-slate-100 bg-slate-50">
+            {{ $connexions->links() }}
+        </div>
+        @endif
+    </div>
 </div>
 @endsection

@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Paramètres Établissement - STAGILOG')
-@section('header_title', 'Paramètres')
+@section('title', 'Profil Établissement - STAGILOG')
+@section('header_title', 'Mon Profil École')
 
 @section('dashboard_content')
 <div class="max-w-5xl mx-auto space-y-8">
@@ -28,6 +28,10 @@
                 <span class="inline-flex items-center px-3 py-1 bg-blue-50 text-[#1B3A8C] rounded-full text-xs font-mono font-bold border border-blue-100 mt-1">{{ $ecole->sigle }}</span>
             @endif
             <p class="text-xs text-slate-500 mt-1">Compte officiel : <span class="font-bold text-slate-700">{{ $user->email }}</span></p>
+            <div class="flex items-center space-x-2 mt-2 text-[11px] text-slate-400">
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span>Session active (10 Heures de validité)</span>
+            </div>
         </div>
     </div>
 
@@ -52,14 +56,14 @@
         <div class="bg-white rounded-3xl shadow-card border border-slate-100 p-8">
             <h3 class="text-sm font-extrabold text-[#0D1B4B] uppercase tracking-wider mb-6 flex items-center space-x-2">
                 <span class="w-2 h-2 rounded-full bg-[#1B3A8C]"></span>
-                <span>Informations de l'Établissement</span>
+                <span>Informations du Profil Établissement</span>
             </h3>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <!-- Nom responsable de la connexion -->
                 <div class="sm:col-span-2">
                     <label for="nom_responsable" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                        Votre Nom (Responsable connecté) <span class="text-[#E8001D]">*</span>
+                        Votre Nom (Responsable ou Secrétariat) <span class="text-[#E8001D]">*</span>
                     </label>
                     <input type="text" name="nom_responsable" id="nom_responsable" 
                            value="{{ old('nom_responsable', $user->name) }}" required
@@ -132,40 +136,18 @@
             </div>
         </div>
 
-        <!-- Changement de mot de passe -->
-        <div class="bg-white rounded-3xl shadow-card border border-slate-100 p-8">
-            <h3 class="text-sm font-extrabold text-[#0D1B4B] uppercase tracking-wider mb-2 flex items-center space-x-2">
-                <span class="w-2 h-2 rounded-full bg-[#E8001D]"></span>
-                <span>Changer le Mot de Passe</span>
-            </h3>
-            <p class="text-[11px] text-slate-400 mb-6">Laissez ces champs vides si vous ne souhaitez pas modifier votre mot de passe.</p>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div class="sm:col-span-2">
-                    <label for="current_password" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                        Mot de passe actuel
-                    </label>
-                    <input type="password" name="current_password" id="current_password"
-                           class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white transition"
-                           placeholder="Votre mot de passe actuel">
+        <!-- Encart Sécurité & Mots de passe gérés par l'Admin -->
+        <div class="bg-gradient-to-r from-blue-50/80 to-slate-50 border border-blue-100 rounded-3xl p-6 sm:p-8">
+            <div class="flex items-start space-x-4">
+                <div class="w-10 h-10 rounded-2xl bg-[#1B3A8C] text-white flex items-center justify-center flex-shrink-0 shadow-md">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                 </div>
-
                 <div>
-                    <label for="new_password" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                        Nouveau mot de passe
-                    </label>
-                    <input type="password" name="new_password" id="new_password"
-                           class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white transition"
-                           placeholder="Minimum 6 caractères">
-                </div>
-
-                <div>
-                    <label for="new_password_confirmation" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                        Confirmer le nouveau mot de passe
-                    </label>
-                    <input type="password" name="new_password_confirmation" id="new_password_confirmation"
-                           class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white transition"
-                           placeholder="Confirmer le nouveau mot de passe">
+                    <h4 class="text-sm font-extrabold text-[#0D1B4B] mb-1">Sécurité &amp; Gestion des Mots de Passe</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Conformément à la politique de sécurité de <strong>Technology Forever Group SARL</strong>, la gestion, l'attribution et la modification des mots de passe des comptes d'accès sont <strong>administrées exclusivement par l'équipe d'administration TFG SARL</strong>.<br>
+                        En cas de perte ou pour toute demande de réinitialisation, veuillez contacter l'administrateur à <a href="mailto:stagilogtfg@gmail.com" class="font-bold text-[#1B3A8C] underline">stagilogtfg@gmail.com</a>.
+                    </p>
                 </div>
             </div>
         </div>
@@ -173,7 +155,7 @@
         <div class="flex justify-end">
             <button type="submit"
                     class="px-8 py-3.5 bg-[#1B3A8C] hover:bg-[#142B6B] text-white rounded-2xl font-bold text-sm shadow-xl hover:shadow-blue-900/20 transition transform hover:-translate-y-0.5">
-                Enregistrer les modifications
+                Enregistrer les modifications de mon profil
             </button>
         </div>
     </form>
@@ -182,52 +164,56 @@
     <div class="bg-white rounded-3xl shadow-card border border-slate-100 p-8">
         <h3 class="text-sm font-extrabold text-[#0D1B4B] uppercase tracking-wider mb-2 flex items-center space-x-2">
             <svg class="w-4 h-4 text-[#1B3A8C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <span>Historique des Connexions Récentes</span>
+            <span>Historique de Vos Connexions</span>
         </h3>
-        <p class="text-[11px] text-slate-400 mb-6">Journal des 10 dernières connexions à votre compte école.</p>
+        <p class="text-[11px] text-slate-400 mb-6">Journal des sessions récentes de votre compte établissement.</p>
 
         <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
                 <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-bold border-b border-slate-100">
                     <tr>
-                        <th class="py-3 px-4">Date & Heure</th>
-                        <th class="py-3 px-4">Adresse IP</th>
-                        <th class="py-3 px-4">Navigateur & Appareil</th>
+                        <th class="py-3 px-4">Date</th>
+                        <th class="py-3 px-4">Heure Connecté</th>
+                        <th class="py-3 px-4">Heure Déconnecté</th>
+                        <th class="py-3 px-4">IP & Navigateur</th>
                         <th class="py-3 px-4 text-right">Statut</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
                     @forelse($connexions as $conn)
                     <tr class="hover:bg-slate-50/70 transition">
-                        <td class="py-3.5 px-4 font-mono font-bold text-[#0D1B4B]">
-                            {{ $conn->created_at ? $conn->created_at->locale('fr')->isoFormat('ddd. D MMMM YYYY [à] HH:mm') : '-' }}
+                        <td class="py-3.5 px-4 font-bold text-[#0D1B4B]">
+                            {{ $conn->created_at ? $conn->created_at->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }}
+                        </td>
+                        <td class="py-3.5 px-4 font-mono font-bold text-[#1B3A8C]">
+                            {{ $conn->created_at ? $conn->created_at->format('H:i:s') : '-' }}
                         </td>
                         <td class="py-3.5 px-4 font-mono text-slate-500">
-                            {{ $conn->ip_address ?? '127.0.0.1' }}
+                            {{ $conn->deconnecte_at ? $conn->deconnecte_at->format('H:i:s') : ($conn->statut === 'succes' ? 'En session' : '-') }}
                         </td>
                         <td class="py-3.5 px-4">
                             <div class="font-bold text-slate-800">{{ $conn->navigateur ?? 'Navigateur Web' }}</div>
-                            <div class="text-[10px] text-slate-400">{{ $conn->appareil ?? 'Ordinateur' }}</div>
+                            <div class="text-[10px] text-slate-400">{{ $conn->ip_address ?? '127.0.0.1' }} &bull; {{ $conn->appareil ?? 'Ordinateur' }}</div>
                         </td>
                         <td class="py-3.5 px-4 text-right">
                             @if($conn->statut === 'succes')
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">
-                                    Connexion Réussie
+                                    Réussie
                                 </span>
                             @elseif($conn->statut === 'deconnexion')
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">
-                                    Déconnexion
+                                    Déconnecté
                                 </span>
                             @else
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700">
-                                    Échec / OTP
+                                    Échec
                                 </span>
                             @endif
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="4" class="py-6 text-center text-slate-400">Aucune activité enregistrée.</td>
+                        <td colspan="5" class="py-6 text-center text-slate-400">Aucune activité enregistrée.</td>
                     </tr>
                     @endforelse
                 </tbody>

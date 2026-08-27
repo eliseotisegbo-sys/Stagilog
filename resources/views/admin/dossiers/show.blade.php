@@ -98,12 +98,21 @@
                 </div>
 
                 <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 sm:col-span-2">
-                    <p class="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Période de Stage Définie</p>
-                    <p class="text-sm font-bold text-slate-800 mt-1 lowercase">
-                        {{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }} 
-                        <span class="text-slate-400 mx-1">au</span>
-                        {{ $dossier->datefin ? $dossier->datefin->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }}
-                    </p>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Période de Stage Définie</p>
+                            <p class="text-sm font-bold text-slate-800 mt-1 lowercase">
+                                {{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }} 
+                                <span class="text-slate-400 mx-1">au</span>
+                                {{ $dossier->datefin ? $dossier->datefin->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }}
+                            </p>
+                        </div>
+                        <button type="button" onclick="openModifierPeriodeModal()" 
+                                class="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-[#1B3A8C]/10 hover:bg-[#1B3A8C] text-[#1B3A8C] hover:text-white rounded-xl text-xs font-bold transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                            <span>Modifier les dates</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 sm:col-span-2">
@@ -258,4 +267,69 @@
         </form>
     </div>
 </div>
+
+<!-- MODAL MODIFICATION DE LA PÉRIODE DE STAGE -->
+<div id="modal-modifier-periode" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100 relative">
+        <div class="flex items-center space-x-3 text-[#1B3A8C] mb-4">
+            <div class="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center">
+                <svg class="w-6 h-6 text-[#1B3A8C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <div>
+                <h3 class="text-lg font-black text-[#0D1B4B]">Ajuster la Période</h3>
+                <p class="text-[11px] text-slate-400 font-semibold">{{ $codeDossier }}</p>
+            </div>
+        </div>
+
+        <p class="text-xs text-slate-500 mb-6 leading-relaxed">
+            En tant qu'administrateur, vous pouvez adapter les dates officielles de début et de fin de stage avant validation.
+        </p>
+
+        <form method="POST" action="{{ route('admin.dossiers.modifier-periode', $dossier->id_dossier) }}" class="space-y-4">
+            @csrf
+            <div>
+                <label for="modal_datedebut" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                    Nouvelle Date de Début <span class="text-[#E8001D]">*</span>
+                </label>
+                <input type="text" name="datedebut" id="modal_datedebut" required
+                       value="{{ $dossier->datedebut ? $dossier->datedebut->format('Y-m-d') : '' }}"
+                       class="datepicker-input w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-[#0D1B4B] focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]">
+            </div>
+
+            <div>
+                <label for="modal_datefin" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                    Nouvelle Date de Fin <span class="text-[#E8001D]">*</span>
+                </label>
+                <input type="text" name="datefin" id="modal_datefin" required
+                       value="{{ $dossier->datefin ? $dossier->datefin->format('Y-m-d') : '' }}"
+                       class="datepicker-input w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-[#0D1B4B] focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]">
+            </div>
+
+            <div class="flex items-center justify-end space-x-3 pt-4 border-t border-slate-100">
+                <button type="button" onclick="closeModifierPeriodeModal()"
+                        class="px-5 py-2.5 rounded-2xl bg-slate-100 text-slate-600 font-bold text-xs hover:bg-slate-200 transition">
+                    Annuler
+                </button>
+                <button type="submit" 
+                        class="px-6 py-2.5 bg-[#1B3A8C] hover:bg-[#142B6B] text-white rounded-2xl font-bold text-xs shadow-lg transition">
+                    Enregistrer la période
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+function openModifierPeriodeModal() {
+    document.getElementById('modal-modifier-periode').classList.remove('hidden');
+    if (window.initCustomDatepickers) {
+        window.initCustomDatepickers();
+    }
+}
+function closeModifierPeriodeModal() {
+    document.getElementById('modal-modifier-periode').classList.add('hidden');
+}
+</script>
+@endpush
 @endsection

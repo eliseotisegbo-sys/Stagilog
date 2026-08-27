@@ -69,16 +69,13 @@
                         <th class="py-4 px-6">Établissement</th>
                         <th class="py-4 px-6">Contact & Email</th>
                         <th class="py-4 px-6">Téléphone</th>
-                        <th class="py-4 px-6 text-center">Compte d'Accès</th>
+                        <th class="py-4 px-6">Comptes d'Accès (Multi-utilisateurs)</th>
                         <th class="py-4 px-6 text-center">Dossiers</th>
                         <th class="py-4 px-6 text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
                     @forelse($ecoles as $ecole)
-                    @php
-                        $userAccount = $ecole->users->first();
-                    @endphp
                     <tr class="hover:bg-slate-50/70 transition search-row">
                         <td class="py-4 px-6">
                             <div class="flex items-center space-x-3">
@@ -98,27 +95,42 @@
                         <td class="py-4 px-6 text-slate-600 search-target">
                             {{ $ecole->telephone ?? $ecole->num_ecole ?? 'N/A' }}
                         </td>
-                        <td class="py-4 px-6 text-center">
-                            @if($userAccount)
-                                <div class="inline-flex flex-col items-center">
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-bold">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
-                                        Compte Actif
-                                    </span>
-                                    <button type="button" 
-                                            onclick="openPasswordModal({{ $ecole->id_ecole }}, '{{ addslashes($ecole->nom_ecole) }}', '{{ $userAccount->email }}')"
-                                            class="text-[11px] text-[#1B3A8C] font-bold hover:underline mt-1">
-                                        Modifier le mot de passe
-                                    </button>
-                                </div>
-                            @else
+                        <td class="py-4 px-6">
+                            <div class="space-y-1.5">
+                                @if($ecole->users->count() > 0)
+                                    @foreach($ecole->users as $u)
+                                    <div class="flex items-center justify-between p-1.5 rounded-xl bg-slate-50 border border-slate-100 text-[11px]">
+                                        <div class="truncate mr-2">
+                                            <span class="font-bold text-[#0D1B4B]">{{ $u->name }}</span>
+                                            <span class="text-slate-400 block text-[10px] truncate">{{ $u->email }}</span>
+                                        </div>
+                                        <div class="flex items-center space-x-1 flex-shrink-0">
+                                            <button type="button" 
+                                                    onclick="openPasswordModal({{ $u->id }}, '{{ addslashes($u->name) }} ({{ addslashes($ecole->nom_ecole) }})', '{{ $u->email }}')"
+                                                    class="p-1 text-[#1B3A8C] hover:bg-blue-100 rounded-lg" title="Modifier le mot de passe">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                                            </button>
+                                            @if($ecole->users->count() > 1)
+                                            <form action="{{ route('admin.ecoles.supprimer-utilisateur', $u->id) }}" method="POST" class="inline" onsubmit="return confirm('Supprimer ce compte utilisateur ?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="p-1 text-red-500 hover:bg-red-50 rounded-lg" title="Supprimer cet utilisateur">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                </button>
+                                            </form>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                @endif
+
                                 <button type="button" 
-                                        onclick="openCreateAccountModal({{ $ecole->id_ecole }}, '{{ addslashes($ecole->nom_ecole) }}', '{{ $ecole->email ?? $ecole->mail }}')"
-                                        class="inline-flex items-center space-x-1.5 bg-[#1B3A8C] hover:bg-[#142B6B] text-white px-3.5 py-1.5 rounded-xl font-bold text-xs shadow transition">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                    <span>Créer un compte</span>
+                                        onclick="openAddUserModal({{ $ecole->id_ecole }}, '{{ addslashes($ecole->nom_ecole) }}', '{{ $ecole->email ?? $ecole->mail }}')"
+                                        class="inline-flex items-center space-x-1 text-[11px] font-bold text-[#1B3A8C] hover:text-[#142B6B] mt-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                    <span>+ Ajouter un utilisateur</span>
                                 </button>
-                            @endif
+                            </div>
                         </td>
                         <td class="py-4 px-6 text-center">
                             <span class="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-[#1B3A8C] font-bold">
@@ -135,7 +147,7 @@
                             <form action="{{ route('admin.ecoles.destroy', $ecole->id_ecole) }}" method="POST" class="inline" onsubmit="return confirm('Confirmez-vous la suppression de cette école ?');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="p-2 text-slate-500 hover:text-[#E8001D] hover:bg-red-50 rounded-xl transition" title="Supprimer">
+                                <button type="submit" class="p-2 text-slate-500 hover:text-[#E8001D] hover:bg-red-50 rounded-xl transition" title="Supprimer l'école">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                     </svg>
@@ -162,31 +174,38 @@
     </div>
 </div>
 
-<!-- Modal 1 : Création & Validation du Compte École avec Prévisualisation et Choix d'Envoi -->
-<div id="create-account-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+<!-- Modal : Ajouter un utilisateur d'accès pour une École -->
+<div id="add-user-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100 relative">
-        <button onclick="closeCreateAccountModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-600">
+        <button onclick="closeAddUserModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-600">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
 
-        <h3 class="text-xl font-black text-[#0D1B4B] mb-1">Création du Compte d'Accès</h3>
-        <p id="modal-create-ecole-name" class="text-xs font-semibold text-[#1B3A8C] mb-6"></p>
+        <h3 class="text-xl font-black text-[#0D1B4B] mb-1">Ajouter un Utilisateur</h3>
+        <p id="modal-add-user-ecole-name" class="text-xs font-semibold text-[#1B3A8C] mb-6"></p>
 
-        <form id="create-account-form" method="POST" action="" class="space-y-4">
+        <form id="add-user-form" method="POST" action="" class="space-y-4">
             @csrf
             <div>
-                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Identifiant de connexion (Email)</label>
-                <input type="text" id="modal-create-email" readonly class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-2xl text-xs font-bold text-slate-700">
+                <label for="modal-add-name" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Nom du Responsable <span class="text-[#E8001D]">*</span></label>
+                <input type="text" name="name" id="modal-add-name" required placeholder="Ex: M. Jean Dupont (Secrétariat)"
+                       class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]">
             </div>
 
             <div>
-                <label for="modal-create-pass" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Mot de Passe Initial <span class="text-[#E8001D]">*</span></label>
-                <input type="text" name="password" id="modal-create-pass" required minlength="6"
+                <label for="modal-add-email" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Adresse Email de Connexion <span class="text-[#E8001D]">*</span></label>
+                <input type="email" name="email" id="modal-add-email" required placeholder="responsable@ecole.sn"
+                       class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]">
+            </div>
+
+            <div>
+                <label for="modal-add-pass" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Mot de Passe <span class="text-[#E8001D]">*</span></label>
+                <input type="text" name="password" id="modal-add-pass" required minlength="6"
                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white font-mono font-bold text-[#0D1B4B]">
             </div>
 
             <div class="flex items-center justify-between">
-                <button type="button" onclick="generateRandomPassForCreate()" class="text-xs font-bold text-[#1B3A8C] hover:underline">
+                <button type="button" onclick="generateRandomPassForAdd()" class="text-xs font-bold text-[#1B3A8C] hover:underline">
                     Générer un autre mot de passe
                 </button>
             </div>
@@ -195,36 +214,36 @@
                 <label class="flex items-center space-x-2 text-xs font-semibold text-slate-700 cursor-pointer">
                     <input type="checkbox" name="envoyer_email" value="1" checked 
                            class="w-4 h-4 text-[#1B3A8C] rounded border-slate-300 focus:ring-[#1B3A8C]">
-                    <span>Envoyer immédiatement les identifiants par email</span>
+                    <span>Envoyer les identifiants par email</span>
                 </label>
             </div>
 
             <div class="pt-4 flex items-center justify-end space-x-3 border-t border-slate-100">
-                <button type="button" onclick="closeCreateAccountModal()" class="px-5 py-2.5 rounded-2xl bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition">
+                <button type="button" onclick="closeAddUserModal()" class="px-5 py-2.5 rounded-2xl bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition">
                     Annuler
                 </button>
                 <button type="submit" class="px-6 py-2.5 rounded-2xl bg-[#1B3A8C] text-white text-xs font-bold hover:bg-[#142B6B] shadow-lg transition">
-                    Valider & Activer le Compte
+                    Créer l'Utilisateur
                 </button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Modal 2 : Modification du Mot de Passe par l'Admin -->
+<!-- Modal : Modification du Mot de Passe par l'Admin -->
 <div id="password-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100 relative">
         <button onclick="closePasswordModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-600">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
 
-        <h3 class="text-xl font-black text-[#0D1B4B] mb-1">Gestion du Mot de Passe</h3>
+        <h3 class="text-xl font-black text-[#0D1B4B] mb-1">Changer le Mot de Passe</h3>
         <p id="modal-ecole-name" class="text-xs font-semibold text-[#1B3A8C] mb-6"></p>
 
         <form id="password-form" method="POST" action="" class="space-y-4">
             @csrf
             <div>
-                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Identifiant de connexion</label>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Identifiant (Email)</label>
                 <input type="text" id="modal-email" readonly class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-2xl text-xs font-bold text-slate-700">
             </div>
 
@@ -232,7 +251,7 @@
                 <label for="new_password" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Nouveau Mot de Passe <span class="text-[#E8001D]">*</span></label>
                 <input type="text" name="password" id="new_password" required minlength="6"
                        placeholder="Saisissez ou générez un mot de passe"
-                       class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white font-mono">
+                       class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white font-mono font-bold text-[#0D1B4B]">
             </div>
 
             <div class="flex items-center justify-between pt-2">
@@ -246,7 +265,7 @@
                     Annuler
                 </button>
                 <button type="submit" class="px-6 py-2.5 rounded-2xl bg-[#1B3A8C] text-white text-xs font-bold hover:bg-[#142B6B] shadow-lg transition">
-                    Enregistrer
+                    Mettre à jour
                 </button>
             </div>
         </form>
@@ -270,34 +289,35 @@ document.getElementById('live-search-ecoles').addEventListener('input', function
     });
 });
 
-// Modal Création Compte
-function openCreateAccountModal(ecoleId, ecoleName, email) {
-    document.getElementById('modal-create-ecole-name').innerText = ecoleName;
-    document.getElementById('modal-create-email').value = email;
-    document.getElementById('create-account-form').action = '/admin/ecoles/' + ecoleId + '/creer-compte';
-    generateRandomPassForCreate();
-    document.getElementById('create-account-modal').classList.remove('hidden');
+// Modal Ajouter Utilisateur
+function openAddUserModal(ecoleId, ecoleName, defaultEmail) {
+    document.getElementById('modal-add-user-ecole-name').innerText = ecoleName;
+    document.getElementById('modal-add-name').value = '';
+    document.getElementById('modal-add-email').value = '';
+    document.getElementById('add-user-form').action = '/admin/ecoles/' + ecoleId + '/ajouter-utilisateur';
+    generateRandomPassForAdd();
+    document.getElementById('add-user-modal').classList.remove('hidden');
 }
 
-function closeCreateAccountModal() {
-    document.getElementById('create-account-modal').classList.add('hidden');
+function closeAddUserModal() {
+    document.getElementById('add-user-modal').classList.add('hidden');
 }
 
-function generateRandomPassForCreate() {
+function generateRandomPassForAdd() {
     const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
     let pass = "Tfg@";
     for(let i = 0; i < 5; i++) {
         pass += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     pass += Math.floor(100 + Math.random() * 900);
-    document.getElementById('modal-create-pass').value = pass;
+    document.getElementById('modal-add-pass').value = pass;
 }
 
 // Modal Modification Mot de Passe
-function openPasswordModal(ecoleId, ecoleName, email) {
-    document.getElementById('modal-ecole-name').innerText = ecoleName;
+function openPasswordModal(userIdOrEcoleId, title, email) {
+    document.getElementById('modal-ecole-name').innerText = title;
     document.getElementById('modal-email').value = email;
-    document.getElementById('password-form').action = '/admin/ecoles/' + ecoleId + '/update-password';
+    document.getElementById('password-form').action = '/admin/ecoles/' + userIdOrEcoleId + '/update-password';
     document.getElementById('new_password').value = '';
     document.getElementById('password-modal').classList.remove('hidden');
 }

@@ -59,10 +59,9 @@ class DossierController extends Controller
             'annee_academique' => 'required|string|max:50',
             'id_filiere' => 'required|exists:filieres,id_filiere',
             'id_cycle' => 'required|exists:cycles,id_cycle',
-            'type_stage' => 'required|string|max:100',
             'datedebut' => 'required|date',
             'datefin' => 'required|date|after:datedebut',
-            'note_demande_file' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
+            'note_demande_file' => 'required|file|mimes:pdf|max:10240',
             
             // Validation des étudiants avec niveau individuel et âge >= 16 ans
             'etudiants' => 'required|array|min:1',
@@ -73,6 +72,8 @@ class DossierController extends Controller
             'etudiants.*.date_naissance' => 'nullable|date|before_or_equal:' . $maxBirthDate,
             'etudiants.*.cv_file' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
         ], [
+            'note_demande_file.required' => 'La note de demande officielle de l\'établissement en format PDF est obligatoire.',
+            'note_demande_file.mimes' => 'La note de demande doit impérativement être un fichier au format PDF.',
             'etudiants.min' => 'Vous devez renseigner au moins un étudiant pour ce dossier.',
             'etudiants.*.nom.required' => 'Le nom de l\'étudiant est obligatoire.',
             'etudiants.*.prenom.required' => 'Le prénom de l\'étudiant est obligatoire.',

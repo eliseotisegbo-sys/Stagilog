@@ -94,13 +94,15 @@
                         @error('annee_academique') <p class="text-xs text-[#E8001D] mt-1">{{ $message }}</p> @enderror
                     </div>
 
-                    <!-- Note de Demande Officielle (Fichier) -->
+                    <!-- Note de Demande Officielle (Fichier PDF Obligatoire) -->
                     <div class="sm:col-span-2">
                         <label for="note_demande_file" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                            Note de Demande Officielle de l'Établissement (PDF)
+                            Note de Demande Officielle de l'Établissement (Format PDF) <span class="text-[#E8001D]">*</span>
                         </label>
-                        <input type="file" name="note_demande_file" id="note_demande_file" accept=".pdf,.doc,.docx"
+                        <input type="file" name="note_demande_file" id="note_demande_file" required accept=".pdf"
                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#1B3A8C] file:text-white hover:file:bg-[#142B6B] transition">
+                        <p class="text-[10px] text-slate-400 mt-1">La note de demande officielle est transmise sous format PDF obligatoirement.</p>
+                        @error('note_demande_file') <p class="text-xs text-[#E8001D] mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <!-- Période de stage (Calendrier Dynamique Flatpickr) -->
@@ -242,7 +244,7 @@
 
                             <div>
                                 <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
-                                    Curriculum Vitae (PDF)
+                                    Curriculum Vitae (PDF - Optionnel)
                                 </label>
                                 <input type="file" name="etudiants[{{ $index }}][cv_file]" accept=".pdf,.doc,.docx"
                                        class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-[11px] file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-blue-50 file:text-[#1B3A8C]">
@@ -485,7 +487,7 @@ function addStudentCard() {
 
             <div>
                 <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
-                    Curriculum Vitae (PDF)
+                    Curriculum Vitae (PDF - Optionnel)
                 </label>
                 <input type="file" name="etudiants[${newIndex}][cv_file]" accept=".pdf,.doc,.docx"
                        class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-[11px] file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-blue-50 file:text-[#1B3A8C]">

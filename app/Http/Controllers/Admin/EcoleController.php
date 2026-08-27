@@ -136,7 +136,75 @@ class EcoleController extends Controller
     }
 
     /**
-     * Mettre à jour le mot de passe du compte d'une école par l'administrateur
+     * Ajouter un nouvel utilisateur d'accès pour une école (Multi-utilisateurs par école)
+     */
+    public function ajouterUtilisateur(Request $request, $id)
+    {
+        $ecole = Ecole::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => 'nullable|string|min:6',
+            'envoyer_email' => 'nullable|boolean',
+        ], [
+            'name.required' => 'Le nom du responsable ou de l\'utilisateur est obligatoire.',
+            'email.required' => 'L\'adresse email est obligatoire.',
+            'email.unique' => 'Cette adresse email est déjà utilisée par un autre compte.',
+        ]);
+
+        $password = $request->input('password');
+        if (empty($password)) {
+            $password = 'Tfg@' . strtoupper(Str::random(4)) . rand(100, 999);
+        }
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($password),
+            'role' => 'ecole',
+            'id_ecole' => $ecole->id_ecole,
+            'first_login' => false,
+        ]);
+
+        $emailEnvoye = false;
+        if ($request->boolean('envoyer_email', true)) {
+            try {
+                Mail::to($user->email)->send(new WelcomeEcoleMail($ecole, [
+                    'email' => $user->email,
+                    'password' => $password,
+                ]));
+                $emailEnvoye = true;
+            } catch (\Exception $e) {
+                Log::warning("Erreur envoi email ajout utilisateur école : " . $e->getMessage());
+            }
+        }
+
+        return redirect()->route('admin.ecoles.index')
+            ->with('compte_cree', [
+                'ecole' => $ecole->nom_ecole . ' (' . $user->name . ')',
+                'email' => $user->email,
+                'password' => $password,
+                'email_envoye' => $emailEnvoye,
+            ])
+            ->with('success', "Utilisateur {$user->name} ajouté avec succès pour {$ecole->nom_ecole} !");
+    }
+
+    /**
+     * Supprimer un utilisateur d'une école
+     */
+    public function supprimerUtilisateur($id)
+    {
+        $user = User::where('role', 'ecole')->findOrFail($id);
+        $ecoleName = $user->ecole->nom_ecole ?? 'l\'établissement';
+        $userName = $user->name;
+        $user->delete();
+
+        return redirect()->route('admin.ecoles.index')->with('success', "Le compte utilisateur de {$userName} ({$ecoleName}) a été supprimé.");
+    }
+
+    /**
+     * Mettre à jour le mot de passe d'un utilisateur école par l'administrateur
      */
     public function updatePassword(Request $request, $id)
     {
@@ -147,11 +215,14 @@ class EcoleController extends Controller
             'password.min' => 'Le mot de passe doit comporter au moins 6 caractères.',
         ]);
 
-        $ecole = Ecole::findOrFail($id);
-        $user = User::where('id_ecole', $id)->first();
+        // Vérifier si l'id correspond à un User directement ou à une École
+        $user = User::find($id);
+        if (!$user) {
+            $user = User::where('id_ecole', $id)->first();
+        }
 
         if (!$user) {
-            // Si pas d'utilisateur, le créer avec ce mot de passe
+            $ecole = Ecole::findOrFail($id);
             $user = User::create([
                 'name' => $ecole->nom_ecole,
                 'email' => $ecole->email,
@@ -165,7 +236,9 @@ class EcoleController extends Controller
             $user->save();
         }
 
-        return redirect()->route('admin.ecoles.index')->with('success', "Le mot de passe du compte pour {$ecole->nom_ecole} a été mis à jour avec succès.");
+        $ecoleName = $user->ecole->nom_ecole ?? 'l\'établissement';
+
+        return redirect()->route('admin.ecoles.index')->with('success', "Le mot de passe pour {$user->name} ({$ecoleName}) a été mis à jour avec succès.");
     }
 
     /**
