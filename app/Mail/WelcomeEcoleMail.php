@@ -11,17 +11,17 @@ class WelcomeEcoleMail extends Mailable
     use Queueable, SerializesModels;
 
     public $ecole;
-    public $username;
-    public $password;
+    public $credentials;
+    public $urlConnexion;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($ecole, $username, $password)
+    public function __construct($ecole, array $credentials)
     {
         $this->ecole = $ecole;
-        $this->username = $username;
-        $this->password = $password;
+        $this->credentials = $credentials;
+        $this->urlConnexion = url('/auth/ecole/login');
     }
 
     /**
@@ -29,7 +29,7 @@ class WelcomeEcoleMail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Bienvenue sur STAGILOG - TFG SARL')
+        return $this->subject('Bienvenue sur STAGILOG — Vos identifiants de connexion — TFG SARL')
                     ->view('emails.welcome-ecole');
     }
 }
