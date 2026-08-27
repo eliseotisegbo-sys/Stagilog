@@ -41,7 +41,6 @@
         <div class="bg-white p-6 rounded-3xl shadow-card border border-slate-100/80 hover:shadow-hover transition-all duration-300">
             <div class="flex items-center justify-between mb-3">
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Écoles Partenaires</span>
-                <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
             </div>
             <div class="flex items-end justify-between">
                 <div>
@@ -60,7 +59,6 @@
         <div class="bg-white p-6 rounded-3xl shadow-card border border-slate-100/80 hover:shadow-hover transition-all duration-300">
             <div class="flex items-center justify-between mb-3">
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Dossiers Soumis</span>
-                <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
             </div>
             <div class="flex items-end justify-between">
                 <div>
@@ -79,7 +77,6 @@
         <div class="bg-white p-6 rounded-3xl shadow-card border border-slate-100/80 hover:shadow-hover transition-all duration-300">
             <div class="flex items-center justify-between mb-3">
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-500">En Attente</span>
-                <span class="w-2.5 h-2.5 rounded-full bg-[#E8001D]"></span>
             </div>
             <div class="flex items-end justify-between">
                 <div>
@@ -98,7 +95,6 @@
         <div class="bg-white p-6 rounded-3xl shadow-card border border-slate-100/80 hover:shadow-hover transition-all duration-300">
             <div class="flex items-center justify-between mb-3">
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Stagiaires</span>
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
             </div>
             <div class="flex items-end justify-between">
                 <div>

@@ -25,9 +25,8 @@
             
             <!-- SECTION 1 : INFORMATIONS GÉNÉRALES DU STAGE -->
             <div>
-                <h4 class="text-xs font-bold uppercase tracking-wider text-[#1B3A8C] mb-4 flex items-center space-x-2">
-                    <span class="w-2 h-2 rounded-full bg-[#1B3A8C]"></span>
-                    <span>1. Informations Générales</span>
+                <h4 class="text-xs font-bold uppercase tracking-wider text-[#1B3A8C] mb-4">
+                    1. Informations Générales
                 </h4>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -149,9 +148,8 @@
             <!-- SECTION 2 : CANDIDATS / ÉTUDIANTS (DYNAMIQUE + RETOUR VISUEL COULEUR + NIVEAU) -->
             <div class="pt-6 border-t border-slate-100">
                 <div class="mb-4">
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-[#1B3A8C] flex items-center space-x-2">
-                        <span class="w-2 h-2 rounded-full bg-[#1B3A8C]"></span>
-                        <span>2. Liste des Candidats / Étudiants</span>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-[#1B3A8C]">
+                        2. Liste des Candidats / Étudiants
                     </h4>
                     <p class="text-[11px] text-slate-400 mt-0.5">Renseignez les étudiants de la promotion. Les fiches passent au vert dès que tous les champs requis sont saisis.</p>
                 </div>

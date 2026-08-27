@@ -66,10 +66,9 @@ class DashboardController extends Controller
         $totalEtudiants    = Etudiant::whereIn('id_dossier', $dossierIds)->count();
         $rapportsDisponibles = Etudiant::whereIn('id_dossier', $dossierIds)->whereNotNull('rapport')->count();
 
-        // 5 Derniers dossiers
+        // 5 Derniers dossiers (toujours les plus récents, non filtrés par la période)
         $recentsDossiers = Dossier::where('id_ecole', $idEcole)
             ->with(['cycle', 'filiereRelation', 'etudiants'])
-            ->when($startDate && $endDate, fn($q) => $q->whereBetween('created_at', [$startDate, $endDate]))
             ->latest()
             ->take(5)
             ->get();
@@ -170,9 +169,8 @@ class DashboardController extends Controller
 
         $tauxApprobation   = $totalDossiers > 0 ? round(($dossiersValides / $totalDossiers) * 100, 1) : 0;
 
-        // 5 Derniers dossiers filtrés
+        // 5 Derniers dossiers (toujours les plus récents, non filtrés par la période)
         $derniersDossiers = Dossier::with(['ecole', 'cycle', 'filiereRelation', 'etudiants'])
-            ->when($startDate && $endDate, fn($q) => $q->whereBetween('created_at', [$startDate, $endDate]))
             ->latest()
             ->take(5)
             ->get();

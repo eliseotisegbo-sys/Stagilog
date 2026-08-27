@@ -23,11 +23,17 @@
                 </div>
             </div>
             <div class="text-center sm:text-left">
+                @if($isSuperAdmin)
                 <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-red-100 text-[#E8001D] mb-2">
                     Super Administrateur
                 </div>
+                @else
+                <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-blue-100 text-[#1B3A8C] mb-2">
+                    Administrateur
+                </div>
+                @endif
                 <h2 class="text-2xl font-black text-[#0D1B4B]">{{ $user->name }}</h2>
-                <p class="text-xs text-slate-500 mt-0.5">{{ $user->email }} &bull; Technology Forever Group SARL</p>
+                <p class="text-xs text-slate-500 mt-0.5">{{ $user->email }} — Technology Forever Group SARL</p>
             </div>
         </div>
 
@@ -64,9 +70,8 @@
 
                 <!-- Informations du profil + Photo -->
                 <div class="bg-white rounded-3xl shadow-card border border-slate-100 p-8">
-                    <h3 class="text-sm font-extrabold text-[#0D1B4B] uppercase tracking-wider mb-6 flex items-center space-x-2">
-                        <span class="w-2 h-2 rounded-full bg-[#1B3A8C]"></span>
-                        <span>Modifier Mon Profil & Photo</span>
+                    <h3 class="text-sm font-extrabold text-[#0D1B4B] uppercase tracking-wider mb-6">
+                        Modifier Mon Profil & Photo
                     </h3>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -106,9 +111,8 @@
 
                 <!-- Changement de mot de passe -->
                 <div class="bg-white rounded-3xl shadow-card border border-slate-100 p-8">
-                    <h3 class="text-sm font-extrabold text-[#0D1B4B] uppercase tracking-wider mb-2 flex items-center space-x-2">
-                        <span class="w-2 h-2 rounded-full bg-[#E8001D]"></span>
-                        <span>Modifier Mon Mot de Passe</span>
+                    <h3 class="text-sm font-extrabold text-[#0D1B4B] uppercase tracking-wider mb-2">
+                        Modifier Mon Mot de Passe
                     </h3>
                     <p class="text-[11px] text-slate-400 mb-6">Laissez ces champs vides si vous ne souhaitez pas modifier votre mot de passe.</p>
 
@@ -180,10 +184,10 @@
         <!-- SECTION 2 : GESTION DES COMPTES ADMINISTRATEURS (5 cols) -->
         <div class="lg:col-span-5 space-y-6" id="section-admins">
             
-            <!-- Formulaire Ajouter un Administrateur -->
+            @if($isSuperAdmin)
+            <!-- Formulaire Ajouter un Administrateur (Uniquement Super Admin) -->
             <div class="bg-white rounded-3xl shadow-card border border-slate-100 p-6 sm:p-8">
                 <h3 class="text-sm font-extrabold text-[#0D1B4B] uppercase tracking-wider mb-2 flex items-center space-x-2">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                     <span>Créer un Compte Administrateur</span>
                 </h3>
                 <p class="text-xs text-slate-400 mb-6">Ajouter un autre collaborateur avec les privilèges d'administration TFG SARL.</p>
@@ -226,6 +230,18 @@
                     </button>
                 </form>
             </div>
+            @else
+            <!-- Information pour les administrateurs non-super-admin -->
+            <div class="bg-white rounded-3xl shadow-card border border-slate-100 p-6 sm:p-8">
+                <div class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                </div>
+                <h4 class="text-xs font-extrabold text-[#0D1B4B] uppercase tracking-wider mb-1">Gestion Administrateurs</h4>
+                <p class="text-xs text-slate-500 leading-relaxed">
+                    Seul le Super Administrateur (<strong class="text-[#0D1B4B]">{{ $firstAdmin->name ?? 'Super Admin' }}</strong>) peut créer de nouveaux comptes ou gérer les privilèges d'administration.
+                </p>
+            </div>
+            @endif
 
             <!-- Liste des Administrateurs existants -->
             <div class="bg-white rounded-3xl shadow-card border border-slate-100 p-6 sm:p-8">
@@ -246,19 +262,26 @@
                                 </div>
                             @endif
                             <div class="truncate">
-                                <span class="font-bold text-[#0D1B4B] block truncate">{{ $adm->name }}</span>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="font-bold text-[#0D1B4B] truncate">{{ $adm->name }}</span>
+                                    @if($firstAdmin && $adm->id === $firstAdmin->id)
+                                    <span class="text-[9px] font-black uppercase text-[#E8001D] bg-red-50 px-1.5 py-0.2 rounded">Super Admin</span>
+                                    @endif
+                                </div>
                                 <span class="text-[10px] text-slate-400 block truncate">{{ $adm->email }}</span>
                             </div>
                         </div>
 
                         @if($adm->id !== $user->id)
-                        <form action="{{ route('admin.parametres.admin-user.destroy', $adm->id) }}" method="POST" class="inline flex-shrink-0 ml-2" onsubmit="return confirm('Supprimer cet administrateur ?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="p-1.5 text-slate-400 hover:text-[#E8001D] hover:bg-red-50 rounded-lg transition" title="Supprimer">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                            </button>
-                        </form>
+                            @if($isSuperAdmin)
+                            <form action="{{ route('admin.parametres.admin-user.destroy', $adm->id) }}" method="POST" class="inline flex-shrink-0 ml-2" onsubmit="return confirm('Supprimer cet administrateur ?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="p-1.5 text-slate-400 hover:text-[#E8001D] hover:bg-red-50 rounded-lg transition" title="Supprimer">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                </button>
+                            </form>
+                            @endif
                         @else
                         <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100 flex-shrink-0">Vous</span>
                         @endif

@@ -32,7 +32,6 @@
         <div class="flex items-start justify-between">
             <div>
                 <h4 class="text-sm font-black text-emerald-900 uppercase tracking-wider mb-2 flex items-center space-x-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
                     <span>Compte d'accès créé pour {{ session('compte_cree')['ecole'] }}</span>
                 </h4>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-medium text-emerald-800 bg-white/70 p-4 rounded-2xl border border-emerald-200">

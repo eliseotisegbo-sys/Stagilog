@@ -50,9 +50,8 @@
 
         <!-- Informations de l'établissement -->
         <div class="bg-white rounded-3xl shadow-card border border-slate-100 p-8">
-            <h3 class="text-sm font-extrabold text-[#0D1B4B] uppercase tracking-wider mb-6 flex items-center space-x-2">
-                <span class="w-2 h-2 rounded-full bg-[#1B3A8C]"></span>
-                <span>Informations du Profil Établissement</span>
+            <h3 class="text-sm font-extrabold text-[#0D1B4B] uppercase tracking-wider mb-6">
+                Informations du Profil Établissement
             </h3>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">

@@ -213,24 +213,24 @@
     <div class="flex-1 flex flex-col min-w-0 overflow-y-auto max-h-screen relative">
         
         <!-- TOPBAR HEADER -->
-        <header class="bg-white/90 backdrop-blur-md sticky top-0 z-20 border-b border-slate-100 px-6 sm:px-8 py-3.5 flex items-center justify-between shadow-sm">
-            <div class="flex items-center space-x-3 sm:space-x-4">
+        <header class="bg-white/90 backdrop-blur-md sticky top-0 z-20 border-b border-slate-100 px-4 sm:px-8 py-3 sm:py-3.5 flex items-center justify-between shadow-sm">
+            <div class="flex items-center space-x-2.5 sm:space-x-4 min-w-0">
                 <!-- 3 Barres Hamburger Button Topbar (Mobile & Desktop) -->
                 <button type="button" onclick="toggleSidebar()" 
-                        class="p-2.5 rounded-2xl bg-slate-100 hover:bg-[#EEF4FF] text-[#0D1B4B] hover:text-[#1B3A8C] border border-slate-200/80 transition shadow-sm focus:outline-none"
+                        class="p-2 sm:p-2.5 rounded-2xl bg-slate-100 hover:bg-[#EEF4FF] text-[#0D1B4B] hover:text-[#1B3A8C] border border-slate-200/80 transition shadow-sm focus:outline-none flex-shrink-0"
                         title="Ouvrir / Rabattre le menu latéral">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
                     </svg>
                 </button>
 
-                <h2 class="text-xl sm:text-2xl font-black text-[#0D1B4B] tracking-tight truncate">
+                <h2 class="text-base sm:text-xl md:text-2xl font-black text-[#0D1B4B] tracking-tight truncate">
                     @yield('header_title', 'Tableau de bord')
                 </h2>
             </div>
 
             <!-- Actions Header (Notifications + Photo Profil & Nom connecté) -->
-            <div class="flex items-center space-x-3 sm:space-x-4">
+            <div class="flex items-center space-x-2.5 sm:space-x-4 flex-shrink-0">
                 <!-- Date badge -->
                 <div class="hidden md:flex items-center space-x-2 text-xs font-semibold text-slate-500 bg-slate-100/90 px-3.5 py-2 rounded-xl border border-slate-200/60">
                     <svg class="w-4 h-4 text-[#1B3A8C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -242,8 +242,8 @@
                 <!-- Notifications Button with Interactive Dropdown -->
                 <div class="relative" id="notif-dropdown-wrapper">
                     <button id="notif-btn" type="button" 
-                            class="w-10 h-10 rounded-2xl bg-white border border-slate-200 text-slate-600 flex items-center justify-center hover:bg-slate-50 hover:text-[#1B3A8C] transition shadow-sm relative">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-white border border-slate-200 text-slate-600 flex items-center justify-center hover:bg-slate-50 hover:text-[#1B3A8C] transition shadow-sm relative">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                         </svg>
                         <span id="notif-badge" class="hidden absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-[#E8001D] text-white text-[10px] font-black rounded-full border-2 border-white flex items-center justify-center">0</span>
@@ -264,8 +264,8 @@
                     </div>
                 </div>
 
-                <!-- Avatar Profile + Nom de celui qui est connecté (Image 3) -->
-                <div class="flex items-center space-x-3 pl-2 border-l border-slate-200">
+                <!-- Avatar Profile + Nom de celui qui est connecté -->
+                <div class="flex items-center space-x-2.5 sm:space-x-3 pl-2 border-l border-slate-200">
                     <div class="hidden sm:block text-right">
                         <p class="text-xs font-bold text-[#0D1B4B] truncate max-w-[140px]">{{ session('user_session_name', auth()->user()->name) }}</p>
                         <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
@@ -275,12 +275,12 @@
 
                     @if(auth()->user()->photo_profil)
                         <img src="{{ asset('uploads/avatars/' . auth()->user()->photo_profil) }}" alt="{{ auth()->user()->name }}"
-                             class="w-10 h-10 rounded-2xl object-cover border-2 border-slate-200 shadow-md">
+                             class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl object-cover border-2 border-slate-200 shadow-md">
                     @elseif(auth()->user()->ecole && auth()->user()->ecole->logo)
                         <img src="{{ asset('uploads/logos/' . auth()->user()->ecole->logo) }}" alt="{{ auth()->user()->ecole->nom_ecole }}"
-                             class="w-10 h-10 rounded-2xl object-contain bg-white p-0.5 border-2 border-slate-200 shadow-md">
+                             class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl object-contain bg-white p-0.5 border-2 border-slate-200 shadow-md">
                     @else
-                        <div class="w-10 h-10 rounded-2xl bg-[#1B3A8C] text-white flex items-center justify-center font-black text-sm shadow-md">
+                        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-[#1B3A8C] text-white flex items-center justify-center font-black text-sm shadow-md">
                             {{ strtoupper(substr(session('user_session_name', auth()->user()->name), 0, 1)) }}
                         </div>
                     @endif
@@ -289,7 +289,7 @@
         </header>
 
         <!-- MAIN VIEW SLOT -->
-        <main class="p-6 sm:p-8 flex-1">
+        <main class="p-4 sm:p-6 lg:p-8 flex-1">
             @yield('dashboard_content')
         </main>
     </div>

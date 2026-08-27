@@ -44,64 +44,106 @@
             </div>
         </div>
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs" id="rapports-table">
+            <table class="w-full text-left text-xs min-w-[850px]" id="rapports-table">
                 <thead class="bg-slate-50/80 text-slate-500 uppercase tracking-wider font-bold border-b border-slate-100">
                     <tr>
-                        <th class="py-4 px-6">Stagiaire Admis</th>
-                        <th class="py-4 px-6">Niveau & Filière</th>
-                        <th class="py-4 px-6">Université Partenaire</th>
-                        <th class="py-4 px-6">Documents Déposés</th>
-                        <th class="py-4 px-6 text-right">Actions</th>
+                        <th class="py-3 px-4">Stagiaire Admis</th>
+                        <th class="py-3 px-4">Niveau &amp; Filière</th>
+                        <th class="py-3 px-4">Université</th>
+                        <th class="py-3 px-4">Période de Stage</th>
+                        <th class="py-3 px-4">Documents</th>
+                        <th class="py-3 px-4 text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
                     @forelse($etudiants as $etu)
+                    @php
+                        $debut = $etu->dossier && $etu->dossier->datedebut ? \Carbon\Carbon::parse($etu->dossier->datedebut)->startOfDay() : null;
+                        $fin   = $etu->dossier && $etu->dossier->datefin  ? \Carbon\Carbon::parse($etu->dossier->datefin)->endOfDay()   : null;
+                        $now   = now();
+                        if (!$debut || !$fin) {
+                            $stageStatus = 'unknown'; $stageLabel = 'Dates non définies'; $stageBadge = 'bg-slate-100 text-slate-500';
+                        } elseif ($now->lt($debut)) {
+                            $d = (int) $now->diffInDays($debut);
+                            $stageStatus = 'upcoming';
+                            $stageLabel  = $d === 0 ? 'Commence demain' : "Dans $d jour" . ($d > 1 ? 's' : '');
+                            $stageBadge  = 'bg-blue-100 text-[#1B3A8C]';
+                        } elseif ($now->lte($fin)) {
+                            $tot = max(1, $debut->diffInDays($fin));
+                            $pct = min(100, max(0, round(($debut->diffInDays($now) / $tot) * 100)));
+                            $stageStatus = 'ongoing'; $stageLabel = "En cours ($pct%)"; $stageBadge = 'bg-emerald-100 text-emerald-800';
+                        } else {
+                            $d = (int) $fin->diffInDays($now);
+                            $stageStatus = 'finished';
+                            if ($d === 0)      $stageLabel = "Terminé aujourd'hui";
+                            elseif ($d < 7)    $stageLabel = "Fini il y a $d j.";
+                            elseif ($d < 30)   { $w = floor($d/7);  $stageLabel = "Fini il y a $w sem."; }
+                            elseif ($d < 365)  { $m = floor($d/30); $stageLabel = "Fini il y a $m mois"; }
+                            else               { $y = floor($d/365);$stageLabel = "Fini il y a $y an" . ($y>1?'s':''); }
+                            $stageBadge = 'bg-slate-100 text-slate-600';
+                        }
+                    @endphp
                     <tr class="hover:bg-slate-50/70 transition search-row">
-                        <td class="py-4 px-6">
-                            <div class="font-bold text-[#0D1B4B] text-sm search-target">{{ $etu->nom_etudiant }} {{ $etu->prenom_etudiant }}</div>
+                        <td class="py-3 px-4">
+                            <div class="font-bold text-[#0D1B4B] search-target">{{ $etu->nom_etudiant }} {{ $etu->prenom_etudiant }}</div>
                             <div class="text-[11px] text-slate-400 search-target">{{ $etu->email_etu }}</div>
                         </td>
-                        <td class="py-4 px-6">
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-blue-50 text-[#1B3A8C] font-bold text-[10px] uppercase">
-                                {{ $etu->niveau_etude ?? $etu->dossier->filiere }}
-                            </span>
-                            <div class="text-[11px] text-slate-600 font-medium mt-0.5 search-target">{{ $etu->dossier->filiere }}</div>
+                        <td class="py-3 px-4">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-blue-50 text-[#1B3A8C] font-bold text-[10px] uppercase">{{ $etu->niveau_etude ?? ($etu->dossier->filiere ?? '-') }}</span>
+                            <div class="text-[11px] text-slate-600 mt-0.5 search-target">{{ $etu->dossier->filiere ?? '-' }}</div>
                         </td>
-                        <td class="py-4 px-6">
+                        <td class="py-3 px-4">
                             <div class="font-bold text-slate-800 search-target">{{ $etu->dossier->ecole->nom_ecole ?? 'N/A' }}</div>
                             <div class="text-[11px] text-[#1B3A8C] font-mono font-bold">{{ $etu->dossier->code_dossier ?? (($etu->dossier->ecole->sigle ?? 'STG') . '-' . ($etu->dossier->created_at ? $etu->dossier->created_at->format('dmYHi') : '')) }}</div>
                         </td>
-                        <td class="py-4 px-6">
+                        <td class="py-3 px-4">
+                            @if($debut && $fin)
+                            <div class="text-[11px] font-semibold text-[#0D1B4B] lowercase leading-tight">
+                                {{ $debut->locale('fr')->isoFormat('D MMM YY') }}
+                                <span class="text-slate-400 mx-1">au</span>
+                                {{ $fin->locale('fr')->isoFormat('D MMM YY') }}
+                            </div>
+                            <div class="text-[10px] text-slate-400">{{ max(1, $debut->diffInDays($fin)) }} jours</div>
+                            @endif
+                            <span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold {{ $stageBadge }}">
+                                @if($stageStatus === 'ongoing')<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse inline-block flex-shrink-0"></span>
+                                @elseif($stageStatus === 'upcoming')<svg class="w-2.5 h-2.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                @elseif($stageStatus === 'finished')<svg class="w-2.5 h-2.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                @endif
+                                {{ $stageLabel }}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4">
                             @if($etu->documents->count() > 0)
-                                <div class="space-y-1.5">
+                                <div class="space-y-1">
                                     @foreach($etu->documents as $doc)
                                     <a href="{{ asset('uploads/rapports/' . $doc->fichier) }}" target="_blank" 
-                                       class="inline-flex items-center space-x-1.5 px-2.5 py-1 bg-slate-50 hover:bg-blue-50 text-[#1B3A8C] rounded-lg font-bold text-[11px] border border-slate-200 transition">
-                                        <svg class="w-3.5 h-3.5 text-[#1B3A8C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                        <span>{{ $doc->nom_document }}</span>
+                                       class="inline-flex items-center space-x-1.5 px-2.5 py-1 bg-slate-50 hover:bg-blue-50 text-[#1B3A8C] rounded-lg font-bold text-[10px] border border-slate-200 transition w-full">
+                                        <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                        <span class="truncate">{{ $doc->nom_document }}</span>
                                     </a>
                                     @endforeach
                                 </div>
                             @elseif($etu->rapport)
                                 <a href="{{ asset('uploads/rapports/' . $etu->rapport) }}" target="_blank" 
-                                   class="inline-flex items-center space-x-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg font-bold text-[11px]">
+                                   class="inline-flex items-center space-x-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg font-bold text-[10px]">
                                     <span>Rapport Principal</span>
                                 </a>
                             @else
-                                <span class="text-slate-400 italic text-[11px]">Aucun document déposé</span>
+                                <span class="text-slate-400 italic text-[10px]">Aucun document</span>
                             @endif
                         </td>
-                        <td class="py-4 px-6 text-right">
+                        <td class="py-3 px-4 text-right">
                             <a href="{{ route('admin.rapports.depot', $etu->id_etudiant) }}" 
-                               class="inline-flex items-center space-x-1.5 px-3.5 py-2 bg-[#1B3A8C] hover:bg-[#142B6B] text-white rounded-xl font-bold text-xs shadow-md transition">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                                <span>Dépot de Rapport</span>
+                               class="inline-flex items-center space-x-1.5 px-3 py-2 bg-[#1B3A8C] hover:bg-[#142B6B] text-white rounded-xl font-bold text-xs shadow-md transition">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                <span>Dépôt</span>
                             </a>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="py-12 text-center text-slate-400">
+                        <td colspan="6" class="py-12 text-center text-slate-400">
                             Aucun stagiaire validé pour le moment. Les étudiants apparaîtront ici dès que leur dossier sera validé.
                         </td>
                     </tr>

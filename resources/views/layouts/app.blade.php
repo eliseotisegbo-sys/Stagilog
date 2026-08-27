@@ -247,26 +247,151 @@
             color: #CBD5E1 !important;
         }
 
-        /* Dark Mode Tokens */
+        /* Dark Mode Tokens & Overrides (High-Fidelity Cinema Instrument) */
+        html.dark {
+            color-scheme: dark;
+        }
         html.dark body {
-            background-color: #0D1B4B !important;
+            background-color: #0A1128 !important;
             color: #E2E8F0 !important;
         }
         html.dark .flag-wave-ambient {
             background-image: 
-                linear-gradient(135deg, rgba(13,27,75,0.94) 0%, rgba(4,9,30,0.91) 45%, rgba(18,37,100,0.93) 100%),
+                linear-gradient(135deg, rgba(10,17,40,0.96) 0%, rgba(4,9,26,0.94) 45%, rgba(13,27,75,0.95) 100%),
                 url('/images/d203f8a59f9618c83b358090aff71451.jpg') !important;
         }
-        html.dark .bg-white { background-color: #1A2A5E !important; color: #E2E8F0 !important; }
-        html.dark .bg-slate-50, html.dark .bg-slate-50\/80, html.dark .bg-[#F0F4FF] {
-            background-color: #142050 !important;
+        html.dark .bg-white { 
+            background-color: #132048 !important; 
+            color: #F1F5F9 !important; 
         }
-        html.dark .text-slate-800, html.dark .text-[#0D1B4B] { color: #E2E8F0 !important; }
-        html.dark .text-slate-600 { color: #A0AEC0 !important; }
-        html.dark .text-slate-500 { color: #8B95B0 !important; }
-        html.dark .text-slate-400 { color: #6B7A9A !important; }
-        html.dark .border-slate-100, html.dark .border-slate-200 { border-color: rgba(255,255,255,0.08) !important; }
-        html.dark .shadow-card { box-shadow: 0 4px 20px -2px rgba(0,0,0,0.3) !important; }
+        html.dark .bg-slate-50, 
+        html.dark .bg-slate-50\/80, 
+        html.dark .bg-slate-50\/70,
+        html.dark .bg-[#F0F4FF],
+        html.dark .bg-[#EEF4FF] {
+            background-color: #0E1838 !important;
+        }
+        html.dark .text-slate-800, 
+        html.dark .text-[#0D1B4B], 
+        html.dark .text-slate-900 { 
+            color: #F8FAFC !important; 
+        }
+        html.dark .text-slate-700 { color: #E2E8F0 !important; }
+        html.dark .text-slate-600 { color: #CBD5E1 !important; }
+        html.dark .text-slate-500 { color: #94A3B8 !important; }
+        html.dark .text-slate-400 { color: #7384A6 !important; }
+        
+        /* Vivid blue contrast for links/accents on dark surfaces */
+        html.dark .text-[#1B3A8C] { 
+            color: #60A5FA !important; 
+        }
+        html.dark .hover\:text-\[\#142B6B\]:hover,
+        html.dark .hover\:text-\[\#1B3A8C\]:hover {
+            color: #93C5FD !important;
+        }
+        
+        /* Inputs, selects, and textareas */
+        html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]),
+        html.dark select,
+        html.dark textarea {
+            background-color: #0E1838 !important;
+            color: #F8FAFC !important;
+            border-color: rgba(255,255,255,0.12) !important;
+        }
+        html.dark input::placeholder,
+        html.dark textarea::placeholder {
+            color: #64748B !important;
+        }
+        html.dark input:focus,
+        html.dark select:focus,
+        html.dark textarea:focus {
+            background-color: #14204A !important;
+            border-color: #3B82F6 !important;
+            ring-color: #3B82F6 !important;
+        }
+        
+        /* Borders & Separators */
+        html.dark .border-slate-100, 
+        html.dark .border-slate-200,
+        html.dark .border-slate-300 { 
+            border-color: rgba(255,255,255,0.08) !important; 
+        }
+        html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]) {
+            border-color: rgba(255,255,255,0.06) !important;
+        }
+        html.dark .shadow-card { 
+            box-shadow: 0 4px 24px -2px rgba(0,0,0,0.45) !important; 
+        }
+
+        /* Badges & Status Pills */
+        html.dark .bg-blue-50 {
+            background-color: rgba(59, 130, 246, 0.16) !important;
+            color: #93C5FD !important;
+        }
+        html.dark .bg-emerald-50,
+        html.dark .bg-emerald-100 {
+            background-color: rgba(16, 185, 129, 0.16) !important;
+            color: #6EE7B7 !important;
+        }
+        html.dark .bg-amber-50,
+        html.dark .bg-amber-100 {
+            background-color: rgba(245, 158, 11, 0.16) !important;
+            color: #FCD34D !important;
+        }
+        html.dark .bg-red-50,
+        html.dark .bg-red-100 {
+            background-color: rgba(232, 0, 29, 0.16) !important;
+            color: #FCA5A5 !important;
+        }
+        html.dark .bg-slate-100 {
+            background-color: rgba(255, 255, 255, 0.08) !important;
+            color: #CBD5E1 !important;
+        }
+
+        /* Table header & hover rows */
+        html.dark thead.bg-slate-50\/80 {
+            background-color: #0B132C !important;
+            color: #94A3B8 !important;
+        }
+        html.dark tbody tr.search-row:hover,
+        html.dark tr.hover\:bg-slate-50\/70:hover {
+            background-color: rgba(255,255,255,0.035) !important;
+        }
+
+        /* Modals in Dark Mode */
+        html.dark #add-user-modal > div,
+        html.dark #password-modal > div,
+        html.dark #modal-reset-password > div {
+            background-color: #132048 !important;
+            border-color: rgba(255,255,255,0.12) !important;
+        }
+
+        /* Flatpickr in Dark Mode */
+        html.dark .flatpickr-calendar {
+            background: #132048 !important;
+            border-color: rgba(255,255,255,0.12) !important;
+            box-shadow: 0 24px 64px -10px rgba(0, 0, 0, 0.6) !important;
+        }
+        html.dark .flatpickr-day {
+            color: #E2E8F0 !important;
+        }
+        html.dark .flatpickr-day:hover {
+            background: #1B3A8C !important;
+            color: #FFFFFF !important;
+        }
+        html.dark span.flatpickr-weekday {
+            color: #94A3B8 !important;
+        }
+
+        /* ApexCharts in Dark Mode */
+        html.dark .apexcharts-text tspan,
+        html.dark .apexcharts-legend-text {
+            fill: #94A3B8 !important;
+            color: #94A3B8 !important;
+        }
+        html.dark .apexcharts-gridline {
+            stroke: rgba(255,255,255,0.06) !important;
+        }
 
         /* Sidebar transition styles */
         .sidebar-expanded {

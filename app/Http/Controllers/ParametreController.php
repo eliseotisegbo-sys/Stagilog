@@ -20,13 +20,17 @@ class ParametreController extends Controller
     {
         $user = auth()->user();
         
+        // Super Admin = premier compte admin créé
+        $firstAdmin = User::where('role', 'admin')->orderBy('id', 'asc')->first();
+        $isSuperAdmin = $firstAdmin && ($firstAdmin->id === $user->id);
+
         // Liste de tous les comptes Administrateurs TFG SARL
         $admins = User::where('role', 'admin')->latest()->get();
 
         // Historique complet des connexions / déconnexions
         $connexions = ConnexionHistorique::latest()->paginate(25);
 
-        return view('admin.parametres.index', compact('user', 'admins', 'connexions'));
+        return view('admin.parametres.index', compact('user', 'admins', 'connexions', 'isSuperAdmin', 'firstAdmin'));
     }
 
     /**
@@ -73,10 +77,15 @@ class ParametreController extends Controller
     }
 
     /**
-     * Créer un nouvel administrateur TFG SARL (Multi-comptes admin)
+     * Créer un nouvel administrateur TFG SARL (Multi-comptes admin - réservé au Super Admin)
      */
     public function storeAdminUser(Request $request)
     {
+        $firstAdmin = User::where('role', 'admin')->orderBy('id', 'asc')->first();
+        if (!$firstAdmin || $firstAdmin->id !== auth()->id()) {
+            return back()->with('error', 'Action non autorisée. Seul le Super Administrateur (premier compte créé) est habilité à créer de nouveaux comptes administrateurs.');
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
@@ -120,11 +129,16 @@ class ParametreController extends Controller
     }
 
     /**
-     * Supprimer un compte administrateur
+     * Supprimer un compte administrateur (réservé au Super Admin)
      */
     public function destroyAdminUser($id)
     {
         $current = auth()->user();
+        $firstAdmin = User::where('role', 'admin')->orderBy('id', 'asc')->first();
+        if (!$firstAdmin || $firstAdmin->id !== $current->id) {
+            return back()->with('error', 'Action non autorisée. Seul le Super Administrateur est habilité à supprimer des comptes administrateurs.');
+        }
+
         if ($current->id == $id) {
             return back()->with('error', 'Vous ne pouvez pas supprimer votre propre compte actif.');
         }
