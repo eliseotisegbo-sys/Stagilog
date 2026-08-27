@@ -130,4 +130,28 @@ class RapportController extends Controller
 
         return redirect()->route('admin.rapports.depot', $etudiantId)->with('success', "Le document a été supprimé.");
     }
+
+    /**
+     * Liste dédiée des étudiants en stage actuellement avec suivi de progression
+     */
+    public function stagiairesActifs(Request $request)
+    {
+        $search = $request->query('search');
+
+        $etudiants = Etudiant::whereHas('dossier', function($q) {
+                $q->where('statut', 'valide');
+            })
+            ->with(['dossier.ecole'])
+            ->when($search, function($q) use ($search) {
+                $q->where(function($sub) use ($search) {
+                    $sub->where('nom_etudiant', 'like', "%{$search}%")
+                        ->orWhere('prenom_etudiant', 'like', "%{$search}%")
+                        ->orWhere('email_etu', 'like', "%{$search}%");
+                });
+            })
+            ->latest()
+            ->paginate(20);
+
+        return view('admin.rapports.stagiaires-actifs', compact('etudiants', 'search'));
+    }
 }

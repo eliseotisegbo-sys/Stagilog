@@ -63,9 +63,9 @@
             <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 sm:col-span-2">
                 <p class="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Période Définie</p>
                 <p class="text-sm font-bold text-slate-800 mt-1 lowercase">
-                    {{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }}
+                    {{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('ddd D MMMM YYYY') : '-' }}
                     <span class="text-slate-400 mx-1">au</span>
-                    {{ $dossier->datefin ? $dossier->datefin->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }}
+                    {{ $dossier->datefin ? $dossier->datefin->locale('fr')->isoFormat('ddd D MMMM YYYY') : '-' }}
                 </p>
             </div>
         </div>

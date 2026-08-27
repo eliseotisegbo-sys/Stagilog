@@ -295,7 +295,7 @@
                 </a>
 
                 <div class="flex items-center space-x-3 w-full sm:w-auto">
-                    <button type="submit" name="action" value="brouillon"
+                    <button type="submit" name="action" value="brouillon" formnovalidate
                             class="w-full sm:w-auto px-6 py-3.5 bg-white hover:bg-slate-50 text-[#1B3A8C] border-2 border-[#1B3A8C] rounded-2xl font-bold text-xs shadow-sm transition">
                         Enregistrer les modifications
                     </button>

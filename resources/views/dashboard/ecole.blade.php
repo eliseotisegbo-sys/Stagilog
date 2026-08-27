@@ -246,9 +246,9 @@
                             <span class="font-semibold">{{ $dossier->etudiants->count() }} étudiant(s)</span>
                         </td>
                         <td class="py-4 px-6 text-slate-600 text-xs lowercase">
-                            {{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }}
+                            {{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('ddd D MMMM YYYY') : '-' }}
                             <span class="text-slate-400 mx-1">au</span>
-                            {{ $dossier->datefin ? $dossier->datefin->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }}
+                            {{ $dossier->datefin ? $dossier->datefin->locale('fr')->isoFormat('ddd D MMMM YYYY') : '-' }}
                         </td>
                         <td class="py-4 px-6">
                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase {{ $dossier->statut_brouillon === 'soumis' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-700' }}">

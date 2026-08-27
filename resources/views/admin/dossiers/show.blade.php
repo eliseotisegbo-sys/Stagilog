@@ -50,9 +50,9 @@
             <h4 class="text-sm font-extrabold text-emerald-900">Dossier Validé par la Direction</h4>
             <p class="text-xs text-emerald-700 mt-0.5">
                 Les stagiaires de cette promotion peuvent démarrer leur stage directement à partir du 
-                <strong>{{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }}</strong> 
+                <strong>{{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('ddd D MMMM YYYY') : '-' }}</strong> 
                 au 
-                <strong>{{ $dossier->datefin ? $dossier->datefin->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }}</strong>.
+                <strong>{{ $dossier->datefin ? $dossier->datefin->locale('fr')->isoFormat('ddd D MMMM YYYY') : '-' }}</strong>.
             </p>
         </div>
     </div>
@@ -102,9 +102,9 @@
                         <div>
                             <p class="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Période de Stage Définie</p>
                             <p class="text-sm font-bold text-slate-800 mt-1 lowercase">
-                                {{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }} 
+                                {{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('ddd D MMMM YYYY') : '-' }} 
                                 <span class="text-slate-400 mx-1">au</span>
-                                {{ $dossier->datefin ? $dossier->datefin->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }}
+                                {{ $dossier->datefin ? $dossier->datefin->locale('fr')->isoFormat('ddd D MMMM YYYY') : '-' }}
                             </p>
                         </div>
                         <button type="button" onclick="openModifierPeriodeModal()" 

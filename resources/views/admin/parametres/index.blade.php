@@ -147,8 +147,27 @@
                     </div>
                 </div>
 
-                <!-- Bouton Enregistrer -->
-                <div class="flex justify-end">
+                <!-- Bouton Enregistrer + Mode -->
+                <div class="flex items-center justify-between gap-4 flex-wrap">
+                    <!-- Bascule Mode Sombre / Clair -->
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs font-semibold text-slate-500">Apparence :</span>
+                        <div class="flex items-center bg-slate-100 rounded-2xl p-1 gap-1">
+                            <button type="button" id="theme-btn-light"
+                                    onclick="setAppTheme('light')"
+                                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m8.66-13H20m-16 0H2.34M18.36 5.64l-.71.71M6.34 17.66l-.71.71M18.36 18.36l-.71-.71M6.34 6.34l-.71-.71M12 8a4 4 0 110 8 4 4 0 010-8z"/></svg>
+                                Clair
+                            </button>
+                            <button type="button" id="theme-btn-dark"
+                                    onclick="setAppTheme('dark')"
+                                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                                Sombre
+                            </button>
+                        </div>
+                    </div>
+
                     <button type="submit" 
                             class="inline-flex items-center space-x-2 bg-[#1B3A8C] hover:bg-[#142B6B] text-white px-8 py-4 rounded-2xl font-bold text-xs shadow-xl hover:shadow-blue-900/20 transition transform hover:-translate-y-0.5">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
@@ -282,7 +301,7 @@
                     <tr class="hover:bg-slate-50/70 transition">
                         <!-- Date -->
                         <td class="py-4 px-6 font-bold text-[#0D1B4B]">
-                            {{ $c->created_at ? $c->created_at->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }}
+                            {{ $c->created_at ? $c->created_at->locale('fr')->isoFormat('ddd D MMMM YYYY') : '-' }}
                         </td>
                         
                         <!-- Heure connecté -->
@@ -360,4 +379,40 @@
         @endif
     </div>
 </div>
+
+@push('scripts')
+<script>
+// ─── Dark Mode Toggle ──────────────────────────────────────────────────────
+function setAppTheme(theme) {
+    try { localStorage.setItem('stagilog_theme', theme); } catch(e) {}
+    if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+    updateThemeBtns(theme);
+}
+
+function updateThemeBtns(theme) {
+    const light = document.getElementById('theme-btn-light');
+    const dark  = document.getElementById('theme-btn-dark');
+    if (!light || !dark) return;
+    if (theme === 'dark') {
+        dark.classList.add('bg-[#1B3A8C]', 'text-white', 'shadow-md');
+        dark.classList.remove('text-slate-500');
+        light.classList.remove('bg-white', 'text-[#1B3A8C]', 'shadow-sm');
+        light.classList.add('text-slate-500');
+    } else {
+        light.classList.add('bg-white', 'text-[#1B3A8C]', 'shadow-sm');
+        light.classList.remove('text-slate-500');
+        dark.classList.remove('bg-[#1B3A8C]', 'text-white', 'shadow-md');
+        dark.classList.add('text-slate-500');
+    }
+}
+// Init
+(function() {
+    try { updateThemeBtns(localStorage.getItem('stagilog_theme') || 'light'); } catch(e) {}
+})();
+</script>
+@endpush
 @endsection

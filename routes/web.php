@@ -93,6 +93,7 @@ Route::middleware(['auth', 'first.login', 'role:ecole'])->prefix('ecole')->name(
 
     // Rapports
     Route::get('/rapports', [EcoleRapportController::class, 'index'])->name('rapports.index');
+    Route::get('/rapports/stagiaires-actifs', [EcoleRapportController::class, 'stagiairesActifs'])->name('rapports.stagiaires');
 
     // Paramètres Espace École
     Route::get('/parametres', [ParametreController::class, 'ecoleIndex'])->name('parametres.index');
@@ -127,6 +128,7 @@ Route::middleware(['auth', 'first.login', 'role:admin'])->prefix('admin')->name(
 
     // Gestion & Dépôt des Rapports & Documents Multiples
     Route::get('/rapports', [AdminRapportController::class, 'index'])->name('rapports.index');
+    Route::get('/rapports/stagiaires-actifs', [AdminRapportController::class, 'stagiairesActifs'])->name('rapports.stagiaires');
     Route::get('/rapports/{id}/depot', [AdminRapportController::class, 'depot'])->name('rapports.depot');
     Route::post('/rapports/{id}/depot', [AdminRapportController::class, 'storeDepot'])->name('rapports.depot.store');
     Route::delete('/rapports/document/{id}', [AdminRapportController::class, 'destroyDocument'])->name('rapports.document.destroy');

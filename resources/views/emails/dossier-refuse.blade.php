@@ -82,7 +82,7 @@
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Période :</span>
-                        <span class="detail-value">{{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }} au {{ $dossier->datefin ? $dossier->datefin->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }}</span>
+                        <span class="detail-value">{{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('ddd D MMMM YYYY') : '-' }} au {{ $dossier->datefin ? $dossier->datefin->locale('fr')->isoFormat('ddd D MMMM YYYY') : '-' }}</span>
                     </div>
                 </div>
 

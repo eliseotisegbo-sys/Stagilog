@@ -94,58 +94,111 @@
         /* Modern Flatpickr Calendar Styling */
         .flatpickr-calendar {
             font-family: 'Plus Jakarta Sans', sans-serif !important;
-            border-radius: 20px !important;
-            box-shadow: 0 20px 60px -10px rgba(13, 27, 75, 0.20), 0 0 0 1px rgba(27, 58, 140, 0.08) !important;
+            border-radius: 24px !important;
+            box-shadow: 0 24px 64px -10px rgba(13, 27, 75, 0.22), 0 0 0 1px rgba(27, 58, 140, 0.08) !important;
             border: 1px solid #E2E8F0 !important;
             overflow: hidden !important;
-            padding: 8px !important;
+            padding: 16px !important;
+            width: 324px !important;
             background: #FFFFFF !important;
         }
         .flatpickr-months {
             background: #0D1B4B !important;
-            border-radius: 14px 14px 10px 10px !important;
-            padding: 8px 4px !important;
-            margin-bottom: 8px !important;
+            border-radius: 16px 16px 12px 12px !important;
+            padding: 10px 8px !important;
+            margin-bottom: 12px !important;
+            display: flex !important;
+            align-items: center !important;
         }
         .flatpickr-months .flatpickr-month {
             color: #FFFFFF !important;
             fill: #FFFFFF !important;
+            flex: 1 !important;
         }
         .flatpickr-current-month {
             font-weight: 700 !important;
             font-size: 14px !important;
             color: #FFFFFF !important;
-            padding-top: 4px !important;
+            padding-top: 2px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 4px !important;
+            width: 100% !important;
         }
         .flatpickr-current-month .flatpickr-monthDropdown-months {
             font-weight: 700 !important;
             color: #FFFFFF !important;
-            background: #0D1B4B !important;
+            background: rgba(255,255,255,0.12) !important;
             border-radius: 8px !important;
-            padding: 2px 6px !important;
+            padding: 3px 8px !important;
+            border: 1px solid rgba(255,255,255,0.15) !important;
+            cursor: pointer !important;
+            margin-right: 2px !important;
         }
         .flatpickr-current-month input.cur-year {
             font-weight: 800 !important;
             color: #93C5FD !important;
+            background: rgba(255,255,255,0.08) !important;
+            border-radius: 6px !important;
+            padding: 2px 4px !important;
+            border: 1px solid rgba(255,255,255,0.12) !important;
+            width: 54px !important;
+            text-align: center !important;
+        }
+        /* Year scroll arrows — always visible */
+        .flatpickr-current-month .numInputWrapper {
+            display: inline-flex !important;
+            align-items: center !important;
+            position: relative !important;
+            margin-left: 2px !important;
+        }
+        .flatpickr-current-month .numInputWrapper span {
+            opacity: 1 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 18px !important;
+            height: 18px !important;
+            border-radius: 5px !important;
+            background: rgba(255,255,255,0.15) !important;
+            border: 1px solid rgba(255,255,255,0.2) !important;
+            right: -22px !important;
+            position: absolute !important;
+            cursor: pointer !important;
+            transition: background 0.15s !important;
+        }
+        .flatpickr-current-month .numInputWrapper span:hover {
+            background: rgba(255,255,255,0.30) !important;
+        }
+        .flatpickr-current-month .numInputWrapper span.arrowUp {
+            top: -10px !important;
+        }
+        .flatpickr-current-month .numInputWrapper span.arrowDown {
+            top: 10px !important;
+        }
+        .flatpickr-current-month .numInputWrapper span::after {
+            border-color: #FFFFFF transparent !important;
         }
         .flatpickr-months .flatpickr-prev-month, 
         .flatpickr-months .flatpickr-next-month {
             color: #FFFFFF !important;
             fill: #FFFFFF !important;
-            padding: 6px !important;
-            border-radius: 8px !important;
+            padding: 7px !important;
+            border-radius: 10px !important;
             transition: all 0.2s ease !important;
+            flex-shrink: 0 !important;
         }
         .flatpickr-months .flatpickr-prev-month:hover, 
         .flatpickr-months .flatpickr-next-month:hover {
-            background: rgba(255, 255, 255, 0.15) !important;
+            background: rgba(255, 255, 255, 0.18) !important;
         }
         .flatpickr-months .flatpickr-prev-month svg, 
         .flatpickr-months .flatpickr-next-month svg {
             fill: #FFFFFF !important;
         }
         .flatpickr-weekdays {
-            margin-top: 4px !important;
+            margin-top: 6px !important;
             margin-bottom: 4px !important;
         }
         span.flatpickr-weekday {
@@ -194,6 +247,27 @@
             color: #CBD5E1 !important;
         }
 
+        /* Dark Mode Tokens */
+        html.dark body {
+            background-color: #0D1B4B !important;
+            color: #E2E8F0 !important;
+        }
+        html.dark .flag-wave-ambient {
+            background-image: 
+                linear-gradient(135deg, rgba(13,27,75,0.94) 0%, rgba(4,9,30,0.91) 45%, rgba(18,37,100,0.93) 100%),
+                url('/images/d203f8a59f9618c83b358090aff71451.jpg') !important;
+        }
+        html.dark .bg-white { background-color: #1A2A5E !important; color: #E2E8F0 !important; }
+        html.dark .bg-slate-50, html.dark .bg-slate-50\/80, html.dark .bg-[#F0F4FF] {
+            background-color: #142050 !important;
+        }
+        html.dark .text-slate-800, html.dark .text-[#0D1B4B] { color: #E2E8F0 !important; }
+        html.dark .text-slate-600 { color: #A0AEC0 !important; }
+        html.dark .text-slate-500 { color: #8B95B0 !important; }
+        html.dark .text-slate-400 { color: #6B7A9A !important; }
+        html.dark .border-slate-100, html.dark .border-slate-200 { border-color: rgba(255,255,255,0.08) !important; }
+        html.dark .shadow-card { box-shadow: 0 4px 20px -2px rgba(0,0,0,0.3) !important; }
+
         /* Sidebar transition styles */
         .sidebar-expanded {
             width: 18rem; /* 288px */
@@ -235,6 +309,19 @@
     </style>
     
     @stack('styles')
+    <script>
+        // Dark mode initialization — runs before paint to avoid flicker
+        (function() {
+            try {
+                const theme = localStorage.getItem('stagilog_theme');
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            } catch(e) {}
+        })();
+    </script>
 </head>
 <body class="h-full text-slate-800 antialiased bg-[#F0F4FF] relative selection:bg-[#1B3A8C] selection:text-white">
     <!-- Arrière-plan image avec dégradé -->
@@ -317,5 +404,22 @@
     @yield('content')
     
     @stack('scripts')
+    <script>
+    // Auto-dismiss flash notifications after 5 seconds
+    (function() {
+        var toastContainer = document.querySelector('.fixed.top-5.right-5');
+        if (toastContainer) {
+            var toasts = toastContainer.children;
+            Array.from(toasts).forEach(function(toast) {
+                setTimeout(function() {
+                    toast.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateY(-12px)';
+                    setTimeout(function() { toast.remove(); }, 500);
+                }, 5000);
+            });
+        }
+    })();
+    </script>
 </body>
 </html>

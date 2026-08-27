@@ -121,7 +121,7 @@
                 <!-- Upload Logo -->
                 <div class="sm:col-span-2">
                     <label for="logo" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                        Logo de l'Établissement (PNG, JPG, SVG — Max. 4MB)
+                        Photo de profil (PNG, JPG, SVG. Max: 4MB)
                     </label>
                     <input type="file" name="logo" id="logo" accept="image/png,image/jpeg,image/jpg,image/svg+xml,image/webp"
                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#1B3A8C] file:text-white hover:file:bg-[#142B6B] transition">
@@ -132,23 +132,26 @@
             </div>
         </div>
 
-        <!-- Encart Sécurité & Mots de passe gérés par l'Admin -->
-        <div class="bg-gradient-to-r from-blue-50/80 to-slate-50 border border-blue-100 rounded-3xl p-6 sm:p-8">
-            <div class="flex items-start space-x-4">
-                <div class="w-10 h-10 rounded-2xl bg-[#1B3A8C] text-white flex items-center justify-center flex-shrink-0 shadow-md">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                </div>
-                <div>
-                    <h4 class="text-sm font-extrabold text-[#0D1B4B] mb-1">Sécurité &amp; Gestion des Mots de Passe</h4>
-                    <p class="text-xs text-slate-600 leading-relaxed">
-                        Conformément à la politique de sécurité de <strong>Technology Forever Group SARL</strong>, la gestion, l'attribution et la modification des mots de passe des comptes d'accès sont <strong>administrées exclusivement par l'équipe d'administration TFG SARL</strong>.<br>
-                        En cas de perte ou pour toute demande de réinitialisation, veuillez contacter l'administrateur à <a href="mailto:stagilogtfg@gmail.com" class="font-bold text-[#1B3A8C] underline">stagilogtfg@gmail.com</a>.
-                    </p>
+        <div class="flex items-center justify-between gap-4 flex-wrap">
+            <!-- Bascule Mode Sombre / Clair -->
+            <div class="flex items-center gap-3">
+                <span class="text-xs font-semibold text-slate-500">Apparence :</span>
+                <div class="flex items-center bg-slate-100 rounded-2xl p-1 gap-1">
+                    <button type="button" id="theme-btn-light"
+                            onclick="setAppTheme('light')"
+                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 theme-btn-light">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m8.66-13H20m-16 0H2.34M18.36 5.64l-.71.71M6.34 17.66l-.71.71M18.36 18.36l-.71-.71M6.34 6.34l-.71-.71M12 8a4 4 0 110 8 4 4 0 010-8z"/></svg>
+                        Clair
+                    </button>
+                    <button type="button" id="theme-btn-dark"
+                            onclick="setAppTheme('dark')"
+                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 theme-btn-dark">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                        Sombre
+                    </button>
                 </div>
             </div>
-        </div>
 
-        <div class="flex justify-end">
             <button type="submit"
                     class="px-8 py-3.5 bg-[#1B3A8C] hover:bg-[#142B6B] text-white rounded-2xl font-bold text-sm shadow-xl hover:shadow-blue-900/20 transition transform hover:-translate-y-0.5">
                 Enregistrer les informations de l'établissement
@@ -317,7 +320,7 @@
                     @forelse($connexions as $conn)
                     <tr class="hover:bg-slate-50/70 transition">
                         <td class="py-3.5 px-4 font-bold text-[#0D1B4B]">
-                            {{ $conn->created_at ? $conn->created_at->locale('fr')->isoFormat('ddd. D MMMM YYYY') : '-' }}
+                            {{ $conn->created_at ? $conn->created_at->locale('fr')->isoFormat('ddd D MMMM YYYY') : '-' }}
                         </td>
                         <td class="py-3.5 px-4 font-mono font-bold text-[#1B3A8C]">
                             {{ $conn->created_at ? $conn->created_at->format('H:i:s') : '-' }}
@@ -484,5 +487,42 @@
             showModalAlert('error', 'Erreur de communication avec le serveur.');
         });
     }
+</script>
+
+<script>
+// ─── Dark Mode Toggle ──────────────────────────────────────────────────────
+function setAppTheme(theme) {
+    try { localStorage.setItem('stagilog_theme', theme); } catch(e) {}
+    if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+    updateThemeBtns(theme);
+}
+
+function updateThemeBtns(theme) {
+    const light = document.getElementById('theme-btn-light');
+    const dark  = document.getElementById('theme-btn-dark');
+    if (!light || !dark) return;
+    if (theme === 'dark') {
+        dark.classList.add('bg-[#1B3A8C]', 'text-white', 'shadow-md');
+        dark.classList.remove('text-slate-500');
+        light.classList.remove('bg-[#1B3A8C]', 'text-white', 'shadow-md');
+        light.classList.add('text-slate-500');
+    } else {
+        light.classList.add('bg-white', 'text-[#1B3A8C]', 'shadow-sm');
+        light.classList.remove('text-slate-500');
+        dark.classList.remove('bg-[#1B3A8C]', 'text-white', 'shadow-md');
+        dark.classList.add('text-slate-500');
+    }
+}
+
+// Initialize active state
+(function() {
+    try {
+        updateThemeBtns(localStorage.getItem('stagilog_theme') || 'light');
+    } catch(e) {}
+})();
 </script>
 @endsection

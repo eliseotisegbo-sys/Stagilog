@@ -79,7 +79,7 @@
                     <div>
                         <p class="text-sm font-bold text-[#0D1B4B]">{{ $doc->nom_document }}</p>
                         <p class="text-[11px] text-slate-400">
-                            Fichier : {{ $doc->fichier }} • {{ $doc->taille_fichier }} • Ajouté le {{ $doc->created_at->format('d/m/Y à H:i') }}
+                            Fichier : {{ $doc->fichier }} — {{ $doc->taille_fichier }} — Ajouté le {{ $doc->created_at->format('d/m/Y à H:i') }}
                         </p>
                     </div>
                 </div>

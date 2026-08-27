@@ -41,4 +41,32 @@ class RapportController extends Controller
 
         return view('ecole.rapports.index', compact('etudiants', 'search', 'totalDocuments'));
     }
+
+    /**
+     * Liste dédiée des étudiants en stage actuellement avec suivi de progression
+     */
+    public function stagiairesActifs(Request $request)
+    {
+        $idEcole = auth()->user()->id_ecole;
+        $search = $request->query('search');
+
+        // Récupérer uniquement les dossiers VALIDÉS de cette école
+        $dossierIds = Dossier::where('id_ecole', $idEcole)
+            ->where('statut', 'valide')
+            ->pluck('id_dossier');
+
+        $etudiants = Etudiant::whereIn('id_dossier', $dossierIds)
+            ->with(['dossier'])
+            ->when($search, function($q) use ($search) {
+                $q->where(function($sub) use ($search) {
+                    $sub->where('nom_etudiant', 'like', "%{$search}%")
+                        ->orWhere('prenom_etudiant', 'like', "%{$search}%")
+                        ->orWhere('email_etu', 'like', "%{$search}%");
+                });
+            })
+            ->latest()
+            ->paginate(20);
+
+        return view('ecole.rapports.stagiaires-actifs', compact('etudiants', 'search'));
+    }
 }
