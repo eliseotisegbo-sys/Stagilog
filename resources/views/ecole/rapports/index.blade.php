@@ -98,8 +98,7 @@
                                 <span class="text-slate-400 mx-1">au</span>
                                 {{ $fin->locale('fr')->isoFormat('D MMM YY') }}
                             </div>
-                            <div class="text-[10px] text-slate-400">{{ max(1, $debut->diffInDays($fin)) }} jours</div>
-                            @endif
+<div class="text-[10px] text-slate-400">{{ (int) round(max(1, $debut->diffInDays($fin))) }} jours</div>                            @endif
                             <span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold {{ $stageBadge }}">
                                 @if($stageStatus === 'ongoing')<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse inline-block flex-shrink-0"></span>
                                 @elseif($stageStatus === 'upcoming')<svg class="w-2.5 h-2.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>

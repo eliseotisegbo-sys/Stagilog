@@ -117,13 +117,25 @@
                            placeholder="Avenue Cheikh Anta Diop...">
                 </div>
 
-                <!-- Upload Logo -->
-                <div class="sm:col-span-2">
+                <!-- Upload Photo de Profil Personnelle du Compte -->
+                <div>
+                    <label for="photo_profil" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                        Photo de profil personnelle (Compte {{ $user->name }})
+                    </label>
+                    <input type="file" name="photo_profil" id="photo_profil" accept="image/png,image/jpeg,image/jpg,image/svg+xml,image/webp"
+                           class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#1B3A8C] file:text-white hover:file:bg-[#142B6B] transition">
+                    @if($user->photo_profil)
+                    <p class="text-[10px] text-emerald-600 font-semibold mt-1">✓ Photo de profil personnalisée active</p>
+                    @endif
+                </div>
+
+                <!-- Upload Logo Officiel Établissement -->
+                <div>
                     <label for="logo" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                        Photo de profil (PNG, JPG, SVG. Max: 4MB)
+                        Logo officiel de l'établissement ({{ $ecole->nom_ecole ?? 'École' }})
                     </label>
                     <input type="file" name="logo" id="logo" accept="image/png,image/jpeg,image/jpg,image/svg+xml,image/webp"
-                           class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#1B3A8C] file:text-white hover:file:bg-[#142B6B] transition">
+                           class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-[#1B3A8C] hover:file:bg-blue-100 transition">
                     @if($ecole && $ecole->logo)
                     <p class="text-[10px] text-slate-400 mt-1">Logo actuel : <strong>{{ $ecole->logo }}</strong></p>
                     @endif

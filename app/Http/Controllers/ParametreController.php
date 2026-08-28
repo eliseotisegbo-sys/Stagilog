@@ -194,28 +194,26 @@ class ParametreController extends Controller
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,svg,webp|max:4096',
         ]);
 
-        $imageFile = $request->file('photo_profil') ?? $request->file('logo');
-
-        if ($imageFile) {
-            // 1. Sauvegarder la photo de profil personnelle de l'utilisateur
+        // 1. Upload Photo de Profil Personnelle de l'utilisateur connecté
+        if ($request->hasFile('photo_profil')) {
             $avatarDir = public_path('uploads/avatars');
             if (!File::isDirectory($avatarDir)) {
                 File::makeDirectory($avatarDir, 0755, true, true);
             }
-            $avatarName = 'avatar_' . $user->id . '_' . time() . '.' . $imageFile->getClientOriginalExtension();
-            $imageFile->move($avatarDir, $avatarName);
+            $avatarName = 'avatar_' . $user->id . '_' . time() . '.' . $request->file('photo_profil')->getClientOriginalExtension();
+            $request->file('photo_profil')->move($avatarDir, $avatarName);
             $user->photo_profil = $avatarName;
+        }
 
-            // 2. Si c'est une école, copier pour le logo de l'établissement
-            if ($ecole) {
-                $logoDir = public_path('uploads/logos');
-                if (!File::isDirectory($logoDir)) {
-                    File::makeDirectory($logoDir, 0755, true, true);
-                }
-                $logoName = 'logo_' . $ecole->id_ecole . '_' . time() . '.' . $imageFile->getClientOriginalExtension();
-                File::copy(public_path('uploads/avatars/' . $avatarName), $logoDir . '/' . $logoName);
-                $ecole->logo = $logoName;
+        // 2. Upload Logo Officiel de l'Établissement
+        if ($request->hasFile('logo') && $ecole) {
+            $logoDir = public_path('uploads/logos');
+            if (!File::isDirectory($logoDir)) {
+                File::makeDirectory($logoDir, 0755, true, true);
             }
+            $logoName = 'logo_' . $ecole->id_ecole . '_' . time() . '.' . $request->file('logo')->getClientOriginalExtension();
+            $request->file('logo')->move($logoDir, $logoName);
+            $ecole->logo = $logoName;
         }
 
         if ($ecole) {
