@@ -28,7 +28,10 @@ class ParametreController extends Controller
         $admins = User::where('role', 'admin')->latest()->get();
 
         // Historique complet des connexions / déconnexions
-        $connexions = ConnexionHistorique::latest()->paginate(25);
+        // Ne montrer que les connexions réussies (après validation du code 6 chiffres)
+        $connexions = ConnexionHistorique::where('statut', 'succes')
+            ->latest()
+            ->paginate(25);
 
         return view('admin.parametres.index', compact('user', 'admins', 'connexions', 'isSuperAdmin', 'firstAdmin'));
     }
@@ -158,8 +161,13 @@ class ParametreController extends Controller
         $user = auth()->user();
         $ecole = $user->ecole;
 
+        // Ne montrer que les connexions réussies (après validation du code 6 chiffres)
         $connexions = ConnexionHistorique::where('id_user', $user->id)
-            ->orWhere('email', $user->email)
+            ->where('statut', 'succes')
+            ->orWhere(function($query) use ($user) {
+                $query->where('email', $user->email)
+                      ->where('statut', 'succes');
+            })
             ->latest()
             ->take(15)
             ->get();

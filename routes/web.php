@@ -49,6 +49,8 @@ Route::prefix('auth')->group(function () {
     // Réinitialisation de mot de passe
     Route::get('/forgot-password', [PasswordResetController::class, 'showLinkRequestForm'])->name('password.request');
     Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::get('/verify-reset-code', [PasswordResetController::class, 'showVerifyCodeForm'])->name('password.verify-code');
+    Route::post('/verify-reset-code', [PasswordResetController::class, 'verifyCode'])->name('password.verify-code.post');
     Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
     Route::post('/reset-password', [PasswordResetController::class, 'reset'])->name('password.update');
 

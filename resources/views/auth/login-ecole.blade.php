@@ -19,9 +19,6 @@
                 </div>
                 
                 <div class="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/15 shadow-inner">
-                    <span class="inline-block px-3 py-1 bg-white/20 rounded-full text-xs font-bold uppercase tracking-wider text-blue-200 mb-4">
-                        Espace Universités & Écoles
-                    </span>
                     <h1 class="text-3xl font-extrabold mb-3 leading-tight">
                         Bienvenue sur STAGILOG !
                     </h1>
@@ -34,9 +31,6 @@
                 </div>
             </div>
 
-            <div class="mt-8 text-xs text-blue-200/70">
-                &copy; {{ date('Y') }} Technology Forever Group SARL — Tous droits réservés.
-            </div>
         </div>
         
         <!-- Partie droite : Formulaire de connexion -->

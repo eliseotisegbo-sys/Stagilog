@@ -62,20 +62,44 @@
         html {
             scroll-behavior: smooth;
         }
-        /* Custom scrollbar */
+        /* Custom scrollbar - PLUS VISIBLE ET STYLÉE */
         ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 10px !important;
+            height: 10px !important;
         }
         ::-webkit-scrollbar-track {
-            background: #F0F4FF;
+            background: linear-gradient(135deg, #F0F4FF 0%, #E8EFFD 100%) !important;
+            border-radius: 10px !important;
+            border: 1px solid #E2E8F0 !important;
         }
         ::-webkit-scrollbar-thumb {
-            background: #CBD5E1;
-            border-radius: 9999px;
+            background: linear-gradient(135deg, #94A3B8 0%, #64748B 100%) !important;
+            border-radius: 10px !important;
+            border: 2px solid #F0F4FF !important;
+            transition: all 0.3s ease !important;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #1B3A8C;
+            background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%) !important;
+            border-color: #DBEAFE !important;
+            transform: scale(1.1) !important;
+            box-shadow: 0 0 8px rgba(59, 130, 246, 0.4) !important;
+        }
+        ::-webkit-scrollbar-thumb:active {
+            background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
+        }
+        /* Scrollbar en mode sombre */
+        html.dark ::-webkit-scrollbar-track {
+            background: linear-gradient(135deg, rgba(15, 29, 58, 0.9) 0%, rgba(11, 23, 52, 1) 100%) !important;
+            border: 1px solid rgba(148, 163, 184, 0.3) !important;
+        }
+        html.dark ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #475569 0%, #334155 100%) !important;
+            border: 2px solid rgba(15, 29, 58, 0.8) !important;
+        }
+        html.dark ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%) !important;
+            border-color: rgba(59, 130, 246, 0.3) !important;
+            box-shadow: 0 0 12px rgba(96, 165, 250, 0.5) !important;
         }
         /* Ambient Image Background with Light Gradient Overlay */
         .flag-wave-ambient {
@@ -91,306 +115,849 @@
             background-attachment: fixed;
         }
 
-        /* Modern Flatpickr Calendar Styling */
-        .flatpickr-calendar {
+        /* ======================================================= */
+        /* 1. CALENDRIER THEME 1 : PÉRIODES & DATES DE STAGE */
+        /*    Sélection de plages - FRANÇAIS + Boutons ascenseur visibles */
+        /* ======================================================= */
+        .flatpickr-calendar,
+        .flatpickr-calendar.flatpickr-range-theme {
             font-family: 'Plus Jakarta Sans', sans-serif !important;
             border-radius: 24px !important;
-            box-shadow: 0 24px 64px -10px rgba(13, 27, 75, 0.22), 0 0 0 1px rgba(27, 58, 140, 0.08) !important;
+            box-shadow: 0 24px 56px -12px rgba(15, 23, 42, 0.2), 0 0 0 1px rgba(15, 23, 42, 0.08) !important;
             border: 1px solid #E2E8F0 !important;
-            overflow: hidden !important;
-            padding: 16px !important;
-            width: 324px !important;
+            padding: 24px !important;
+            width: auto !important;
+            min-width: 340px !important;
             background: #FFFFFF !important;
+            color: #1E293B !important;
         }
-        .flatpickr-months {
-            background: #0D1B4B !important;
-            border-radius: 16px 16px 12px 12px !important;
-            padding: 10px 8px !important;
+        .flatpickr-calendar .flatpickr-months {
+            background: transparent !important;
+            padding: 0 6px 20px 6px !important;
             margin-bottom: 12px !important;
             display: flex !important;
             align-items: center !important;
-        }
-        .flatpickr-months .flatpickr-month {
-            color: #FFFFFF !important;
-            fill: #FFFFFF !important;
-            flex: 1 !important;
-        }
-        .flatpickr-current-month {
-            font-weight: 700 !important;
-            font-size: 14px !important;
-            color: #FFFFFF !important;
-            padding-top: 2px !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            gap: 4px !important;
-            width: 100% !important;
-        }
-        .flatpickr-current-month .flatpickr-monthDropdown-months {
-            font-weight: 700 !important;
-            color: #FFFFFF !important;
-            background: rgba(255,255,255,0.12) !important;
-            border-radius: 8px !important;
-            padding: 3px 8px !important;
-            border: 1px solid rgba(255,255,255,0.15) !important;
-            cursor: pointer !important;
-            margin-right: 2px !important;
-        }
-        .flatpickr-current-month input.cur-year {
-            font-weight: 800 !important;
-            color: #93C5FD !important;
-            background: rgba(255,255,255,0.08) !important;
-            border-radius: 6px !important;
-            padding: 2px 4px !important;
-            border: 1px solid rgba(255,255,255,0.12) !important;
-            width: 54px !important;
-            text-align: center !important;
-        }
-        /* Year scroll arrows — always visible */
-        .flatpickr-current-month .numInputWrapper {
-            display: inline-flex !important;
-            align-items: center !important;
+            justify-content: space-between !important;
             position: relative !important;
-            margin-left: 2px !important;
+            gap: 12px !important;
         }
-        .flatpickr-current-month .numInputWrapper span {
-            opacity: 1 !important;
+        .flatpickr-calendar .flatpickr-months .flatpickr-month {
+            color: #1E293B !important;
+            fill: #1E293B !important;
+            flex: 1 !important;
+            height: auto !important;
+        }
+        .flatpickr-calendar .flatpickr-current-month {
+            font-weight: 800 !important;
+            font-size: 18px !important;
+            color: #1E293B !important;
+            padding: 0 !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            width: 18px !important;
-            height: 18px !important;
-            border-radius: 5px !important;
-            background: rgba(255,255,255,0.15) !important;
-            border: 1px solid rgba(255,255,255,0.2) !important;
-            right: -22px !important;
-            position: absolute !important;
-            cursor: pointer !important;
-            transition: background 0.15s !important;
+            gap: 10px !important;
+            width: 100% !important;
+            position: static !important;
+            left: 0 !important;
+            transform: none !important;
         }
-        .flatpickr-current-month .numInputWrapper span:hover {
-            background: rgba(255,255,255,0.30) !important;
-        }
-        .flatpickr-current-month .numInputWrapper span.arrowUp {
-            top: -10px !important;
-        }
-        .flatpickr-current-month .numInputWrapper span.arrowDown {
-            top: 10px !important;
-        }
-        .flatpickr-current-month .numInputWrapper span::after {
-            border-color: #FFFFFF transparent !important;
-        }
-        .flatpickr-months .flatpickr-prev-month, 
-        .flatpickr-months .flatpickr-next-month {
-            color: #FFFFFF !important;
-            fill: #FFFFFF !important;
-            padding: 7px !important;
-            border-radius: 10px !important;
-            transition: all 0.2s ease !important;
-            flex-shrink: 0 !important;
-        }
-        .flatpickr-months .flatpickr-prev-month:hover, 
-        .flatpickr-months .flatpickr-next-month:hover {
-            background: rgba(255, 255, 255, 0.18) !important;
-        }
-        .flatpickr-months .flatpickr-prev-month svg, 
-        .flatpickr-months .flatpickr-next-month svg {
-            fill: #FFFFFF !important;
-        }
-        .flatpickr-weekdays {
-            margin-top: 6px !important;
-            margin-bottom: 4px !important;
-        }
-        span.flatpickr-weekday {
-            color: #64748B !important;
+        .flatpickr-calendar .flatpickr-current-month .flatpickr-monthDropdown-months {
             font-weight: 800 !important;
+            color: #1E293B !important;
+            background: #FFFFFF !important;
+            border-radius: 12px !important;
+            padding: 6px 12px !important;
+            border: 1px solid #CBD5E1 !important;
+            cursor: pointer !important;
+            font-size: 16px !important;
+            appearance: auto !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06) !important;
+            outline: none !important;
+        }
+        .flatpickr-calendar .flatpickr-current-month .flatpickr-monthDropdown-months:hover {
+            border-color: #94A3B8 !important;
+            background: #F8FAFC !important;
+        }
+        .flatpickr-calendar .flatpickr-current-month .numInputWrapper {
+            display: inline-block !important;
+            position: relative !important;
+            background: #FFFFFF !important;
+            border: 1px solid #CBD5E1 !important;
+            border-radius: 12px !important;
+            padding: 4px 10px !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06) !important;
+        }
+        .flatpickr-calendar .flatpickr-current-month input.cur-year {
+            font-weight: 800 !important;
+            color: #1E293B !important;
+            background: transparent !important;
+            border: none !important;
+            padding: 2px 4px !important;
+            width: 72px !important;
+            font-size: 16px !important;
+            outline: none !important;
+            text-align: center !important;
+        }
+        .flatpickr-calendar .flatpickr-current-month input.cur-year:hover,
+        .flatpickr-calendar .flatpickr-current-month input.cur-year:focus {
+            background: transparent !important;
+        }
+        /* BOUTONS ASCENSEUR ANNÉE - TRÈS VISIBLES */
+        .flatpickr-calendar .flatpickr-current-month .numInputWrapper .arrowUp,
+        .flatpickr-calendar .flatpickr-current-month .numInputWrapper .arrowDown {
+            position: absolute !important;
+            right: 4px !important;
+            width: 20px !important;
+            height: 18px !important;
+            border: 1.5px solid #94A3B8 !important;
+            background: linear-gradient(135deg, #FFFFFF 0%, #F1F5F9 100%) !important;
+            border-radius: 7px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+        }
+        .flatpickr-calendar .flatpickr-current-month .numInputWrapper .arrowUp {
+            top: 2px !important;
+        }
+        .flatpickr-calendar .flatpickr-current-month .numInputWrapper .arrowDown {
+            bottom: 2px !important;
+        }
+        .flatpickr-calendar .flatpickr-current-month .numInputWrapper .arrowUp:hover,
+        .flatpickr-calendar .flatpickr-current-month .numInputWrapper .arrowDown:hover {
+            background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%) !important;
+            border-color: #3B82F6 !important;
+            transform: scale(1.2) !important;
+            box-shadow: 0 3px 10px rgba(59, 130, 246, 0.5) !important;
+        }
+        .flatpickr-calendar .flatpickr-current-month .numInputWrapper .arrowUp:after,
+        .flatpickr-calendar .flatpickr-current-month .numInputWrapper .arrowDown:after {
+            border-color: #475569 !important;
+            border-width: 0 2.5px 2.5px 0 !important;
+            padding: 3px !important;
+        }
+        .flatpickr-calendar .flatpickr-current-month .numInputWrapper .arrowUp:hover:after,
+        .flatpickr-calendar .flatpickr-current-month .numInputWrapper .arrowDown:hover:after {
+            border-color: #FFFFFF !important;
+        }
+        .flatpickr-calendar .flatpickr-months .flatpickr-prev-month, 
+        .flatpickr-calendar .flatpickr-months .flatpickr-next-month {
+            position: static !important;
+            width: 40px !important;
+            height: 40px !important;
+            border-radius: 12px !important;
+            border: 1px solid #CBD5E1 !important;
+            background: #FFFFFF !important;
+            color: #475569 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 0 !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06) !important;
+        }
+        .flatpickr-calendar .flatpickr-months .flatpickr-prev-month:hover, 
+        .flatpickr-calendar .flatpickr-months .flatpickr-next-month:hover {
+            background: #F1F5F9 !important;
+            border-color: #94A3B8 !important;
+            color: #1E293B !important;
+            transform: scale(1.08) !important;
+        }
+        .flatpickr-calendar .flatpickr-months .flatpickr-prev-month svg, 
+        .flatpickr-calendar .flatpickr-months .flatpickr-next-month svg {
+            width: 14px !important;
+            height: 14px !important;
+            fill: currentColor !important;
+        }
+        .flatpickr-calendar .flatpickr-weekdays {
+            margin-bottom: 12px !important;
+            padding: 0 6px !important;
+        }
+        .flatpickr-calendar span.flatpickr-weekday {
+            color: #94A3B8 !important;
+            font-weight: 700 !important;
             font-size: 11px !important;
             text-transform: uppercase !important;
-            letter-spacing: 0.5px !important;
+            letter-spacing: 0.6px !important;
         }
-        .flatpickr-day {
-            border-radius: 10px !important;
+        .flatpickr-calendar .flatpickr-days {
+            padding: 0 6px !important;
+        }
+        .flatpickr-calendar .flatpickr-day {
+            border-radius: 12px !important;
             font-weight: 600 !important;
-            font-size: 13px !important;
-            color: #1E293B !important;
-            height: 36px !important;
-            line-height: 36px !important;
-            margin: 2px !important;
-            transition: all 0.15s ease !important;
+            font-size: 15px !important;
+            color: #475569 !important;
+            height: 42px !important;
+            line-height: 42px !important;
+            max-width: 42px !important;
+            margin: 2px 0 !important;
+            border: 1px solid transparent !important;
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
-        .flatpickr-day:hover {
-            background: #EEF4FF !important;
-            color: #1B3A8C !important;
-            border-color: #BFDBFE !important;
+        .flatpickr-calendar .flatpickr-day:hover {
+            background: #EEF2FF !important;
+            color: #312E81 !important;
+            border-color: transparent !important;
+            transform: scale(1.08) !important;
         }
-        .flatpickr-day.today {
-            border-color: #E8001D !important;
-            color: #E8001D !important;
-            font-weight: 800 !important;
+        .flatpickr-calendar .flatpickr-day.today {
+            border: 2.5px solid #6366F1 !important;
+            color: #6366F1 !important;
+            font-weight: 900 !important;
+            background: transparent !important;
         }
-        .flatpickr-day.selected, 
-        .flatpickr-day.startRange, 
-        .flatpickr-day.endRange {
-            background: #1B3A8C !important;
-            border-color: #1B3A8C !important;
+        .flatpickr-calendar .flatpickr-day.selected, 
+        .flatpickr-calendar .flatpickr-day.startRange, 
+        .flatpickr-calendar .flatpickr-day.endRange {
+            background: linear-gradient(135deg, #6366F1 0%, #818CF8 100%) !important;
+            border-color: #6366F1 !important;
             color: #FFFFFF !important;
-            font-weight: 800 !important;
-            box-shadow: 0 4px 12px rgba(27, 58, 140, 0.35) !important;
+            font-weight: 900 !important;
+            border-radius: 14px !important;
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45) !important;
+            transform: scale(1.08) !important;
         }
-        .flatpickr-day.inRange {
-            background: #EEF4FF !important;
-            border-color: #EEF4FF !important;
-            color: #1B3A8C !important;
+        .flatpickr-calendar .flatpickr-day.inRange {
+            background: #E0E7FF !important;
+            border-color: #C7D2FE !important;
+            color: #4338CA !important;
+            font-weight: 600 !important;
+            border-radius: 0 !important;
+            box-shadow: -5px 0 0 #E0E7FF, 5px 0 0 #E0E7FF !important;
         }
-        .flatpickr-day.flatpickr-disabled, 
-        .flatpickr-day.flatpickr-disabled:hover {
+        .flatpickr-calendar .flatpickr-day.flatpickr-disabled, 
+        .flatpickr-calendar .flatpickr-day.flatpickr-disabled:hover {
             color: #CBD5E1 !important;
+            opacity: 0.35 !important;
+            cursor: not-allowed !important;
+            transform: none !important;
+        }
+        .flatpickr-calendar .flatpickr-day.prevMonthDay,
+        .flatpickr-calendar .flatpickr-day.nextMonthDay {
+            color: #CBD5E1 !important;
+            opacity: 0.5 !important;
         }
 
-        /* Dark Mode Tokens & Overrides (High-Fidelity Cinema Instrument) */
+        /* ======================================================= */
+        /* 2. CALENDRIER THEME 2 : DATE DE NAISSANCE ÉTUDIANT (IMAGE 2) */
+        /*    Sélection simple avec mois et année séparés                  */
+        /*    OPTIMISÉ pour sélection rapide de dates anciennes (1970-2010)*/
+        /* ======================================================= */
+        .flatpickr-calendar.flatpickr-birthdate-theme {
+            border-radius: 20px !important;
+            padding: 18px !important;
+            width: 340px !important;
+            border: 1px solid #CBD5E1 !important;
+            box-shadow: 0 20px 48px -10px rgba(15, 23, 42, 0.18) !important;
+            background: #FAFBFF !important;
+        }
+        .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-months {
+            padding: 0 6px 16px 6px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            gap: 12px !important;
+        }
+        /* Flèche précédente plus visible */
+        .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-months .flatpickr-prev-month {
+            width: 36px !important;
+            height: 36px !important;
+            border: 1.5px solid #CBD5E1 !important;
+            background: #FFFFFF !important;
+            color: #475569 !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08) !important;
+            border-radius: 10px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.2s ease !important;
+        }
+        .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-months .flatpickr-prev-month:hover {
+            background: #F1F5F9 !important;
+            border-color: #94A3B8 !important;
+            transform: scale(1.1) !important;
+        }
+        .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-months .flatpickr-prev-month svg {
+            width: 14px !important;
+            height: 14px !important;
+        }
+        .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-months .flatpickr-next-month {
+            display: none !important;
+        }
+        .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-current-month {
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            justify-content: flex-start !important;
+            flex: 1 !important;
+        }
+        /* Dropdown mois plus grand et stylé */
+        .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-current-month .flatpickr-monthDropdown-months {
+            background: #FFFFFF !important;
+            border: 1.5px solid #CBD5E1 !important;
+            border-radius: 12px !important;
+            padding: 6px 14px !important;
+            font-weight: 700 !important;
+            font-size: 15px !important;
+            color: #1E293B !important;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08) !important;
+            appearance: auto !important;
+            cursor: pointer !important;
+            min-width: 140px !important;
+        }
+        .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-current-month .flatpickr-monthDropdown-months:hover {
+            border-color: #94A3B8 !important;
+            background: #F8FAFC !important;
+        }
+        /* Input année PLUS GRAND avec scrollbar personnalisée */
+        .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-current-month .numInputWrapper {
+            background: #FFFFFF !important;
+            border: 1.5px solid #CBD5E1 !important;
+            border-radius: 12px !important;
+            padding: 4px 10px !important;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08) !important;
+            position: relative !important;
+        }
+        .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-current-month input.cur-year {
+            font-weight: 800 !important;
+            font-size: 15px !important;
+            color: #1E293B !important;
+            width: 70px !important;
+            padding: 2px 4px !important;
+            border: none !important;
+            background: transparent !important;
+        }
+        .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-current-month input.cur-year:hover,
+        .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-current-month input.cur-year:focus {
+            background: transparent !important;
+        }
+        .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-current-month .numInputWrapper:hover {
+            border-color: #94A3B8 !important;
+            background: #F8FAFC !important;
+        }
+        /* Boutons ascenseur (up/down) BEAUCOUP PLUS VISIBLES */
+        .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-current-month .numInputWrapper .arrowUp,
+        .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-current-month .numInputWrapper .arrowDown {
+            width: 18px !important;
+            height: 16px !important;
+            border: 1px solid #94A3B8 !important;
+            background: linear-gradient(135deg, #FFFFFF 0%, #F1F5F9 100%) !important;
+            border-radius: 6px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+            transition: all 0.15s ease !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+        }
+        .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-current-month .numInputWrapper .arrowUp:hover,
+        .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-current-month .numInputWrapper .arrowDown:hover {
+            background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%) !important;
+            border-color: #3B82F6 !important;
+            transform: scale(1.15) !important;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4) !important;
+        }
+        .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-current-month .numInputWrapper .arrowUp:after,
+        .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-current-month .numInputWrapper .arrowDown:after {
+            border-color: #475569 !important;
+            border-width: 0 2px 2px 0 !important;
+            padding: 2.5px !important;
+        }
+        .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-current-month .numInputWrapper .arrowUp:hover:after,
+        .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-current-month .numInputWrapper .arrowDown:hover:after {
+            border-color: #FFFFFF !important;
+            border-width: 0 2.5px 2.5px 0 !important;
+        }
+        /* Grid des jours */
+        .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-day {
+            border: 1px solid #E2E8F0 !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+            height: 42px !important;
+            line-height: 42px !important;
+            font-weight: 600 !important;
+            color: #475569 !important;
+            transition: all 0.15s ease !important;
+        }
+        .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-day.selected {
+            background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%) !important;
+            color: #FFFFFF !important;
+            border-color: #0284C7 !important;
+            font-weight: 900 !important;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35) !important;
+        }
+        .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-day:hover {
+            background: #DBEAFE !important;
+            color: #0369A1 !important;
+            border-color: #93C5FD !important;
+            transform: scale(1.05) !important;
+        }
+        .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-day.today {
+            border: 2px solid #0284C7 !important;
+            color: #0284C7 !important;
+            font-weight: 800 !important;
+        }
+
+        /* ======================================================= */
+        /* AMÉLIORATION GLOBALE DE LA LISIBILITÉ DES TABLEAUX      */
+        /* ======================================================= */
+        table {
+            font-size: 0.875rem !important; /* 14px au lieu de 12px */
+        }
+        thead th {
+            font-size: 0.8125rem !important; /* 13px */
+            font-weight: 800 !important;
+            letter-spacing: 0.05em !important;
+            padding-top: 1rem !important;
+            padding-bottom: 1rem !important;
+        }
+        tbody td {
+            padding-top: 0.875rem !important;
+            padding-bottom: 0.875rem !important;
+            line-height: 1.5 !important;
+        }
+
+        /* ======================================================= */
+        /* 3. PALETTE MODE SOMBRE OPTIMISÉE (WCAG AA+ CONFORME)    */
+        /*    Ratio contraste minimum : 4.5:1 pour texte normal   */
+        /*                            : 3:1 pour gros titres       */
+        /* ======================================================= */
         html.dark {
             color-scheme: dark;
         }
         html.dark body {
-            background-color: #0A1128 !important;
-            color: #E2E8F0 !important;
+            background-color: #0A1628 !important;
+            color: #F1F5F9 !important;
         }
         html.dark .flag-wave-ambient {
             background-image: 
-                linear-gradient(135deg, rgba(10,17,40,0.96) 0%, rgba(4,9,26,0.94) 45%, rgba(13,27,75,0.95) 100%),
+                linear-gradient(135deg, rgba(10,22,40,0.97) 0%, rgba(7,15,32,0.95) 45%, rgba(13,25,52,0.96) 100%),
                 url('/images/d203f8a59f9618c83b358090aff71451.jpg') !important;
         }
-        html.dark .bg-white { 
-            background-color: #132048 !important; 
-            color: #F1F5F9 !important; 
+
+        /* ─────────────────────────────────────────────────────── */
+        /* HEADER & TOPBAR — Transition harmonieuse                */
+        /* ─────────────────────────────────────────────────────── */
+        html.dark header {
+            background: linear-gradient(135deg, rgba(20, 36, 74, 0.96) 0%, rgba(15, 29, 62, 0.98) 100%) !important;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2) !important;
+            backdrop-filter: blur(12px) !important;
         }
+        html.dark header h2,
+        html.dark header h1 {
+            color: #FFFFFF !important;
+            font-weight: 900 !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+        }
+        html.dark header .text-slate-500,
+        html.dark header .text-slate-400 {
+            color: #CBD5E1 !important;
+        }
+
+        /* ─────────────────────────────────────────────────────── */
+        /* CARTES PRINCIPALES — Distinction nette du fond           */
+        /* ─────────────────────────────────────────────────────── */
+        html.dark .bg-white { 
+            background: linear-gradient(135deg, rgba(26, 40, 71, 0.95) 0%, rgba(20, 35, 63, 0.98) 100%) !important; 
+            color: #F1F5F9 !important; 
+            border: 1px solid rgba(148, 163, 184, 0.25) !important;
+        }
+        html.dark .shadow-card { 
+            box-shadow: 0 12px 48px -8px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(148, 163, 184, 0.15) !important; 
+        }
+        html.dark .shadow-hover:hover {
+            box-shadow: 0 18px 60px -10px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(148, 163, 184, 0.22) !important;
+        }
+        html.dark .rounded-3xl {
+            box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        /* ─────────────────────────────────────────────────────── */
+        /* CONTENEURS SECONDAIRES — Blocs internes aux cartes      */
+        /* ─────────────────────────────────────────────────────── */
         html.dark .bg-slate-50, 
         html.dark .bg-slate-50\/80, 
         html.dark .bg-slate-50\/70,
+        html.dark .bg-slate-50\/40,
         html.dark .bg-[#F0F4FF],
-        html.dark .bg-[#EEF4FF] {
-            background-color: #0E1838 !important;
+        html.dark .bg-[#EEF4FF],
+        html.dark .bg-slate-100,
+        html.dark .bg-slate-100\/90,
+        html.dark .bg-gray-50 {
+            background: rgba(15, 29, 58, 0.85) !important;
+            border-color: rgba(148, 163, 184, 0.2) !important;
         }
-        html.dark .text-slate-800, 
-        html.dark .text-[#0D1B4B], 
-        html.dark .text-slate-900 { 
-            color: #F8FAFC !important; 
+        html.dark .bg-slate-200 {
+            background-color: rgba(51, 65, 85, 0.6) !important;
         }
-        html.dark .text-slate-700 { color: #E2E8F0 !important; }
-        html.dark .text-slate-600 { color: #CBD5E1 !important; }
-        html.dark .text-slate-500 { color: #94A3B8 !important; }
-        html.dark .text-slate-400 { color: #7384A6 !important; }
+
+        /* ─────────────────────────────────────────────────────── */
+        /* TYPOGRAPHIE — Contraste élevé (WCAG AA+)                 */
+        /* ─────────────────────────────────────────────────────── */
         
-        /* Vivid blue contrast for links/accents on dark surfaces */
-        html.dark .text-[#1B3A8C] { 
+        /* Titres principaux et noms dans l'en-tête profil */
+        html.dark h1,
+        html.dark h2,
+        html.dark h3,
+        html.dark h4,
+        html.dark h5,
+        html.dark .text-[#0D1B4B], 
+        html.dark .text-slate-900,
+        html.dark .text-slate-800 { 
+            color: #F8FAFC !important; 
+            font-weight: 800 !important;
+        }
+        
+        /* Titres de sections en majuscules — Lisibilité maximale */
+        html.dark h3.uppercase,
+        html.dark h4.uppercase,
+        html.dark .uppercase.tracking-wider,
+        html.dark .font-extrabold.uppercase {
+            color: #FFFFFF !important;
+            font-weight: 900 !important;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        /* Sous-titres et textes semi-importants */
+        html.dark .text-slate-700 { 
+            color: #E2E8F0 !important; 
+        }
+        html.dark .text-slate-600 { 
+            color: #CBD5E1 !important; 
+        }
+        html.dark .text-slate-500 { 
+            color: #A1B0C8 !important; 
+        }
+        html.dark .text-slate-400 { 
+            color: #8A9AB3 !important; 
+        }
+        html.dark .text-slate-300 {
+            color: #CBD5E1 !important;
+        }
+
+        /* ─────────────────────────────────────────────────────── */
+        /* LIENS & ACCENTS BLEUS                                    */
+        /* ─────────────────────────────────────────────────────── */
+        html.dark .text-[#1B3A8C],
+        html.dark .text-blue-600,
+        html.dark .text-blue-700 { 
             color: #60A5FA !important; 
         }
+        html.dark a.text-[#1B3A8C]:hover,
         html.dark .hover\:text-\[\#142B6B\]:hover,
-        html.dark .hover\:text-\[\#1B3A8C\]:hover {
+        html.dark .hover\:text-\[\#1B3A8C\]:hover,
+        html.dark a:hover {
             color: #93C5FD !important;
         }
-        
-        /* Inputs, selects, and textareas */
-        html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]),
+        html.dark .bg-[#1B3A8C],
+        html.dark .bg-blue-600 {
+            background-color: #2563EB !important;
+        }
+        html.dark .hover\:bg-\[\#142B6B\]:hover,
+        html.dark .bg-[#1B3A8C]:hover {
+            background-color: #1D4ED8 !important;
+        }
+
+        /* ─────────────────────────────────────────────────────── */
+        /* FORMULAIRES — Labels, Inputs, Focus                      */
+        /* ─────────────────────────────────────────────────────── */
+        html.dark label {
+            color: #F1F5F9 !important;
+            font-weight: 800 !important;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+        }
+        html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="file"]),
         html.dark select,
         html.dark textarea {
-            background-color: #0E1838 !important;
+            background: rgba(15, 29, 58, 0.9) !important;
             color: #F8FAFC !important;
-            border-color: rgba(255,255,255,0.12) !important;
+            border: 1.5px solid rgba(148, 163, 184, 0.3) !important;
         }
         html.dark input::placeholder,
         html.dark textarea::placeholder {
-            color: #64748B !important;
+            color: #94A3B8 !important;
         }
         html.dark input:focus,
         html.dark select:focus,
         html.dark textarea:focus {
-            background-color: #14204A !important;
-            border-color: #3B82F6 !important;
-            ring-color: #3B82F6 !important;
+            background: rgba(20, 36, 74, 0.95) !important;
+            border-color: #60A5FA !important;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.25), 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+            outline: none !important;
         }
-        
-        /* Borders & Separators */
-        html.dark .border-slate-100, 
-        html.dark .border-slate-200,
-        html.dark .border-slate-300 { 
-            border-color: rgba(255,255,255,0.08) !important; 
-        }
-        html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]) {
-            border-color: rgba(255,255,255,0.06) !important;
-        }
-        html.dark .shadow-card { 
-            box-shadow: 0 4px 24px -2px rgba(0,0,0,0.45) !important; 
+        html.dark input[readonly],
+        html.dark input[readonly]:focus {
+            background: rgba(15, 29, 58, 0.6) !important;
+            cursor: pointer !important;
         }
 
-        /* Badges & Status Pills */
-        html.dark .bg-blue-50 {
-            background-color: rgba(59, 130, 246, 0.16) !important;
+        /* ─────────────────────────────────────────────────────── */
+        /* BADGES & STATUTS                                         */
+        /* ─────────────────────────────────────────────────────── */
+        html.dark .bg-blue-50,
+        html.dark .bg-blue-100 {
+            background-color: rgba(59, 130, 246, 0.22) !important;
             color: #93C5FD !important;
+            border: 1px solid rgba(59, 130, 246, 0.35) !important;
         }
         html.dark .bg-emerald-50,
-        html.dark .bg-emerald-100 {
-            background-color: rgba(16, 185, 129, 0.16) !important;
+        html.dark .bg-emerald-100,
+        html.dark .bg-green-50 {
+            background-color: rgba(16, 185, 129, 0.22) !important;
             color: #6EE7B7 !important;
+            border: 1px solid rgba(16, 185, 129, 0.35) !important;
         }
         html.dark .bg-amber-50,
-        html.dark .bg-amber-100 {
-            background-color: rgba(245, 158, 11, 0.16) !important;
+        html.dark .bg-amber-100,
+        html.dark .bg-yellow-50 {
+            background-color: rgba(245, 158, 11, 0.22) !important;
             color: #FCD34D !important;
+            border: 1px solid rgba(245, 158, 11, 0.35) !important;
         }
         html.dark .bg-red-50,
         html.dark .bg-red-100 {
-            background-color: rgba(232, 0, 29, 0.16) !important;
+            background-color: rgba(239, 68, 68, 0.22) !important;
             color: #FCA5A5 !important;
+            border: 1px solid rgba(239, 68, 68, 0.35) !important;
         }
-        html.dark .bg-slate-100 {
-            background-color: rgba(255, 255, 255, 0.08) !important;
+
+        /* ─────────────────────────────────────────────────────── */
+        /* TABLEAUX — Augmentation taille texte + contraste         */
+        /* ─────────────────────────────────────────────────────── */
+        html.dark table {
+            font-size: 0.9375rem !important; /* 15px au lieu de 12px */
+        }
+        html.dark thead {
+            background-color: #0D1932 !important;
+        }
+        html.dark thead th {
+            color: #E2E8F0 !important;
+            font-weight: 800 !important;
+            font-size: 0.875rem !important; /* 14px au lieu de 13px */
+            letter-spacing: 0.05em !important;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.15) !important;
+            padding-top: 1.125rem !important;
+            padding-bottom: 1.125rem !important;
+        }
+        html.dark tbody td {
             color: #CBD5E1 !important;
+            font-size: 0.9375rem !important; /* 15px */
+            padding-top: 1.125rem !important;
+            padding-bottom: 1.125rem !important;
+            line-height: 1.6 !important;
+        }
+        html.dark tbody tr:hover,
+        html.dark tr.hover\:bg-slate-50\/70:hover,
+        html.dark tr.hover\:bg-slate-50:hover {
+            background-color: rgba(255, 255, 255, 0.06) !important;
+        }
+        html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+        html.dark .border-slate-100 {
+            border-color: rgba(148, 163, 184, 0.12) !important;
         }
 
-        /* Table header & hover rows */
-        html.dark thead.bg-slate-50\/80 {
-            background-color: #0B132C !important;
-            color: #94A3B8 !important;
-        }
-        html.dark tbody tr.search-row:hover,
-        html.dark tr.hover\:bg-slate-50\/70:hover {
-            background-color: rgba(255,255,255,0.035) !important;
-        }
-
-        /* Modals in Dark Mode */
+        /* ─────────────────────────────────────────────────────── */
+        /* MODALES                                                  */
+        /* ─────────────────────────────────────────────────────── */
+        html.dark .bg-white.rounded-3xl,
         html.dark #add-user-modal > div,
         html.dark #password-modal > div,
-        html.dark #modal-reset-password > div {
-            background-color: #132048 !important;
-            border-color: rgba(255,255,255,0.12) !important;
+        html.dark #modal-logout-confirm > div,
+        html.dark #modal-refus > div,
+        html.dark #modal-modifier-periode > div {
+            background-color: #1A2847 !important;
+            border: 1px solid rgba(148, 163, 184, 0.2) !important;
         }
 
-        /* Flatpickr in Dark Mode */
+        /* Backdrop des modales */
+        html.dark .bg-slate-900\/60,
+        html.dark [class*="bg-slate-900"] {
+            background-color: rgba(0, 0, 0, 0.75) !important;
+        }
+
+        /* ─────────────────────────────────────────────────────── */
+        /* FLATPICKR CALENDRIER EN MODE SOMBRE                     */
+        /* ─────────────────────────────────────────────────────── */
         html.dark .flatpickr-calendar {
-            background: #132048 !important;
-            border-color: rgba(255,255,255,0.12) !important;
-            box-shadow: 0 24px 64px -10px rgba(0, 0, 0, 0.6) !important;
+            background: linear-gradient(135deg, rgba(26, 40, 71, 0.98) 0%, rgba(20, 35, 63, 1) 100%) !important;
+            border: 1px solid rgba(148, 163, 184, 0.25) !important;
+            box-shadow: 0 28px 72px -12px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(148, 163, 184, 0.2) !important;
         }
-        html.dark .flatpickr-day {
-            color: #E2E8F0 !important;
-        }
-        html.dark .flatpickr-day:hover {
-            background: #1B3A8C !important;
+        html.dark .flatpickr-calendar .flatpickr-current-month {
             color: #FFFFFF !important;
         }
-        html.dark span.flatpickr-weekday {
-            color: #94A3B8 !important;
+        html.dark .flatpickr-calendar .flatpickr-current-month .flatpickr-monthDropdown-months {
+            color: #FFFFFF !important;
+            background: rgba(15, 29, 58, 0.9) !important;
+            border-color: rgba(148, 163, 184, 0.35) !important;
+        }
+        html.dark .flatpickr-calendar .flatpickr-current-month .flatpickr-monthDropdown-months:hover {
+            background: rgba(20, 36, 74, 0.95) !important;
+            border-color: rgba(148, 163, 184, 0.5) !important;
+        }
+        html.dark .flatpickr-calendar .flatpickr-current-month input.cur-year {
+            color: #FFFFFF !important;
+            background: rgba(15, 29, 58, 0.9) !important;
+            border-color: rgba(148, 163, 184, 0.35) !important;
+        }
+        html.dark .flatpickr-calendar .flatpickr-current-month input.cur-year:hover,
+        html.dark .flatpickr-calendar .flatpickr-current-month input.cur-year:focus {
+            background: rgba(20, 36, 74, 0.95) !important;
+            border-color: rgba(148, 163, 184, 0.5) !important;
+        }
+        html.dark .flatpickr-calendar .flatpickr-months .flatpickr-prev-month, 
+        html.dark .flatpickr-calendar .flatpickr-months .flatpickr-next-month {
+            background: rgba(15, 29, 58, 0.9) !important;
+            border-color: rgba(148, 163, 184, 0.35) !important;
+            color: #F1F5F9 !important;
+        }
+        html.dark .flatpickr-calendar .flatpickr-months .flatpickr-prev-month:hover, 
+        html.dark .flatpickr-calendar .flatpickr-months .flatpickr-next-month:hover {
+            background: rgba(20, 36, 74, 0.95) !important;
+            border-color: #60A5FA !important;
+            color: #FFFFFF !important;
+        }
+        html.dark .flatpickr-calendar span.flatpickr-weekday {
+            color: #CBD5E1 !important;
+        }
+        html.dark .flatpickr-calendar .flatpickr-day {
+            color: #F1F5F9 !important;
+        }
+        html.dark .flatpickr-calendar .flatpickr-day:hover {
+            background: rgba(99, 102, 241, 0.25) !important;
+            color: #FFFFFF !important;
+        }
+        html.dark .flatpickr-calendar .flatpickr-day.today {
+            border-color: #60A5FA !important;
+            color: #60A5FA !important;
+            font-weight: 900 !important;
+        }
+        html.dark .flatpickr-calendar .flatpickr-day.selected,
+        html.dark .flatpickr-calendar .flatpickr-day.startRange,
+        html.dark .flatpickr-calendar .flatpickr-day.endRange {
+            background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%) !important;
+            border-color: #3B82F6 !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5) !important;
+        }
+        html.dark .flatpickr-calendar .flatpickr-day.inRange {
+            background: rgba(99, 102, 241, 0.3) !important;
+            color: #E0E7FF !important;
+            box-shadow: -5px 0 0 rgba(99, 102, 241, 0.3), 5px 0 0 rgba(99, 102, 241, 0.3) !important;
+        }
+        html.dark .flatpickr-calendar .flatpickr-day.prevMonthDay,
+        html.dark .flatpickr-calendar .flatpickr-day.nextMonthDay {
+            color: #64748B !important;
+        }
+        html.dark .flatpickr-calendar .flatpickr-day.flatpickr-disabled {
+            color: #475569 !important;
         }
 
-        /* ApexCharts in Dark Mode */
+        /* Calendrier date de naissance en mode sombre */
+        html.dark .flatpickr-calendar.flatpickr-birthdate-theme {
+            background: linear-gradient(135deg, rgba(26, 40, 71, 0.98) 0%, rgba(20, 35, 63, 1) 100%) !important;
+            border-color: rgba(148, 163, 184, 0.3) !important;
+        }
+        html.dark .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-months .flatpickr-prev-month {
+            background: rgba(15, 29, 58, 0.9) !important;
+            border-color: rgba(148, 163, 184, 0.4) !important;
+            color: #F1F5F9 !important;
+        }
+        html.dark .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-months .flatpickr-prev-month:hover {
+            background: rgba(20, 36, 74, 0.95) !important;
+            border-color: #60A5FA !important;
+        }
+        html.dark .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-current-month .flatpickr-monthDropdown-months {
+            background: rgba(15, 29, 58, 0.9) !important;
+            border-color: rgba(148, 163, 184, 0.4) !important;
+            color: #F8FAFC !important;
+        }
+        html.dark .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-current-month .flatpickr-monthDropdown-months:hover {
+            background: rgba(20, 36, 74, 0.95) !important;
+            border-color: #60A5FA !important;
+        }
+        html.dark .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-current-month .numInputWrapper {
+            background: rgba(15, 29, 58, 0.9) !important;
+            border-color: rgba(148, 163, 184, 0.4) !important;
+        }
+        html.dark .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-current-month .numInputWrapper:hover {
+            background: rgba(20, 36, 74, 0.95) !important;
+            border-color: #60A5FA !important;
+        }
+        html.dark .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-current-month input.cur-year {
+            color: #F8FAFC !important;
+        }
+        html.dark .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-current-month .numInputWrapper .arrowUp,
+        html.dark .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-current-month .numInputWrapper .arrowDown {
+            background: linear-gradient(135deg, rgba(15, 29, 58, 0.95) 0%, rgba(11, 23, 52, 1) 100%) !important;
+            border-color: rgba(148, 163, 184, 0.5) !important;
+        }
+        html.dark .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-current-month .numInputWrapper .arrowUp:hover,
+        html.dark .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-current-month .numInputWrapper .arrowDown:hover {
+            background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%) !important;
+            border-color: #60A5FA !important;
+        }
+        html.dark .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-day {
+            color: #E2E8F0 !important;
+            border-color: rgba(148, 163, 184, 0.2) !important;
+        }
+        html.dark .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-day:hover {
+            background: rgba(59, 130, 246, 0.25) !important;
+            color: #FFFFFF !important;
+            border-color: rgba(96, 165, 250, 0.5) !important;
+        }
+        html.dark .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-day.selected {
+            background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%) !important;
+            border-color: #3B82F6 !important;
+        }
+        html.dark .flatpickr-calendar.flatpickr-birthdate-theme .flatpickr-day.today {
+            border-color: #60A5FA !important;
+            color: #60A5FA !important;
+        }
+
+        /* ─────────────────────────────────────────────────────── */
+        /* APEXCHARTS EN MODE SOMBRE                                */
+        /* ─────────────────────────────────────────────────────── */
         html.dark .apexcharts-text tspan,
         html.dark .apexcharts-legend-text {
-            fill: #94A3B8 !important;
-            color: #94A3B8 !important;
+            fill: #CBD5E1 !important;
+            color: #CBD5E1 !important;
         }
         html.dark .apexcharts-gridline {
-            stroke: rgba(255,255,255,0.06) !important;
+            stroke: rgba(148, 163, 184, 0.12) !important;
+        }
+
+        /* ─────────────────────────────────────────────────────── */
+        /* SIDEBAR EN MODE SOMBRE                                   */
+        /* ─────────────────────────────────────────────────────── */
+        html.dark aside,
+        html.dark .sidebar {
+            background: linear-gradient(180deg, rgba(15, 29, 62, 0.98) 0%, rgba(11, 23, 52, 1) 100%) !important;
+            border-right: 1px solid rgba(148, 163, 184, 0.2) !important;
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4) !important;
+        }
+        html.dark .sidebar a,
+        html.dark .sidebar-link-item {
+            color: #E2E8F0 !important;
+        }
+        html.dark .sidebar a:hover,
+        html.dark .sidebar-link-item:hover {
+            background: rgba(96, 165, 250, 0.18) !important;
+            color: #FFFFFF !important;
+        }
+        html.dark .sidebar a.active,
+        html.dark .sidebar-link-item.active {
+            background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%) !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4) !important;
+        }
+        html.dark .sidebar .text-slate-400,
+        html.dark .sidebar .text-slate-500 {
+            color: #CBD5E1 !important;
         }
 
         /* Sidebar transition styles */

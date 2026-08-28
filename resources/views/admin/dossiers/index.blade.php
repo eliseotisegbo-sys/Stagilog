@@ -60,14 +60,13 @@
         </div>
         <input type="text" id="live-search-admin-dossiers"
                placeholder="Rechercher instantanément un dossier, école, filière..." 
-               class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-2xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] shadow-sm">
     </div>
 
     <!-- Tableau des dossiers -->
     <div class="bg-white rounded-3xl shadow-card border border-slate-100 overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs" id="admin-dossiers-table">
-                <thead class="bg-slate-50/80 text-slate-500 uppercase tracking-wider font-bold border-b border-slate-100">
+            <table class="w-full text-left text-sm" id="admin-dossiers-table">
+                <thead class="bg-slate-50/80 text-slate-500 uppercase tracking-wider font-extrabold text-xs border-b border-slate-100">
                     <tr>
                         <th class="py-4 px-6">ID & Université</th>
                         <th class="py-4 px-6">Filière / Cycle</th>
@@ -82,36 +81,36 @@
                     @forelse($dossiers as $dossier)
                     <tr class="hover:bg-slate-50/70 transition search-row">
                         <td class="py-4 px-6">
-                            <div class="font-bold text-[#0D1B4B] search-target font-mono text-xs">{{ $dossier->code_dossier ?? (($dossier->ecole->sigle ?? 'STG') . '-' . ($dossier->created_at ? $dossier->created_at->format('dmYHi') : '')) }}</div>
-                            <div class="text-[11px] text-slate-500 font-sans">{{ $dossier->ecole->nom_ecole ?? 'N/A' }}</div>
-                            <div class="text-[11px] text-slate-400">Année : {{ $dossier->annee_academique }}</div>
+                            <div class="font-bold text-[#0D1B4B] search-target font-mono text-sm">{{ $dossier->code_dossier ?? (($dossier->ecole->sigle ?? 'STG') . '-' . ($dossier->created_at ? $dossier->created_at->format('dmYHi') : '')) }}</div>
+                            <div class="text-xs font-semibold text-slate-600 font-sans mt-0.5">{{ $dossier->ecole->nom_ecole ?? 'N/A' }}</div>
+                            <div class="text-xs text-slate-400">Année : {{ $dossier->annee_academique }}</div>
                         </td>
                         <td class="py-4 px-6">
-                            <div class="font-semibold text-slate-800 search-target">{{ $dossier->filiere }}</div>
-                            <div class="text-[11px] text-[#1B3A8C] font-bold">{{ $dossier->cycle->nom_cycle ?? 'Standard' }}</div>
+                            <div class="font-bold text-slate-900 search-target text-sm">{{ $dossier->filiere }}</div>
+                            <div class="text-xs text-[#1B3A8C] font-extrabold mt-0.5">{{ $dossier->cycle->nom_cycle ?? 'Standard' }}</div>
                         </td>
                         <td class="py-4 px-6">
-                            <div class="text-slate-700 font-medium search-target">{{ $dossier->type_stage ?? 'Stage professionnel' }}</div>
-                            <div class="text-[11px] text-slate-400">{{ $dossier->annee_academique }}</div>
+                            <div class="text-slate-800 font-semibold search-target text-xs">{{ $dossier->type_stage ?? 'Stage professionnel' }}</div>
+                            <div class="text-xs text-slate-400 mt-0.5">{{ $dossier->annee_academique }}</div>
                         </td>
                         <td class="py-4 px-6">
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-blue-50 text-[#1B3A8C] font-bold">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-[#1B3A8C] font-extrabold text-xs">
                                 {{ $dossier->etudiants->count() }} étudiant(s)
                             </span>
                         </td>
-                        <td class="py-4 px-6 text-slate-600 text-xs lowercase">
-                            {{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('ddd D MMMM YYYY') : '-' }}
+                        <td class="py-4 px-6 text-slate-700 text-xs font-medium capitalize">
+                            {{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('D MMM YYYY') : '-' }}
                             <span class="text-slate-400 mx-1">au</span>
-                            {{ $dossier->datefin ? $dossier->datefin->locale('fr')->isoFormat('ddd D MMMM YYYY') : '-' }}
+                            {{ $dossier->datefin ? $dossier->datefin->locale('fr')->isoFormat('D MMM YYYY') : '-' }}
                         </td>
                         <td class="py-4 px-6">
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider {{ $dossier->statut === 'valide' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : ($dossier->statut === 'refuse' ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-amber-100 text-amber-700 border border-amber-200') }}">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider {{ $dossier->statut === 'valide' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : ($dossier->statut === 'refuse' ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-amber-100 text-amber-700 border border-amber-200') }}">
                                 {{ $dossier->statut === 'valide' ? 'Validé' : ($dossier->statut === 'refuse' ? 'Refusé' : 'En attente') }}
                             </span>
                         </td>
                         <td class="py-4 px-6 text-right space-x-2">
                             <a href="{{ route('admin.dossiers.show', $dossier->id_dossier) }}" 
-                               class="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-[#1B3A8C] text-white hover:bg-[#142B6B] rounded-xl font-bold text-xs shadow-sm transition">
+                               class="inline-flex items-center space-x-1.5 px-3.5 py-2 bg-[#1B3A8C] text-white hover:bg-[#142B6B] rounded-xl font-bold text-xs shadow-sm transition">
                                 <span>Examiner</span>
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                             </a>
@@ -119,7 +118,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="py-12 text-center text-slate-400">
+                        <td colspan="7" class="py-12 text-center text-slate-400 text-sm">
                             Aucun dossier de stage trouvé pour cette sélection.
                         </td>
                     </tr>
@@ -127,6 +126,7 @@
                 </tbody>
             </table>
         </div>
+    </div>
 
         @if($dossiers->hasPages())
         <div class="p-4 border-t border-slate-100 bg-slate-50">

@@ -88,19 +88,24 @@ class LoginController extends Controller
         // Génération code aléatoire 6 chiffres
         $code = strval(random_int(100000, 999999));
 
-        // Sauvegarder en session
-        $request->session()->put('2fa_auth', [
+        $data = [
             'user_id' => $user->id,
             'code' => $code,
             'role' => $user->role,
             'email' => $user->email,
             'name' => $user->name,
-            'expires_at' => now()->addMinutes(10)->timestamp,
-        ]);
+            'expires_at' => now()->addMinutes(15)->timestamp,
+        ];
+
+        // Sauvegarder en session et en cache pour éviter toute perte
+        $request->session()->put('2fa_auth', $data);
+        \Illuminate\Support\Facades\Cache::put('2fa_user_' . $user->id, $code, now()->addMinutes(15));
+        \Illuminate\Support\Facades\Cache::put('2fa_email_' . $user->email, $code, now()->addMinutes(15));
 
         // Envoi réel du code par email via stagilogtfg@gmail.com
         try {
             Mail::to($user->email)->send(new VerificationCodeMail($code, $user));
+            Log::info("Code 2FA envoyé avec succès à {$user->email} (Code: {$code})");
         } catch (\Exception $e) {
             Log::error("Erreur d'envoi du code 2FA à {$user->email} : " . $e->getMessage());
         }
@@ -134,34 +139,43 @@ class LoginController extends Controller
      */
     public function verifyCode(Request $request)
     {
-        $request->validate([
-            'digit_1' => 'required|numeric',
-            'digit_2' => 'required|numeric',
-            'digit_3' => 'required|numeric',
-            'digit_4' => 'required|numeric',
-            'digit_5' => 'required|numeric',
-            'digit_6' => 'required|numeric',
-        ], [
-            'digit_1.required' => 'Veuillez saisir les 6 chiffres du code.',
-        ]);
-
-        $submittedCode = $request->digit_1 . $request->digit_2 . $request->digit_3 . $request->digit_4 . $request->digit_5 . $request->digit_6;
-
         $twoFa = $request->session()->get('2fa_auth');
 
         if (!$twoFa) {
             return redirect()->route('welcome')->with('error', 'Session expirée. Veuillez vous réidentifier.');
         }
 
+        // Extraire tous les chiffres du code soumis (soit full_code, soit code, soit la concaténation de digit_1 à digit_6)
+        $submittedRaw = $request->input('full_code') 
+            ?? $request->input('code')
+            ?? ($request->input('digit_1', '') . $request->input('digit_2', '') . $request->input('digit_3', '') . $request->input('digit_4', '') . $request->input('digit_5', '') . $request->input('digit_6', ''));
+
+        $submittedCode = preg_replace('/\D/', '', trim((string)$submittedRaw));
+
+        if (strlen($submittedCode) !== 6) {
+            return back()->with('error', 'Veuillez renseigner l\'intégralité des 6 chiffres du code reçu par email.');
+        }
+
         if (now()->timestamp > $twoFa['expires_at']) {
             $request->session()->forget('2fa_auth');
+            \Illuminate\Support\Facades\Cache::forget('2fa_user_' . $twoFa['user_id']);
+            \Illuminate\Support\Facades\Cache::forget('2fa_email_' . $twoFa['email']);
             return redirect()->route($twoFa['role'] === 'admin' ? 'login.admin' : 'login.ecole')
                 ->with('error', 'Le code de vérification a expiré. Veuillez vous reconnecter pour en recevoir un nouveau.');
         }
 
-        if ($submittedCode !== $twoFa['code']) {
+        // Normaliser et comparer les codes en string pur
+        $expectedCode = trim(str_replace([' ', '-', '_'], '', (string)$twoFa['code']));
+        $submittedCodeNormalized = trim(str_replace([' ', '-', '_'], '', $submittedCode));
+
+        // Log pour debug (à retirer en production)
+        Log::info("Tentative 2FA - Email: {$twoFa['email']}, Code soumis: '{$submittedCodeNormalized}', Code attendu: '{$expectedCode}'");
+
+        // Vérification stricte du code de la session
+        if ($submittedCodeNormalized !== $expectedCode) {
             $user = User::find($twoFa['user_id']);
             ConnexionHistorique::logConnexion($user, $request, 'echec_otp');
+            Log::warning("Échec 2FA pour {$twoFa['email']} — Code saisi : '{$submittedCodeNormalized}', Code attendu : '{$expectedCode}'");
             return back()->with('error', 'Code de vérification incorrect. Veuillez vérifier le code à 6 chiffres reçu par email.');
         }
 
@@ -170,6 +184,8 @@ class LoginController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
         $request->session()->forget('2fa_auth');
+        \Illuminate\Support\Facades\Cache::forget('2fa_user_' . $user->id);
+        \Illuminate\Support\Facades\Cache::forget('2fa_email_' . $user->email);
 
         // Initialiser le nom de session pour les écoles
         session(['user_session_name' => $user->name]);
@@ -204,11 +220,14 @@ class LoginController extends Controller
 
         $code = strval(random_int(100000, 999999));
         $twoFa['code'] = $code;
-        $twoFa['expires_at'] = now()->addMinutes(10)->timestamp;
+        $twoFa['expires_at'] = now()->addMinutes(15)->timestamp;
         $request->session()->put('2fa_auth', $twoFa);
+        \Illuminate\Support\Facades\Cache::put('2fa_user_' . $user->id, $code, now()->addMinutes(15));
+        \Illuminate\Support\Facades\Cache::put('2fa_email_' . $user->email, $code, now()->addMinutes(15));
 
         try {
             Mail::to($user->email)->send(new VerificationCodeMail($code, $user));
+            Log::info("Nouveau code 2FA renvoyé à {$user->email} (Code: {$code})");
         } catch (\Exception $e) {
             Log::error("Erreur renvoi code 2FA : " . $e->getMessage());
         }

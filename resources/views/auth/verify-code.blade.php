@@ -13,16 +13,6 @@
         
         <!-- Carte principale -->
         <div class="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/40 p-8 sm:p-10 text-center relative overflow-hidden">
-            
-            <!-- Bande rouge TFG en haut -->
-            <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#1B3A8C] via-[#E8001D] to-[#1B3A8C]"></div>
-
-            <!-- Logo TFG & Icône Sécurité -->
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-50 text-[#1B3A8C] mb-6 shadow-inner border border-blue-100">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                </svg>
-            </div>
 
             <h1 class="text-2xl font-black text-[#0D1B4B] tracking-tight">Vérification de Sécurité</h1>
             <p class="text-xs text-slate-500 mt-2 leading-relaxed">
@@ -55,6 +45,7 @@
             <!-- Formulaire 6 Digits -->
             <form method="POST" action="{{ route('login.verify-code.submit') }}" id="otp-form" class="mt-8 space-y-6">
                 @csrf
+                <input type="hidden" name="full_code" id="full_code" value="">
 
                 <!-- Conteneur des 6 inputs -->
                 <div class="flex justify-between items-center gap-2 max-w-xs mx-auto">
@@ -91,7 +82,7 @@
 
         <!-- Footer Sécurité -->
         <p class="text-center text-[11px] text-blue-200/60 mt-6">
-            Protection sécurisée STAGILOG &bull; Technology Forever Group SARL
+            Protection sécurisée STAGILOG — Technology Forever Group SARL
         </p>
     </div>
 </div>
@@ -99,8 +90,14 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const inputs = document.querySelectorAll('.otp-input');
+    const fullCodeInput = document.getElementById('full_code');
     
-    // Auto-focus le premier champ
+    function updateFullCode() {
+        let code = Array.from(inputs).map(i => i.value.trim()).join('');
+        if (fullCodeInput) fullCodeInput.value = code;
+        return code;
+    }
+
     if (inputs.length > 0) {
         inputs[0].focus();
     }
@@ -108,15 +105,26 @@ document.addEventListener('DOMContentLoaded', () => {
     inputs.forEach((input, index) => {
         input.addEventListener('input', (e) => {
             const val = e.target.value;
-            // Ne garder que les chiffres
-            e.target.value = val.replace(/\D/g, '');
+            // Si l'utilisateur colle ou tape plusieurs caractères dans un seul champ
+            const cleanDigits = val.replace(/\D/g, '');
             
-            if (e.target.value && index < inputs.length - 1) {
-                inputs[index + 1].focus();
+            if (cleanDigits.length > 1) {
+                cleanDigits.split('').forEach((char, i) => {
+                    const targetIdx = index + i;
+                    if (inputs[targetIdx]) {
+                        inputs[targetIdx].value = char;
+                    }
+                });
+                const nextIdx = Math.min(index + cleanDigits.length, inputs.length - 1);
+                inputs[nextIdx].focus();
+            } else {
+                e.target.value = cleanDigits;
+                if (cleanDigits && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
             }
 
-            // Auto-submit si 6 chiffres saisis
-            let fullCode = Array.from(inputs).map(i => i.value).join('');
+            const fullCode = updateFullCode();
             if (fullCode.length === 6) {
                 submitOtpForm();
             }
@@ -128,7 +136,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Gestion du collage (Paste)
         input.addEventListener('paste', (e) => {
             e.preventDefault();
             const pasteData = (e.clipboardData || window.clipboardData).getData('text').trim();
@@ -140,7 +147,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            if (digits.length === 6) {
+            const fullCode = updateFullCode();
+            if (fullCode.length === 6) {
                 submitOtpForm();
             } else if (digits.length > 0 && inputs[digits.length]) {
                 inputs[digits.length].focus();
@@ -151,21 +159,20 @@ document.addEventListener('DOMContentLoaded', () => {
     let formSubmitted = false;
     function submitOtpForm() {
         if (formSubmitted) return;
-        formSubmitted = true;
+        const code = updateFullCode();
+        if (code.length < 6) return;
         
-        // Disable inputs to prevent further typing/submitting
-        inputs.forEach(input => input.setAttribute('readonly', 'true'));
+        formSubmitted = true;
         
         const btn = document.getElementById('btn-submit-otp');
         if(btn) {
             btn.disabled = true;
-            btn.innerHTML = '<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Validation...';
+            btn.innerHTML = '<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Validation en cours...';
         }
 
         document.getElementById('otp-form').submit();
     }
 
-    // Handle form submit on manual button click
     const otpForm = document.getElementById('otp-form');
     if (otpForm) {
         otpForm.addEventListener('submit', function(e) {
@@ -173,7 +180,6 @@ document.addEventListener('DOMContentLoaded', () => {
             submitOtpForm();
         });
     }
-
 });
 </script>
 @endsection

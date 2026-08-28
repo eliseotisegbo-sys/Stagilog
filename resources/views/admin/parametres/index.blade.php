@@ -231,16 +231,6 @@
                 </form>
             </div>
             @else
-            <!-- Information pour les administrateurs non-super-admin -->
-            <div class="bg-white rounded-3xl shadow-card border border-slate-100 p-6 sm:p-8">
-                <div class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-3">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                </div>
-                <h4 class="text-xs font-extrabold text-[#0D1B4B] uppercase tracking-wider mb-1">Gestion Administrateurs</h4>
-                <p class="text-xs text-slate-500 leading-relaxed">
-                    Seul le Super Administrateur (<strong class="text-[#0D1B4B]">{{ $firstAdmin->name ?? 'Super Admin' }}</strong>) peut créer de nouveaux comptes ou gérer les privilèges d'administration.
-                </p>
-            </div>
             @endif
 
             <!-- Liste des Administrateurs existants -->

@@ -275,15 +275,6 @@
 </div>
 
 @push('scripts')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<style>
-    .flatpickr-calendar { font-family: 'Plus Jakarta Sans', sans-serif !important; border-radius: 16px !important; box-shadow: 0 20px 60px rgba(13,27,75,0.15) !important; border: 1px solid #E2E8F0 !important; }
-    .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange { background: #1B3A8C !important; border-color: #1B3A8C !important; }
-    .flatpickr-day.inRange { background: #EEF4FF !important; border-color: #EEF4FF !important; color: #1B3A8C !important; }
-    .flatpickr-months .flatpickr-month { background: #0D1B4B !important; border-radius: 16px 16px 0 0 !important; }
-    .flatpickr-current-month, .flatpickr-monthDropdown-months, .flatpickr-weekday { color: white !important; }
-    .flatpickr-day:hover { background: #EEF4FF !important; color: #1B3A8C !important; }
-</style>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var startPicker = flatpickr('#start_date_display', {
@@ -293,6 +284,9 @@ document.addEventListener('DOMContentLoaded', function() {
         altFormat: 'D j M Y',
         maxDate: 'today',
         defaultDate: document.getElementById('start_date').value || null,
+        onReady: function(selectedDates, dateStr, instance) {
+            instance.calendarContainer.classList.add('flatpickr-range-theme');
+        },
         onChange: function(selectedDates, dateStr) {
             document.getElementById('start_date').value = dateStr;
             endPicker.set('minDate', dateStr);
@@ -305,6 +299,9 @@ document.addEventListener('DOMContentLoaded', function() {
         altFormat: 'D j M Y',
         maxDate: 'today',
         defaultDate: document.getElementById('end_date').value || null,
+        onReady: function(selectedDates, dateStr, instance) {
+            instance.calendarContainer.classList.add('flatpickr-range-theme');
+        },
         onChange: function(selectedDates, dateStr) {
             document.getElementById('end_date').value = dateStr;
         }

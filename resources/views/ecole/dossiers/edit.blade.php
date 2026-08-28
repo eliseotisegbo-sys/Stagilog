@@ -323,13 +323,17 @@ function updateSigleSuggestion(select) {
 let startPicker, endPicker;
 document.addEventListener('DOMContentLoaded', function() {
     if (typeof flatpickr !== 'undefined') {
-        flatpickr.localize(flatpickr.l1ons.fr);
+        flatpickr.localize(flatpickr.l10ns.fr);
         
         startPicker = flatpickr("#datedebut", {
             dateFormat: "Y-m-d",
             altInput: true,
             altFormat: "j F Y",
             allowInput: true,
+            locale: "fr",
+            onReady: function(selectedDates, dateStr, instance) {
+                instance.calendarContainer.classList.add('flatpickr-range-theme');
+            },
             onChange: function(selectedDates, dateStr) {
                 if (endPicker) {
                     endPicker.set('minDate', dateStr);
@@ -343,6 +347,10 @@ document.addEventListener('DOMContentLoaded', function() {
             altInput: true,
             altFormat: "j F Y",
             allowInput: true,
+            locale: "fr",
+            onReady: function(selectedDates, dateStr, instance) {
+                instance.calendarContainer.classList.add('flatpickr-range-theme');
+            },
             onChange: function() {
                 calculateDuration();
             }
@@ -352,7 +360,7 @@ document.addEventListener('DOMContentLoaded', function() {
         calculateDuration();
     }
 
-    // Initialiser les datepickers pour les dates de naissance
+    // Initialiser les datepickers pour les dates de naissance (Image 2)
     initBirthDatepickers();
 
     // Activer l'écoute des fiches étudiants
@@ -362,12 +370,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function initBirthDatepickers() {
     if (typeof flatpickr !== 'undefined') {
+        flatpickr.localize(flatpickr.l10ns.fr);
         flatpickr(".birth-datepicker-input", {
             dateFormat: "Y-m-d",
             altInput: true,
             altFormat: "j F Y",
             allowInput: true,
-            maxDate: "today"
+            maxDate: "today",
+            locale: "fr",
+            onReady: function(selectedDates, dateStr, instance) {
+                instance.calendarContainer.classList.add('flatpickr-birthdate-theme');
+            }
         });
     }
 }
@@ -382,7 +395,7 @@ function calculateDuration() {
         const d1 = new Date(d1Val);
         const d2 = new Date(d2Val);
         const diffTime = d2 - d1;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24)); // Math.round au lieu de Math.ceil
 
         if (diffDays > 0) {
             const months = Math.round(diffDays / 30);
