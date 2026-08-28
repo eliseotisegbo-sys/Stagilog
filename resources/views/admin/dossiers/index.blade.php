@@ -54,19 +54,22 @@
     </div>
 
     <!-- Barre de Recherche Instantanée -->
-    <div class="relative max-w-md w-full">
-        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+    <div class="bg-white rounded-2xl shadow-card border border-slate-100 p-4">
+        <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </div>
+            <input type="text" id="live-search-admin-dossiers"
+                   placeholder="Rechercher instantanément par code, école, filière, cycle..." 
+                   class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white shadow-sm transition">
         </div>
-        <input type="text" id="live-search-admin-dossiers"
-               placeholder="Rechercher instantanément un dossier, école, filière..." 
     </div>
 
     <!-- Tableau des dossiers -->
     <div class="bg-white rounded-3xl shadow-card border border-slate-100 overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm" id="admin-dossiers-table">
-                <thead class="bg-slate-50/80 text-slate-500 uppercase tracking-wider font-extrabold text-xs border-b border-slate-100">
+            <table class="w-full text-left" id="admin-dossiers-table" style="font-size: 0.8125rem !important;">
+                <thead class="bg-slate-50/80 text-slate-500 uppercase tracking-wider font-extrabold border-b border-slate-100" style="font-size: 0.6875rem !important;">
                     <tr>
                         <th class="py-4 px-6">ID & Université</th>
                         <th class="py-4 px-6">Filière / Cycle</th>
@@ -81,36 +84,36 @@
                     @forelse($dossiers as $dossier)
                     <tr class="hover:bg-slate-50/70 transition search-row">
                         <td class="py-4 px-6">
-                            <div class="font-bold text-[#0D1B4B] search-target font-mono text-sm">{{ $dossier->code_dossier ?? (($dossier->ecole->sigle ?? 'STG') . '-' . ($dossier->created_at ? $dossier->created_at->format('dmYHi') : '')) }}</div>
-                            <div class="text-xs font-semibold text-slate-600 font-sans mt-0.5">{{ $dossier->ecole->nom_ecole ?? 'N/A' }}</div>
-                            <div class="text-xs text-slate-400">Année : {{ $dossier->annee_academique }}</div>
+                            <div class="font-bold text-[#0D1B4B] search-target font-mono" style="font-size: 0.8125rem;">{{ $dossier->code_dossier ?? (($dossier->ecole->sigle ?? 'STG') . '-' . ($dossier->created_at ? $dossier->created_at->format('dmYHi') : '')) }}</div>
+                            <div class="font-semibold text-slate-600 font-sans mt-0.5" style="font-size: 0.6875rem;">{{ $dossier->ecole->nom_ecole ?? 'N/A' }}</div>
+                            <div class="text-slate-400" style="font-size: 0.6875rem;">Année : {{ $dossier->annee_academique }}</div>
                         </td>
                         <td class="py-4 px-6">
-                            <div class="font-bold text-slate-900 search-target text-sm">{{ $dossier->filiere }}</div>
-                            <div class="text-xs text-[#1B3A8C] font-extrabold mt-0.5">{{ $dossier->cycle->nom_cycle ?? 'Standard' }}</div>
+                            <div class="font-bold text-slate-900 search-target" style="font-size: 0.8125rem;">{{ $dossier->filiere }}</div>
+                            <div class="text-[#1B3A8C] font-extrabold mt-0.5" style="font-size: 0.6875rem;">{{ $dossier->cycle->nom_cycle ?? 'Standard' }}</div>
                         </td>
                         <td class="py-4 px-6">
-                            <div class="text-slate-800 font-semibold search-target text-xs">{{ $dossier->type_stage ?? 'Stage professionnel' }}</div>
-                            <div class="text-xs text-slate-400 mt-0.5">{{ $dossier->annee_academique }}</div>
+                            <div class="text-slate-800 font-semibold search-target" style="font-size: 0.75rem;">{{ $dossier->type_stage ?? 'Stage professionnel' }}</div>
+                            <div class="text-slate-400 mt-0.5" style="font-size: 0.6875rem;">{{ $dossier->annee_academique }}</div>
                         </td>
                         <td class="py-4 px-6">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-[#1B3A8C] font-extrabold text-xs">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-[#1B3A8C] font-extrabold" style="font-size: 0.6875rem;">
                                 {{ $dossier->etudiants->count() }} étudiant(s)
                             </span>
                         </td>
-                        <td class="py-4 px-6 text-slate-700 text-xs font-medium capitalize">
+                        <td class="py-4 px-6 text-slate-700 font-medium capitalize" style="font-size: 0.75rem;">
                             {{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('D MMM YYYY') : '-' }}
                             <span class="text-slate-400 mx-1">au</span>
                             {{ $dossier->datefin ? $dossier->datefin->locale('fr')->isoFormat('D MMM YYYY') : '-' }}
                         </td>
                         <td class="py-4 px-6">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider {{ $dossier->statut === 'valide' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : ($dossier->statut === 'refuse' ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-amber-100 text-amber-700 border border-amber-200') }}">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full font-black uppercase tracking-wider {{ $dossier->statut === 'valide' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : ($dossier->statut === 'refuse' ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-amber-100 text-amber-700 border border-amber-200') }}" style="font-size: 0.6875rem;">
                                 {{ $dossier->statut === 'valide' ? 'Validé' : ($dossier->statut === 'refuse' ? 'Refusé' : 'En attente') }}
                             </span>
                         </td>
                         <td class="py-4 px-6 text-right space-x-2">
                             <a href="{{ route('admin.dossiers.show', $dossier->id_dossier) }}" 
-                               class="inline-flex items-center space-x-1.5 px-3.5 py-2 bg-[#1B3A8C] text-white hover:bg-[#142B6B] rounded-xl font-bold text-xs shadow-sm transition">
+                               class="inline-flex items-center space-x-1.5 px-3.5 py-2 bg-[#1B3A8C] text-white hover:bg-[#142B6B] rounded-xl font-bold shadow-sm transition" style="font-size: 0.6875rem;">
                                 <span>Examiner</span>
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                             </a>
@@ -118,7 +121,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="py-12 text-center text-slate-400 text-sm">
+                        <td colspan="7" class="py-12 text-center text-slate-400" style="font-size: 0.875rem;">
                             Aucun dossier de stage trouvé pour cette sélection.
                         </td>
                     </tr>
