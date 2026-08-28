@@ -133,6 +133,7 @@ Route::middleware(['auth', 'first.login', 'role:admin'])->prefix('admin')->name(
     Route::get('/rapports/stagiaires-actifs', [AdminRapportController::class, 'stagiairesActifs'])->name('rapports.stagiaires');
     Route::get('/rapports/{id}/depot', [AdminRapportController::class, 'depot'])->name('rapports.depot');
     Route::post('/rapports/{id}/depot', [AdminRapportController::class, 'storeDepot'])->name('rapports.depot.store');
+    Route::post('/rapports/{id}/publier-brouillons', [AdminRapportController::class, 'publishDrafts'])->name('rapports.depot.publier');
     Route::delete('/rapports/document/{id}', [AdminRapportController::class, 'destroyDocument'])->name('rapports.document.destroy');
     Route::delete('/rapports/{id}', [AdminRapportController::class, 'destroy'])->name('rapports.destroy');
 

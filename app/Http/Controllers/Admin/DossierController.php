@@ -158,7 +158,7 @@ class DossierController extends Controller
             $dossier->id_ecole
         );
 
-        // 2. Envoi réel d'email de refus avec motif via stagilogtfg@gmail.com
+        // 2. Envoi réel d'email de refus avec motif à l'école via stagilogtfg@gmail.com
         if ($dossier->ecole && ($dossier->ecole->email || $dossier->ecole->mail)) {
             $destEmail = $dossier->ecole->email ?? $dossier->ecole->mail;
             try {
@@ -168,8 +168,19 @@ class DossierController extends Controller
             }
         }
 
+        // 3. Envoi réel d'email de refus avec motif à CHAQUE étudiant du dossier
+        foreach ($dossier->etudiants as $etudiant) {
+            if ($etudiant->email_etu && filter_var($etudiant->email_etu, FILTER_VALIDATE_EMAIL)) {
+                try {
+                    Mail::to($etudiant->email_etu)->send(new DossierRefuseMail($dossier, $request->motif_refus));
+                } catch (\Exception $e) {
+                    Log::warning("Erreur envoi email refus étudiant ({$etudiant->email_etu}) : " . $e->getMessage());
+                }
+            }
+        }
+
         return redirect()->route('admin.dossiers.show', $id)
-            ->with('error', "Le dossier {$codeDossier} a été REFUSÉ. L'école a été notifiée par email avec le motif enregistré.");
+            ->with('error', "Le dossier {$codeDossier} a été REFUSÉ. L'école et tous les étudiants ont été notifiés par email avec le motif enregistré.");
     }
 
     /**

@@ -227,6 +227,7 @@
                                     Email Étudiant <span class="text-[#E8001D]">*</span>
                                 </label>
                                 <input type="email" name="etudiants[{{ $index }}][email]" value="{{ $etu['email'] ?? '' }}" required
+                                       pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Veuillez saisir un email valide au format sefoflamm@gmail.com"
                                        class="student-input w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]"
                                        placeholder="etudiant@domaine.com">
                             </div>
@@ -498,6 +499,7 @@ function addStudentCard() {
                     Email Étudiant <span class="text-[#E8001D]">*</span>
                 </label>
                 <input type="email" name="etudiants[${newIndex}][email]" required
+                       pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Veuillez saisir un email valide au format sefoflamm@gmail.com"
                        class="student-input w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]"
                        placeholder="etudiant@domaine.com">
             </div>

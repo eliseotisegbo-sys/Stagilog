@@ -55,11 +55,14 @@ class RapportController extends Controller
             ->with(['dossier.ecole', 'documents'])
             ->findOrFail($id);
 
-        return view('admin.rapports.depot', compact('etudiant'));
+        $datedebut = $etudiant->dossier->datedebut;
+        $stageCommence = $datedebut ? now()->startOfDay()->gte($datedebut->startOfDay()) : true;
+
+        return view('admin.rapports.depot', compact('etudiant', 'datedebut', 'stageCommence'));
     }
 
     /**
-     * Déposer un nouveau document lié au rapport de l'étudiant avec nom personnalisé
+     * Déposer un ou plusieurs nouveaux documents liés à l'étudiant (Support multi-fichiers, brouillons & publication)
      */
     public function storeDepot(Request $request, $id)
     {
@@ -68,49 +71,132 @@ class RapportController extends Controller
             })
             ->findOrFail($id);
 
-        $request->validate([
-            'nom_document' => 'required|string|max:255',
-            'fichier' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,zip|max:20480',
-        ], [
-            'nom_document.required' => 'Veuillez préciser le nom du document (ex: Rapport de Stage, Procès-Verbal, Attestation...).',
-            'fichier.required' => 'Veuillez joindre le fichier à déposer.',
-            'fichier.mimes' => 'Le fichier doit être au format PDF, Word, Excel ou ZIP.',
-        ]);
+        $datedebut = $etudiant->dossier->datedebut;
+        $stageCommence = $datedebut ? now()->startOfDay()->gte($datedebut->startOfDay()) : true;
+        $isDraft = ($request->input('action') === 'brouillon') || !$stageCommence;
 
-        $file = $request->file('fichier');
-        $fileName = 'doc_' . $etudiant->id_etudiant . '_' . time() . '_' . rand(10, 99) . '.' . $file->getClientOriginalExtension();
-        $fileSize = round($file->getSize() / 1024, 1) . ' Ko';
-        if ($file->getSize() > 1048576) {
-            $fileSize = round($file->getSize() / 1048576, 2) . ' Mo';
+        // Préparer la liste des documents à traiter (support format unique ou multiple)
+        $items = [];
+        if ($request->has('documents') && is_array($request->documents)) {
+            $items = $request->documents;
+        } elseif ($request->filled('nom_document') && $request->hasFile('fichier')) {
+            $items[] = [
+                'nom_document' => $request->nom_document,
+                'fichier' => $request->file('fichier'),
+            ];
         }
 
-        $file->move(public_path('uploads/rapports'), $fileName);
-
-        // Enregistrer le document
-        $etudiant->documents()->create([
-            'nom_document' => $request->nom_document,
-            'fichier' => $fileName,
-            'taille_fichier' => $fileSize,
-        ]);
-
-        // Mise à jour de compatibilité sur etudiant->rapport
-        if (!$etudiant->rapport) {
-            $etudiant->rapport = $fileName;
-            $etudiant->save();
+        if (empty($items)) {
+            return back()->with('error', 'Veuillez renseigner au moins un titre et joindre le fichier correspondant.');
         }
 
-        // Notification à l'école
-        \App\Models\AppNotification::notifier(
-            'ecole',
-            'Nouveau Document Déposé',
-            "Un document '{$request->nom_document}' a été déposé par TFG SARL pour {$etudiant->nom_etudiant} {$etudiant->prenom_etudiant}.",
-            route('ecole.rapports.index'),
-            'rapport_depose',
-            $etudiant->dossier->id_ecole
-        );
+        $savedCount = 0;
+        $uploadedNames = [];
 
-        return redirect()->route('admin.rapports.depot', $etudiant->id_etudiant)
-            ->with('success', "Le document '{$request->nom_document}' a été déposé avec succès pour {$etudiant->nom_etudiant} {$etudiant->prenom_etudiant} !");
+        foreach ($items as $item) {
+            if (empty($item['nom_document']) || empty($item['fichier'])) {
+                continue;
+            }
+
+            $file = $item['fichier'];
+            if (!$file->isValid()) {
+                continue;
+            }
+
+            $fileName = 'doc_' . $etudiant->id_etudiant . '_' . time() . '_' . rand(100, 999) . '.' . $file->getClientOriginalExtension();
+            $fileSize = round($file->getSize() / 1024, 1) . ' Ko';
+            if ($file->getSize() > 1048576) {
+                $fileSize = round($file->getSize() / 1048576, 2) . ' Mo';
+            }
+
+            $file->move(public_path('uploads/rapports'), $fileName);
+
+            $statutDoc = $isDraft ? 'brouillon' : 'publie';
+
+            $etudiant->documents()->create([
+                'nom_document' => trim($item['nom_document']),
+                'fichier' => $fileName,
+                'taille_fichier' => $fileSize,
+                'statut' => $statutDoc,
+            ]);
+
+            if ($statutDoc === 'publie' && !$etudiant->rapport) {
+                $etudiant->rapport = $fileName;
+                $etudiant->save();
+            }
+
+            $uploadedNames[] = trim($item['nom_document']);
+            $savedCount++;
+        }
+
+        if ($savedCount === 0) {
+            return back()->with('error', 'Aucun document valide n\'a pu être enregistré. Veuillez vérifier les fichiers.');
+        }
+
+        // Si publié, publier aussi tous les brouillons existants de cet étudiant
+        if (!$isDraft) {
+            EtudiantDocument::where('id_etudiant', $etudiant->id_etudiant)
+                ->where('statut', 'brouillon')
+                ->update(['statut' => 'publie']);
+
+            // Notification à l'école
+            $docListStr = implode(', ', $uploadedNames);
+            \App\Models\AppNotification::notifier(
+                'ecole',
+                'Nouveaux Documents Déposés',
+                "Documents ({$docListStr}) déposés par TFG SARL pour {$etudiant->nom_etudiant} {$etudiant->prenom_etudiant}.",
+                route('ecole.rapports.index'),
+                'rapport_depose',
+                $etudiant->dossier->id_ecole
+            );
+
+            return redirect()->route('admin.rapports.depot', $etudiant->id_etudiant)
+                ->with('success', "{$savedCount} document(s) publié(s) avec succès pour {$etudiant->nom_etudiant} {$etudiant->prenom_etudiant} ! L'école a été notifiée.");
+        }
+
+        $msg = "{$savedCount} document(s) enregistré(s) en Brouillon. ";
+        if (!$stageCommence && $datedebut) {
+            $msg .= "Ils seront transmissibles dès le début du stage le " . $datedebut->format('d/m/Y') . ".";
+        } else {
+            $msg .= "Vous pourrez les publier définitivement à tout moment.";
+        }
+
+        return redirect()->route('admin.rapports.depot', $etudiant->id_etudiant)->with('info', $msg);
+    }
+
+    /**
+     * Publier définitivement tous les documents en brouillon d'un étudiant
+     */
+    public function publishDrafts($id)
+    {
+        $etudiant = Etudiant::whereHas('dossier', function($q) {
+                $q->where('statut', 'valide');
+            })
+            ->findOrFail($id);
+
+        $datedebut = $etudiant->dossier->datedebut;
+        $stageCommence = $datedebut ? now()->startOfDay()->gte($datedebut->startOfDay()) : true;
+
+        if (!$stageCommence) {
+            return back()->with('error', "Le stage de cet étudiant débute le " . $datedebut->format('d/m/Y') . ". Vous ne pouvez pas publier les documents avant cette date.");
+        }
+
+        $count = EtudiantDocument::where('id_etudiant', $etudiant->id_etudiant)
+            ->where('statut', 'brouillon')
+            ->update(['statut' => 'publie']);
+
+        if ($count > 0) {
+            \App\Models\AppNotification::notifier(
+                'ecole',
+                'Nouveaux Documents Publiés',
+                "Des documents officiels de stage ont été publiés par TFG SARL pour {$etudiant->nom_etudiant} {$etudiant->prenom_etudiant}.",
+                route('ecole.rapports.index'),
+                'rapport_depose',
+                $etudiant->dossier->id_ecole
+            );
+        }
+
+        return back()->with('success', "Tous les documents en brouillon ({$count}) ont été publiés et transmis avec succès.");
     }
 
     /**

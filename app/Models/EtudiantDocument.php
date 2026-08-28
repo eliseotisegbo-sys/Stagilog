@@ -17,6 +17,7 @@ class EtudiantDocument extends Model
         'nom_document',
         'fichier',
         'taille_fichier',
+        'statut',
     ];
 
     public function etudiant()

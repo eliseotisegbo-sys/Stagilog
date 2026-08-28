@@ -24,7 +24,11 @@ class RapportController extends Controller
             ->pluck('id_dossier');
 
         $etudiants = Etudiant::whereIn('id_dossier', $dossierIds)
-            ->with(['dossier', 'documents'])
+            ->with(['dossier', 'documents' => function($q) {
+                $q->where(function($sq) {
+                    $sq->where('statut', 'publie')->orWhereNull('statut');
+                });
+            }])
             ->when($search, function($q) use ($search) {
                 $q->where(function($sub) use ($search) {
                     $sub->where('nom_etudiant', 'like', "%{$search}%")
@@ -37,6 +41,8 @@ class RapportController extends Controller
 
         $totalDocuments = EtudiantDocument::whereHas('etudiant', function($q) use ($dossierIds) {
             $q->whereIn('id_dossier', $dossierIds);
+        })->where(function($sq) {
+            $sq->where('statut', 'publie')->orWhereNull('statut');
         })->count();
 
         return view('ecole.rapports.index', compact('etudiants', 'search', 'totalDocuments'));

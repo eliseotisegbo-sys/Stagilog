@@ -19,7 +19,7 @@
 
         <!-- Action Decision Buttons -->
         <div class="flex items-center space-x-3">
-            @if($dossier->statut !== 'valide')
+            @if($dossier->statut === 'en_attente')
                 <form action="{{ route('admin.dossiers.valider', $dossier->id_dossier) }}" method="POST">
                     @csrf
                     <button type="submit" 
@@ -29,13 +29,11 @@
                     </button>
                 </form>
 
-                @if($dossier->statut !== 'refuse')
                 <button type="button" onclick="document.getElementById('modal-refus').classList.remove('hidden')" 
                         class="inline-flex items-center space-x-2 bg-red-50 hover:bg-red-100 text-[#E8001D] border border-red-200 px-5 py-2.5 rounded-2xl text-xs font-bold transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     <span>Refuser le Dossier</span>
                 </button>
-                @endif
             @endif
         </div>
     </div>
