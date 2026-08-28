@@ -151,9 +151,9 @@ class DashboardController extends Controller
         // Compteurs globaux — toujours toutes les écoles
         $totalEcoles = Ecole::count();
 
-        // Dossiers (avec filtre de période si défini)
+        // Dossiers (avec filtre de période si défini, STRICTEMENT SOUMIS)
         $dossierQuery = function() use ($startDate, $endDate) {
-            $q = Dossier::query();
+            $q = Dossier::where('statut_brouillon', 'soumis');
             if ($startDate && $endDate) {
                 $q->whereBetween('created_at', [$startDate, $endDate]);
             }
@@ -161,22 +161,30 @@ class DashboardController extends Controller
         };
 
         $totalDossiers     = (clone $dossierQuery())->count();
-        $dossiersEnAttente = (clone $dossierQuery())->where('statut', 'en_attente')->where('statut_brouillon', 'soumis')->count();
+        $dossiersEnAttente = (clone $dossierQuery())->where('statut', 'en_attente')->count();
         $dossiersValides   = (clone $dossierQuery())->where('statut', 'valide')->count();
         $dossiersRefuses   = (clone $dossierQuery())->where('statut', 'refuse')->count();
-        $totalEtudiants    = Etudiant::count(); // toujours global
-        $totalRapports     = Etudiant::whereNotNull('rapport')->count();
+        
+        // Etudiants uniquement liés aux dossiers soumis
+        $totalEtudiants    = Etudiant::whereHas('dossier', function($q) {
+            $q->where('statut_brouillon', 'soumis');
+        })->count();
+        $totalRapports     = Etudiant::whereHas('dossier', function($q) {
+            $q->where('statut_brouillon', 'soumis');
+        })->whereNotNull('rapport')->count();
 
         $tauxApprobation   = $totalDossiers > 0 ? round(($dossiersValides / $totalDossiers) * 100, 1) : 0;
 
-        // 5 Derniers dossiers (toujours les plus récents, non filtrés par la période)
-        $derniersDossiers = Dossier::with(['ecole', 'cycle', 'filiereRelation', 'etudiants'])
+        // 5 Derniers dossiers (toujours uniquement les dossiers soumis)
+        $derniersDossiers = Dossier::where('statut_brouillon', 'soumis')
+            ->with(['ecole', 'cycle', 'filiereRelation', 'etudiants'])
             ->latest()
             ->take(5)
             ->get();
 
         // --- Filières avec filtre ---
         $filieresStats = Filiere::withCount(['dossiers' => function($q) use ($startDate, $endDate) {
+            $q->where('statut_brouillon', 'soumis');
             if ($startDate && $endDate) {
                 $q->whereBetween('created_at', [$startDate, $endDate]);
             }
@@ -193,7 +201,8 @@ class DashboardController extends Controller
             $last    = $endDate->copy()->startOfMonth();
             while ($current->lte($last)) {
                 $timelineMonths[] = ucfirst($current->locale('fr')->isoFormat('MMM YYYY'));
-                $timelineData[]   = Dossier::whereYear('created_at',  $current->year)
+                $timelineData[]   = Dossier::where('statut_brouillon', 'soumis')
+                    ->whereYear('created_at',  $current->year)
                     ->whereMonth('created_at', $current->month)
                     ->whereBetween('created_at', [$startDate, $endDate])
                     ->count();
@@ -203,14 +212,16 @@ class DashboardController extends Controller
             for ($i = 5; $i >= 0; $i--) {
                 $date = now()->subMonths($i);
                 $timelineMonths[] = ucfirst($date->locale('fr')->isoFormat('MMM YYYY'));
-                $timelineData[]   = Dossier::whereYear('created_at',  $date->year)
+                $timelineData[]   = Dossier::where('statut_brouillon', 'soumis')
+                    ->whereYear('created_at',  $date->year)
                     ->whereMonth('created_at', $date->month)
                     ->count();
             }
         }
 
-        // --- Répartition par école (filtrée) ---
+        // --- Répartition par école (filtrée - uniquement dossiers soumis) ---
         $ecolesWithDossiers = Ecole::withCount(['dossiers' => function($q) use ($startDate, $endDate) {
+            $q->where('statut_brouillon', 'soumis');
             if ($startDate && $endDate) {
                 $q->whereBetween('created_at', [$startDate, $endDate]);
             }

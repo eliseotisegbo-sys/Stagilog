@@ -27,9 +27,9 @@ class ParametreController extends Controller
         // Liste de tous les comptes Administrateurs TFG SARL
         $admins = User::where('role', 'admin')->latest()->get();
 
-        // Historique complet des connexions / déconnexions
-        // Ne montrer que les connexions réussies (après validation du code 6 chiffres)
+        // Historique des connexions des administrateurs (les écoles sont strictement exclues de l'affichage admin)
         $connexions = ConnexionHistorique::where('statut', 'succes')
+            ->where('role', 'admin')
             ->latest()
             ->paginate(25);
 
@@ -190,19 +190,32 @@ class ParametreController extends Controller
             'email' => 'required|email|max:255',
             'telephone' => 'nullable|string|max:50',
             'adresse_ecole' => 'nullable|string|max:255',
+            'photo_profil' => 'nullable|image|mimes:jpeg,png,jpg,svg,webp|max:4096',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,svg,webp|max:4096',
         ]);
 
-        // Upload Logo École
-        if ($request->hasFile('logo') && $ecole) {
-            $logoDir = public_path('uploads/logos');
-            if (!File::isDirectory($logoDir)) {
-                File::makeDirectory($logoDir, 0755, true, true);
-            }
+        $imageFile = $request->file('photo_profil') ?? $request->file('logo');
 
-            $logoName = 'logo_' . $ecole->id_ecole . '_' . time() . '.' . $request->file('logo')->getClientOriginalExtension();
-            $request->file('logo')->move($logoDir, $logoName);
-            $ecole->logo = $logoName;
+        if ($imageFile) {
+            // 1. Sauvegarder la photo de profil personnelle de l'utilisateur
+            $avatarDir = public_path('uploads/avatars');
+            if (!File::isDirectory($avatarDir)) {
+                File::makeDirectory($avatarDir, 0755, true, true);
+            }
+            $avatarName = 'avatar_' . $user->id . '_' . time() . '.' . $imageFile->getClientOriginalExtension();
+            $imageFile->move($avatarDir, $avatarName);
+            $user->photo_profil = $avatarName;
+
+            // 2. Si c'est une école, copier pour le logo de l'établissement
+            if ($ecole) {
+                $logoDir = public_path('uploads/logos');
+                if (!File::isDirectory($logoDir)) {
+                    File::makeDirectory($logoDir, 0755, true, true);
+                }
+                $logoName = 'logo_' . $ecole->id_ecole . '_' . time() . '.' . $imageFile->getClientOriginalExtension();
+                File::copy(public_path('uploads/avatars/' . $avatarName), $logoDir . '/' . $logoName);
+                $ecole->logo = $logoName;
+            }
         }
 
         if ($ecole) {
@@ -219,7 +232,7 @@ class ParametreController extends Controller
         $user->save();
         session(['user_session_name' => $request->nom_responsable]);
 
-        return back()->with('success', 'Les coordonnées de votre établissement et de votre profil ont été mises à jour.');
+        return back()->with('success', 'Les coordonnées de votre établissement et de votre profil personnel ont été mises à jour.');
     }
 
     /**

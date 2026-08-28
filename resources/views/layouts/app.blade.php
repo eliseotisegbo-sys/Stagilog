@@ -179,12 +179,13 @@
             background: #F8FAFC !important;
         }
         .flatpickr-calendar .flatpickr-current-month .numInputWrapper {
-            display: inline-block !important;
+            display: inline-flex !important;
+            align-items: center !important;
             position: relative !important;
             background: #FFFFFF !important;
             border: 1px solid #CBD5E1 !important;
             border-radius: 12px !important;
-            padding: 4px 10px !important;
+            padding: 3px 22px 3px 8px !important;
             box-shadow: 0 2px 4px rgba(0,0,0,0.06) !important;
         }
         .flatpickr-calendar .flatpickr-current-month input.cur-year {
@@ -192,51 +193,39 @@
             color: #1E293B !important;
             background: transparent !important;
             border: none !important;
-            padding: 2px 4px !important;
-            width: 72px !important;
-            font-size: 16px !important;
+            padding: 0 !important;
+            width: 48px !important;
+            font-size: 15px !important;
             outline: none !important;
             text-align: center !important;
+            -moz-appearance: textfield !important;
         }
-        .flatpickr-calendar .flatpickr-current-month input.cur-year:hover,
-        .flatpickr-calendar .flatpickr-current-month input.cur-year:focus {
-            background: transparent !important;
+        .flatpickr-calendar .flatpickr-current-month input.cur-year::-webkit-outer-spin-button,
+        .flatpickr-calendar .flatpickr-current-month input.cur-year::-webkit-inner-spin-button {
+            -webkit-appearance: none !important;
+            margin: 0 !important;
         }
-        /* BOUTONS ASCENSEUR ANNÉE - TRÈS VISIBLES */
+        /* BOUTONS ASCENSEUR ANNÉE - PLACÉS PROPREMENT SANS CHEVAUCHEMENT */
         .flatpickr-calendar .flatpickr-current-month .numInputWrapper .arrowUp,
         .flatpickr-calendar .flatpickr-current-month .numInputWrapper .arrowDown {
             position: absolute !important;
-            right: 4px !important;
-            width: 20px !important;
-            height: 18px !important;
-            border: 1.5px solid #94A3B8 !important;
-            background: linear-gradient(135deg, #FFFFFF 0%, #F1F5F9 100%) !important;
-            border-radius: 7px !important;
+            right: 3px !important;
+            width: 16px !important;
+            height: 12px !important;
+            border: 1px solid #94A3B8 !important;
+            background: #F1F5F9 !important;
+            border-radius: 4px !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
             cursor: pointer !important;
-            transition: all 0.2s ease !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+            transition: all 0.15s ease !important;
         }
         .flatpickr-calendar .flatpickr-current-month .numInputWrapper .arrowUp {
-            top: 2px !important;
+            top: 3px !important;
         }
         .flatpickr-calendar .flatpickr-current-month .numInputWrapper .arrowDown {
-            bottom: 2px !important;
-        }
-        .flatpickr-calendar .flatpickr-current-month .numInputWrapper .arrowUp:hover,
-        .flatpickr-calendar .flatpickr-current-month .numInputWrapper .arrowDown:hover {
-            background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%) !important;
-            border-color: #3B82F6 !important;
-            transform: scale(1.2) !important;
-            box-shadow: 0 3px 10px rgba(59, 130, 246, 0.5) !important;
-        }
-        .flatpickr-calendar .flatpickr-current-month .numInputWrapper .arrowUp:after,
-        .flatpickr-calendar .flatpickr-current-month .numInputWrapper .arrowDown:after {
-            border-color: #475569 !important;
-            border-width: 0 2.5px 2.5px 0 !important;
-            padding: 3px !important;
+            bottom: 3px !important;
         }
         .flatpickr-calendar .flatpickr-current-month .numInputWrapper .arrowUp:hover:after,
         .flatpickr-calendar .flatpickr-current-month .numInputWrapper .arrowDown:hover:after {
