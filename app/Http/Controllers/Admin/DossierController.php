@@ -64,6 +64,9 @@ class DossierController extends Controller
     /**
      * Modifier la durée / dates de stage par l'administrateur
      */
+    /**
+     * Modifier la durée / dates de stage par l'administrateur
+     */
     public function modifierPeriode(Request $request, $id)
     {
         $request->validate([
@@ -75,12 +78,58 @@ class DossierController extends Controller
             'datefin.after' => 'La date de fin doit être postérieure à la date de début.',
         ]);
 
-        $dossier = Dossier::findOrFail($id);
+        $adminUser = auth()->user();
+        $adminName = session('user_session_name') ?? ($adminUser->name ?? 'Administrateur TFG SARL');
+
+        $dossier = Dossier::with(['ecole', 'etudiants'])->findOrFail($id);
         $dossier->datedebut = $request->datedebut;
         $dossier->datefin = $request->datefin;
         $dossier->save();
 
-        return back()->with('success', 'La période de stage a été mise à jour avec succès par l\'administrateur.');
+        $codeDossier = $dossier->code_dossier ?? 'STAGE-' . $dossier->id_dossier;
+
+        // Notification envoyée à l'école
+        \App\Models\AppNotification::notifier(
+            'ecole',
+            'Période de Stage Réajustée',
+            "La période du dossier {$codeDossier} a été réajustée sous réserve par l'administrateur {$adminName} (du " . \Carbon\Carbon::parse($request->datedebut)->format('d/m/Y') . " au " . \Carbon\Carbon::parse($request->datefin)->format('d/m/Y') . ").",
+            route('ecole.dossiers.show', $dossier->id_dossier),
+            'dossier_modifie',
+            $dossier->id_ecole
+        );
+
+        // Notification envoyée aux administrateurs
+        \App\Models\AppNotification::notifier(
+            'admin',
+            'Période de Stage Modifiée par ' . $adminName,
+            "L'administrateur {$adminName} a modifié la période du dossier {$codeDossier}.",
+            route('admin.dossiers.show', $dossier->id_dossier),
+            'dossier_modifie',
+            null
+        );
+
+        // Envoi d'email à l'école avec bouton de refus & création d'un nouveau dossier
+        if ($dossier->ecole && ($dossier->ecole->email || $dossier->ecole->mail)) {
+            $destEmail = $dossier->ecole->email ?? $dossier->ecole->mail;
+            try {
+                Mail::to($destEmail)->send(new \App\Mail\PeriodeStageModifieeMail($dossier, $adminName));
+            } catch (\Exception $e) {
+                Log::warning("Erreur envoi email modification période école ({$codeDossier}) : " . $e->getMessage());
+            }
+        }
+
+        // Envoi d'email à chaque étudiant du dossier
+        foreach ($dossier->etudiants as $etudiant) {
+            if ($etudiant->email_etu && filter_var($etudiant->email_etu, FILTER_VALIDATE_EMAIL)) {
+                try {
+                    Mail::to($etudiant->email_etu)->send(new \App\Mail\PeriodeStageModifieeMail($dossier, $adminName));
+                } catch (\Exception $e) {
+                    Log::warning("Erreur envoi email modification période étudiant ({$etudiant->email_etu}) : " . $e->getMessage());
+                }
+            }
+        }
+
+        return back()->with('success', "La période de stage a été mise à jour par l'administrateur {$adminName}. Un email d'information avec option de déclin a été transmis à l'école et aux étudiants.");
     }
 
     /**
@@ -88,8 +137,12 @@ class DossierController extends Controller
      */
     public function valider($id)
     {
+        $adminUser = auth()->user();
+        $adminName = session('user_session_name') ?? ($adminUser->name ?? 'Administrateur TFG SARL');
+
         $dossier = Dossier::with(['ecole', 'cycle', 'etudiants'])->findOrFail($id);
         $dossier->statut = 'valide';
+        $dossier->valide_par = $adminName;
         $dossier->motif_refus = null;
         $dossier->save();
 
@@ -99,13 +152,23 @@ class DossierController extends Controller
         \App\Models\AppNotification::notifier(
             'ecole',
             'Dossier de Stage Validé',
-            "Excellente nouvelle ! Le dossier {$codeDossier} ({$dossier->filiere}) a été validé par la direction de TFG SARL.",
+            "Excellente nouvelle ! Le dossier {$codeDossier} ({$dossier->filiere}) a été validé par l'administrateur {$adminName} de la direction TFG SARL.",
             route('ecole.dossiers.show', $dossier->id_dossier),
             'dossier_valide',
             $dossier->id_ecole
         );
 
-        // 2. Envoi réel d'email de validation à l'école via stagilogtfg@gmail.com
+        // 2. Notification aux administrateurs
+        \App\Models\AppNotification::notifier(
+            'admin',
+            'Dossier Validé par ' . $adminName,
+            "Le dossier {$codeDossier} ({$dossier->filiere}) a été validé par l'administrateur {$adminName}.",
+            route('admin.dossiers.show', $dossier->id_dossier),
+            'dossier_valide',
+            null
+        );
+
+        // 3. Envoi réel d'email de validation à l'école via stagilogtfg@gmail.com
         if ($dossier->ecole && ($dossier->ecole->email || $dossier->ecole->mail)) {
             $destEmail = $dossier->ecole->email ?? $dossier->ecole->mail;
             try {
@@ -115,7 +178,7 @@ class DossierController extends Controller
             }
         }
 
-        // 3. Envoi réel d'email automatique à CHAQUE étudiant du dossier
+        // 4. Envoi réel d'email automatique à CHAQUE étudiant du dossier
         foreach ($dossier->etudiants as $etudiant) {
             if ($etudiant->email_etu && filter_var($etudiant->email_etu, FILTER_VALIDATE_EMAIL)) {
                 try {
@@ -127,7 +190,7 @@ class DossierController extends Controller
         }
 
         return redirect()->route('admin.dossiers.show', $id)
-            ->with('success', "Le dossier {$codeDossier} ({$dossier->filiere}) a été VALIDÉ avec succès ! Un email de confirmation a été transmis à l'école et à tous les étudiants candidats.");
+            ->with('success', "Le dossier {$codeDossier} ({$dossier->filiere}) a été VALIDÉ par {$adminName} ! Un email de confirmation a été transmis à l'école et à tous les étudiants candidats.");
     }
 
     /**
@@ -141,24 +204,38 @@ class DossierController extends Controller
             'motif_refus.required' => 'Veuillez préciser le motif du refus pour notifier l\'école.',
         ]);
 
+        $adminUser = auth()->user();
+        $adminName = session('user_session_name') ?? ($adminUser->name ?? 'Administrateur TFG SARL');
+
         $dossier = Dossier::with(['ecole', 'cycle', 'etudiants'])->findOrFail($id);
         $dossier->statut = 'refuse';
+        $dossier->refuse_par = $adminName;
         $dossier->motif_refus = $request->motif_refus;
         $dossier->save();
 
         $codeDossier = $dossier->code_dossier ?? ($dossier->ecole->sigle ?? 'STG') . '-' . ($dossier->created_at ? $dossier->created_at->format('dmYHi') : '');
 
-        // 1. Notification interne envoyée à l'école avec motif
+        // 1. Notification interne envoyée à l'école avec motif et nom d'admin
         \App\Models\AppNotification::notifier(
             'ecole',
             'Dossier de Stage Non Retenu',
-            "Le dossier {$codeDossier} ({$dossier->filiere}) n'a pas été retenu. Motif : {$request->motif_refus}",
+            "Le dossier {$codeDossier} ({$dossier->filiere}) n'a pas été retenu par l'administrateur {$adminName}. Motif : {$request->motif_refus}",
             route('ecole.dossiers.show', $dossier->id_dossier),
             'dossier_refuse',
             $dossier->id_ecole
         );
 
-        // 2. Envoi réel d'email de refus avec motif à l'école via stagilogtfg@gmail.com
+        // 2. Notification aux administrateurs avec le nom de l'admin
+        \App\Models\AppNotification::notifier(
+            'admin',
+            'Dossier Refusé par ' . $adminName,
+            "Le dossier {$codeDossier} ({$dossier->filiere}) a été refusé par l'administrateur {$adminName}. Motif : {$request->motif_refus}",
+            route('admin.dossiers.show', $dossier->id_dossier),
+            'dossier_refuse',
+            null
+        );
+
+        // 3. Envoi réel d'email de refus avec motif à l'école via stagilogtfg@gmail.com
         if ($dossier->ecole && ($dossier->ecole->email || $dossier->ecole->mail)) {
             $destEmail = $dossier->ecole->email ?? $dossier->ecole->mail;
             try {
@@ -168,7 +245,7 @@ class DossierController extends Controller
             }
         }
 
-        // 3. Envoi réel d'email de refus avec motif à CHAQUE étudiant du dossier
+        // 4. Envoi réel d'email de refus avec motif à CHAQUE étudiant du dossier
         foreach ($dossier->etudiants as $etudiant) {
             if ($etudiant->email_etu && filter_var($etudiant->email_etu, FILTER_VALIDATE_EMAIL)) {
                 try {
@@ -180,7 +257,7 @@ class DossierController extends Controller
         }
 
         return redirect()->route('admin.dossiers.show', $id)
-            ->with('error', "Le dossier {$codeDossier} a été REFUSÉ. L'école et tous les étudiants ont été notifiés par email avec le motif enregistré.");
+            ->with('error', "Le dossier {$codeDossier} a été REFUSÉ par {$adminName}. L'école et tous les étudiants ont été notifiés par email avec le motif enregistré.");
     }
 
     /**

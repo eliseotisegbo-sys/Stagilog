@@ -25,6 +25,8 @@ class Dossier extends Model
         'type_stage',
         'niveau_etude',
         'motif_refus',
+        'valide_par',
+        'refuse_par',
     ];
 
     protected static function boot()

@@ -15,6 +15,7 @@ class Etudiant extends Model
         'email_etu',
         'date_naissance',
         'niveau_etude',
+        'photo_profil',
         'cv',
         'contrat',
         'autres_documents',

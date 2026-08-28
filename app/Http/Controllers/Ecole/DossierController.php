@@ -368,4 +368,30 @@ class DossierController extends Controller
         $dossier->delete();
         return redirect()->route('ecole.dossiers.index')->with('success', "Le dossier a été supprimé.");
     }
+
+    /**
+     * Décliner une nouvelle date proposée par l'admin et rediriger vers la création d'un nouveau dossier
+     */
+    public function refuserNouvelleDate($id)
+    {
+        $idEcole = auth()->user()->id_ecole;
+        $dossier = Dossier::where('id_ecole', $idEcole)->findOrFail($id);
+
+        $dossier->statut = 'refuse';
+        $dossier->motif_refus = "Période de stage réajustée par l'administration TFG SARL refusée par l'établissement. Demande à réintroduire.";
+        $dossier->save();
+
+        // Notifier les admins de la décision de l'école
+        \App\Models\AppNotification::notifier(
+            'admin',
+            'Proposition de Date Refusée',
+            "L'établissement " . ($dossier->ecole->nom_ecole ?? '') . " a décliné la période proposée pour le dossier {$dossier->code_dossier}.",
+            route('admin.dossiers.show', $dossier->id_dossier),
+            'dossier_refuse',
+            null
+        );
+
+        return redirect()->route('ecole.dossiers.create')
+            ->with('info', "La proposition de nouvelle date pour le dossier {$dossier->code_dossier} a été déclinée. Le dossier a été classé comme refusé. Vous pouvez dès à présent soumettre un nouveau dossier avec vos dates préférées.");
+    }
 }

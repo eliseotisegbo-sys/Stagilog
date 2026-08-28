@@ -63,9 +63,6 @@
     <!-- Banner Information si le stage n'a pas démarré -->
     @if(!$stageCommence && $datedebut)
     <div class="p-5 bg-amber-50/90 border border-amber-200 rounded-3xl text-amber-900 flex items-start space-x-4 shadow-sm">
-        <div class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center flex-shrink-0 font-bold text-lg">
-            🕒
-        </div>
         <div>
             <h4 class="text-sm font-extrabold text-amber-900">Dépôt officiel verrouillé jusqu'au début de la période de stage</h4>
             <p class="text-xs text-amber-700 mt-1 leading-relaxed">
@@ -88,10 +85,10 @@
             
             <!-- Conteneur dynamique des lignes de documents -->
             <div id="document-rows-container" class="space-y-4">
-                <!-- Ligne #1 (par défaut) -->
+                <!-- Ligne 1 (par défaut) -->
                 <div class="doc-row p-5 bg-slate-50/80 rounded-2xl border border-slate-200/80 space-y-4">
                     <div class="flex items-center justify-between">
-                        <span class="doc-row-label text-xs font-black text-[#0D1B4B] uppercase tracking-wider">Document #1</span>
+                        <span class="doc-row-label text-xs font-black text-[#0D1B4B] uppercase tracking-wider">Document 1</span>
                         <button type="button" onclick="removeDocRow(this)" class="btn-remove-row hidden text-slate-400 hover:text-[#E8001D] text-xs font-bold flex items-center space-x-1 transition">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                             <span>Supprimer</span>
@@ -243,7 +240,7 @@ function addDocRow() {
     row.className = 'doc-row p-5 bg-slate-50/80 rounded-2xl border border-slate-200/80 space-y-4 transition-all duration-200';
     row.innerHTML = `
         <div class="flex items-center justify-between">
-            <span class="doc-row-label text-xs font-black text-[#0D1B4B] uppercase tracking-wider">Document #${container.children.length + 1}</span>
+            <span class="doc-row-label text-xs font-black text-[#0D1B4B] uppercase tracking-wider">Document ${container.children.length + 1}</span>
             <button type="button" onclick="removeDocRow(this)" class="btn-remove-row text-slate-400 hover:text-[#E8001D] text-xs font-bold flex items-center space-x-1 transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                 <span>Supprimer</span>
@@ -289,7 +286,7 @@ function updateRowLabels() {
     const rows = container.querySelectorAll('.doc-row');
     rows.forEach((row, index) => {
         const label = row.querySelector('.doc-row-label');
-        if (label) label.innerText = 'Document #' + (index + 1);
+        if (label) label.innerText = 'Document ' + (index + 1);
         
         const btnRemove = row.querySelector('.btn-remove-row');
         if (btnRemove) {

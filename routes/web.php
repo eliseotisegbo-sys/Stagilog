@@ -89,6 +89,7 @@ Route::middleware(['auth', 'first.login', 'role:ecole'])->prefix('ecole')->name(
     Route::get('/dossiers/create', [EcoleDossierController::class, 'create'])->name('dossiers.create');
     Route::post('/dossiers', [EcoleDossierController::class, 'store'])->name('dossiers.store');
     Route::get('/dossiers/{id}', [EcoleDossierController::class, 'show'])->name('dossiers.show');
+    Route::get('/dossiers/{id}/refuser-nouvelle-date', [EcoleDossierController::class, 'refuserNouvelleDate'])->name('dossiers.refuser-date');
     Route::get('/dossiers/{id}/edit', [EcoleDossierController::class, 'edit'])->name('dossiers.edit');
     Route::put('/dossiers/{id}', [EcoleDossierController::class, 'update'])->name('dossiers.update');
     Route::delete('/dossiers/{id}', [EcoleDossierController::class, 'destroy'])->name('dossiers.destroy');
