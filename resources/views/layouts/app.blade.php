@@ -506,19 +506,19 @@
         /* AMÉLIORATION GLOBALE DE LA LISIBILITÉ DES TABLEAUX      */
         /* ======================================================= */
         table {
-            font-size: 0.875rem !important; /* 14px au lieu de 12px */
+            font-size: 0.75rem !important; /* 12px - taille normale */
         }
         thead th {
-            font-size: 0.8125rem !important; /* 13px */
+            font-size: 0.6875rem !important; /* 11px */
             font-weight: 800 !important;
             letter-spacing: 0.05em !important;
-            padding-top: 1rem !important;
-            padding-bottom: 1rem !important;
-        }
-        tbody td {
             padding-top: 0.875rem !important;
             padding-bottom: 0.875rem !important;
-            line-height: 1.5 !important;
+        }
+        tbody td {
+            padding-top: 0.75rem !important;
+            padding-bottom: 0.75rem !important;
+            line-height: 1.4 !important;
         }
 
         /* ======================================================= */
