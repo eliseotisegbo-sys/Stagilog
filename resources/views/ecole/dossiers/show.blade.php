@@ -17,9 +17,23 @@
         </a>
 
         <div class="flex items-center space-x-3">
-            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider {{ $dossier->statut === 'valide' ? 'bg-emerald-100 text-emerald-700' : ($dossier->statut === 'refuse' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700') }}">
-                Validation TFG : {{ $dossier->statut === 'valide' ? 'Validé' : ($dossier->statut === 'refuse' ? 'Refusé' : 'En attente') }}
-            </span>
+            @if($dossier->statut === 'valide')
+                <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700 border border-emerald-200">
+                    Statut : Validé
+                </span>
+            @elseif($dossier->statut === 'refuse')
+                <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-red-100 text-red-700 border border-red-200">
+                    Statut : Refusé
+                </span>
+            @elseif($dossier->statut === 'sous_reserve')
+                <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-100 text-[#1B3A8C] border border-blue-200">
+                    Statut : Sous réserve
+                </span>
+            @else
+                <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-100 text-amber-700 border border-amber-200">
+                    Statut : En attente
+                </span>
+            @endif
         </div>
     </div>
 
@@ -31,6 +45,19 @@
             <span>Dossier Non Retenu par TFG SARL</span>
         </h4>
         <p class="text-xs text-red-700 mt-2"><strong>Motif indiqué :</strong> {{ $dossier->motif_refus }}</p>
+    </div>
+    @endif
+
+    <!-- Alert Sous réserve -->
+    @if($dossier->statut === 'sous_reserve')
+    <div class="p-6 bg-blue-50 border border-blue-200 rounded-3xl text-[#0D1B4B]">
+        <h4 class="text-sm font-bold text-[#1B3A8C] flex items-center space-x-2">
+            <svg class="w-4 h-4 text-[#1B3A8C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <span>Période de Stage Réajustée par TFG SARL</span>
+        </h4>
+        <p class="text-xs text-slate-600 mt-2">
+            L'administration de TFG SARL a planifié ou réajusté les dates de stage pour ce dossier. Si ces dates nécessitent un aménagement supplémentaire, vous pouvez contacter directement la direction à <a href="mailto:stagilogtfg@gmail.com" class="font-bold text-[#1B3A8C] underline">stagilogtfg@gmail.com</a>.
+        </p>
     </div>
     @endif
 
@@ -61,7 +88,7 @@
             </div>
 
             <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 sm:col-span-2">
-                <p class="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Période Définie</p>
+                <p class="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Période Globale Prévue</p>
                 <p class="text-sm font-bold text-slate-800 mt-1 lowercase">
                     {{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('ddd D MMMM YYYY') : '-' }}
                     <span class="text-slate-400 mx-1">au</span>
@@ -83,13 +110,18 @@
                     <tr>
                         <th class="py-4 px-6">Nom & Prénom</th>
                         <th class="py-4 px-6">Email</th>
-                        <th class="py-4 px-6">Niveau & Date Naissance</th>
+                        <th class="py-4 px-6">Niveau & Naissance</th>
+                        <th class="py-4 px-6">Période de Stage</th>
                         <th class="py-4 px-6">Curriculum Vitae</th>
                         <th class="py-4 px-6 text-right">Rapports & Documents</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
                     @foreach($dossier->etudiants as $etudiant)
+                    @php
+                        $debutEtu = $etudiant->datedebut_stage ?? $dossier->datedebut;
+                        $finEtu = $etudiant->datefin_stage ?? $dossier->datefin;
+                    @endphp
                     <tr class="hover:bg-slate-50/70 transition">
                         <td class="py-4 px-6 font-bold text-[#0D1B4B]">
                             {{ $etudiant->nom_etudiant }} {{ $etudiant->prenom_etudiant }}
@@ -100,6 +132,11 @@
                         <td class="py-4 px-6 text-slate-600">
                             <div>{{ $etudiant->niveau_etude ?? '-' }}</div>
                             <div class="text-[10px] text-slate-400">Né(e) le {{ $etudiant->date_naissance ? $etudiant->date_naissance->locale('fr')->isoFormat('D MMM YYYY') : '-' }}</div>
+                        </td>
+                        <td class="py-4 px-6 font-semibold text-[#0D1B4B]">
+                            {{ $debutEtu ? $debutEtu->format('d/m/Y') : '-' }} 
+                            <span class="text-slate-400 font-normal">au</span> 
+                            {{ $finEtu ? $finEtu->format('d/m/Y') : '-' }}
                         </td>
                         <td class="py-4 px-6">
                             @if($etudiant->cv)

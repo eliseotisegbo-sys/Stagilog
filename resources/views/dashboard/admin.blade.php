@@ -34,7 +34,7 @@
         </div>
     </div>
 
-    <!-- 4 KPI CARDS (Vraies valeurs de la BDD, sans données factices ni emojis) -->
+    <!-- 4 KPI CARDS -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         
         <!-- Card 1: Écoles Partenaires -->
@@ -111,59 +111,75 @@
         </div>
     </div>
 
-    <!-- SÉLECTEUR DE PÉRIODE POUR LES STATISTIQUES & GRAPHIQUES -->
-    <div class="bg-white rounded-3xl border border-slate-100 shadow-card p-5">
+    <!-- SÉLECTEUR DE PÉRIODE AVANCÉ POUR LES STATISTIQUES (COMBO JOUR / SEMAINE / MOIS / ANNÉE) -->
+    <div class="bg-white rounded-3xl border border-slate-100 shadow-card p-5 relative">
         <form method="GET" action="{{ route('dashboard.admin') }}" id="period-form" class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+            <input type="hidden" name="start_date" id="start_date" value="{{ request('start_date') }}">
+            <input type="hidden" name="end_date" id="end_date" value="{{ request('end_date') }}">
+
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-2xl bg-[#EEF4FF] text-[#1B3A8C] flex items-center justify-center shadow-inner flex-shrink-0">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                <div class="w-10 h-10 rounded-2xl bg-[#EEF4FF] text-[#1B3A8C] flex items-center justify-center shadow-inner flex-shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 </div>
                 <div>
                     <h4 class="text-xs font-black uppercase tracking-wider text-[#0D1B4B]">Période des Statistiques</h4>
-                    <p class="text-[11px] text-slate-400">Filtrer l'historique et les graphiques d'activité</p>
+                    <p class="text-[11px] text-slate-400">Filtrer par jour, semaine, mois ou année avec double calendrier</p>
                 </div>
             </div>
 
-            <div class="flex flex-col sm:flex-row items-center gap-3 flex-1 max-w-2xl">
-                <div class="relative flex-1 w-full">
-                    <input type="text" id="start_date_display" placeholder="Date de début"
-                        class="w-full pl-3.5 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-[#0D1B4B] focus:ring-2 focus:ring-[#1B3A8C] focus:border-transparent outline-none cursor-pointer bg-slate-50 transition"
-                        readonly>
-                    <input type="hidden" name="start_date" id="start_date" value="{{ request('start_date') }}">
-                </div>
-                
-                <span class="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-xl hidden sm:inline-block">au</span>
+            <!-- Trigger Button & Popover Container -->
+            <div class="relative flex items-center gap-3">
+                <button type="button" onclick="toggleDatePopover()" id="btn-date-trigger"
+                        class="inline-flex items-center space-x-3 px-4 py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-2xl text-xs font-bold text-[#0D1B4B] shadow-sm transition">
+                    <svg class="w-4 h-4 text-[#1B3A8C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <span id="date-summary-label">{{ $periodLabel }}</span>
+                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </button>
 
-                <div class="relative flex-1 w-full">
-                    <input type="text" id="end_date_display" placeholder="Date de fin"
-                        class="w-full pl-3.5 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-[#0D1B4B] focus:ring-2 focus:ring-[#1B3A8C] focus:border-transparent outline-none cursor-pointer bg-slate-50 transition"
-                        readonly>
-                    <input type="hidden" name="end_date" id="end_date" value="{{ request('end_date') }}">
-                </div>
+                @if(request('start_date'))
+                <a href="{{ route('dashboard.admin') }}" class="inline-flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <span>Réinitialiser</span>
+                </a>
+                @endif
 
-                <div class="flex items-center gap-2 w-full sm:w-auto">
-                    <button type="submit" class="inline-flex items-center justify-center gap-1.5 bg-[#1B3A8C] hover:bg-[#142B6B] text-white px-5 py-2.5 rounded-xl text-xs font-bold transition shadow-md flex-1 sm:flex-initial">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/></svg>
-                        Filtrer
-                    </button>
+                <!-- POPOVER ADVANCED CALENDAR & PRESETS (Image 3 Style) -->
+                <div id="date-popover" class="hidden absolute right-0 top-full mt-3 z-50 bg-white rounded-3xl shadow-2xl border border-slate-200 p-6 flex flex-col md:flex-row gap-6 w-full sm:w-[680px]">
+                    <!-- Colonne des raccourcis pré-programmés -->
+                    <div class="w-full md:w-44 border-b md:border-b-0 md:border-r border-slate-100 pb-4 md:pb-0 md:pr-4 flex flex-col space-y-1">
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-2">Raccourcis</span>
+                        <button type="button" onclick="selectDatePreset('today')" class="preset-btn text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-blue-50 hover:text-[#1B3A8C] transition">Aujourd'hui</button>
+                        <button type="button" onclick="selectDatePreset('yesterday')" class="preset-btn text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-blue-50 hover:text-[#1B3A8C] transition">Hier</button>
+                        <button type="button" onclick="selectDatePreset('week')" class="preset-btn text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-blue-50 hover:text-[#1B3A8C] transition">Cette semaine</button>
+                        <button type="button" onclick="selectDatePreset('last_week')" class="preset-btn text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-blue-50 hover:text-[#1B3A8C] transition">Semaine dernière</button>
+                        <button type="button" onclick="selectDatePreset('month')" class="preset-btn text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-blue-50 hover:text-[#1B3A8C] transition">Ce mois</button>
+                        <button type="button" onclick="selectDatePreset('last_month')" class="preset-btn text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-blue-50 hover:text-[#1B3A8C] transition">Mois dernier</button>
+                        <button type="button" onclick="selectDatePreset('year')" class="preset-btn text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-blue-50 hover:text-[#1B3A8C] transition">Cette année</button>
+                        <button type="button" onclick="selectDatePreset('last_year')" class="preset-btn text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-blue-50 hover:text-[#1B3A8C] transition">Année dernière</button>
+                        <button type="button" onclick="selectDatePreset('all')" class="preset-btn text-left px-3 py-2 rounded-xl text-xs font-bold text-[#1B3A8C] bg-blue-50/60 hover:bg-blue-100 transition">Toutes les périodes</button>
+                    </div>
 
-                    @if(request('start_date'))
-                    <a href="{{ route('dashboard.admin') }}" class="inline-flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2.5 rounded-xl text-xs font-bold transition">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                        Réinitialiser
-                    </a>
-                    @endif
+                    <!-- Zone Calendrier & Barre de validation -->
+                    <div class="flex-1 flex flex-col justify-between">
+                        <div>
+                            <div id="flatpickr-inline-target" class="flex justify-center"></div>
+                        </div>
+
+                        <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 mt-4">
+                            <div class="flex items-center space-x-2 text-xs">
+                                <span class="font-bold text-slate-400">Du :</span>
+                                <input type="text" id="popover_start_display" readonly class="w-24 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-center font-bold text-[#0D1B4B] text-[11px]">
+                                <span class="font-bold text-slate-400">Au :</span>
+                                <input type="text" id="popover_end_display" readonly class="w-24 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-center font-bold text-[#0D1B4B] text-[11px]">
+                            </div>
+                            <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+                                <button type="button" onclick="clearDatePreset()" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 font-bold text-xs hover:bg-slate-200 transition">Effacer</button>
+                                <button type="submit" class="px-5 py-2 rounded-xl bg-[#1B3A8C] text-white font-bold text-xs hover:bg-[#142B6B] shadow-md transition">Appliquer</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            @if($periodLabel !== 'Toutes les périodes')
-            <div class="flex items-center gap-2">
-                <span class="inline-flex items-center gap-1.5 bg-[#EEF4FF] text-[#1B3A8C] text-[11px] font-bold px-3 py-1.5 rounded-full border border-[#BFDBFE]">
-                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
-                    {{ $periodLabel }}
-                </span>
-            </div>
-            @endif
         </form>
     </div>
 
@@ -177,7 +193,7 @@
                     <h3 class="text-lg font-extrabold text-[#0D1B4B]">Historique des Dossiers Soumis</h3>
                     <p class="text-xs font-medium text-slate-400">
                         @if($periodLabel !== 'Toutes les périodes')
-                            Période : <span class="text-[#1B3A8C] font-bold">{{ $periodLabel }}</span>
+                            Période sélectionnée : <span class="text-[#1B3A8C] font-bold">{{ $periodLabel }}</span>
                         @else
                             Nombre réel de dossiers enregistrés par mois (6 derniers mois)
                         @endif
@@ -198,81 +214,83 @@
             <div>
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-base font-extrabold text-[#0D1B4B]">Demandes Récentes</h3>
-                    <a href="{{ route('admin.dossiers.index') }}" class="text-xs font-bold text-[#1B3A8C] hover:underline">Voir tout</a>
+                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Temps Réel</span>
                 </div>
 
                 <div class="space-y-4">
-                    @forelse($derniersDossiers->take(4) as $dossier)
-                    <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-[#F0F4FF] transition">
+                    @forelse($derniersDossiers as $dossier)
+                    <a href="{{ route('admin.dossiers.show', $dossier->id_dossier) }}" class="block p-4 rounded-2xl bg-slate-50/70 hover:bg-blue-50/50 border border-slate-100 transition group">
                         <div class="flex items-start justify-between">
-                            <div class="min-w-0 flex-1">
-                                <p class="text-xs font-bold text-[#0D1B4B] truncate">{{ $dossier->ecole->nom_ecole ?? 'École Partenaire' }}</p>
-                                <p class="text-[11px] text-slate-500 mt-0.5 truncate">{{ $dossier->filiere }} ({{ $dossier->etudiants->count() }} étud.)</p>
+                            <div>
+                                <span class="font-bold text-[#0D1B4B] group-hover:text-[#1B3A8C] text-xs transition">
+                                    {{ $dossier->ecole->nom_ecole ?? 'École Partenaire' }}
+                                </span>
+                                <p class="text-[11px] text-slate-500 mt-0.5">{{ $dossier->filiere }} ({{ $dossier->etudiants->count() }} stagiaires)</p>
                             </div>
-                            <span class="ml-2 flex-shrink-0 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase {{ $dossier->statut === 'valide' ? 'bg-emerald-100 text-emerald-700' : ($dossier->statut === 'refuse' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700') }}">
+                            <span class="inline-block px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider {{ $dossier->statut === 'valide' ? 'bg-emerald-100 text-emerald-700' : ($dossier->statut === 'refuse' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700') }}">
                                 {{ $dossier->statut === 'valide' ? 'Validé' : ($dossier->statut === 'refuse' ? 'Refusé' : 'En attente') }}
                             </span>
                         </div>
-                    </div>
+                        <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-[10px] text-slate-400">
+                            <span>{{ $dossier->cycle->nom_cycle ?? 'Cycle standard' }}</span>
+                            <span>{{ $dossier->created_at ? $dossier->created_at->diffForHumans() : '' }}</span>
+                        </div>
+                    </a>
                     @empty
-                    <p class="text-xs text-slate-400 text-center py-6">Aucun dossier enregistré.</p>
+                    <p class="text-xs text-slate-400 text-center py-6">Aucune demande récente.</p>
                     @endforelse
                 </div>
             </div>
 
-            <!-- Taux d'Approbation Réel -->
-            <div class="mt-6 p-4 rounded-2xl bg-gradient-to-br from-[#1B3A8C] to-[#0D1B4B] text-white">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-[11px] text-blue-200 uppercase font-bold tracking-wider">Taux de Validation</p>
-                        <h4 class="text-2xl font-black mt-0.5">{{ $tauxApprobation }}%</h4>
-                    </div>
-                    <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
-                        <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
+            <!-- Taux d'approbation réel -->
+            <div class="mt-6 pt-6 border-t border-slate-100">
+                <div class="flex items-center justify-between text-xs font-bold text-slate-600 mb-2">
+                    <span>Taux d'Approbation Réel</span>
+                    <span class="text-[#1B3A8C] font-black">{{ $tauxApprobation }}%</span>
                 </div>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                    <div class="bg-[#1B3A8C] h-full rounded-full transition-all duration-500" style="width: {{ $tauxApprobation }}%"></div>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1.5">{{ $dossiersValides }} validés sur {{ $totalDossiers }} dossiers soumis au total.</p>
             </div>
         </div>
     </div>
 
-    <!-- SECTION DEUXIÈME : GRAPHIQUES RÉELS -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <!-- 2 GRAPHES SECONDAIRES RÉELS : RÉPARTITION PAR FILIÈRE & PAR ÉCOLE -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
-        <!-- Donut Chart : Répartition par Filière (6 cols) -->
-        <div class="lg:col-span-6 bg-white p-8 rounded-3xl shadow-card border border-slate-100">
-            <div class="mb-6">
-                <h3 class="text-base font-extrabold text-[#0D1B4B]">Répartition par Filière</h3>
-                <p class="text-xs font-medium text-slate-400">
-                    @if($periodLabel !== 'Toutes les périodes') Période : <span class="text-[#1B3A8C] font-bold">{{ $periodLabel }}</span> @else Nombre de dossiers selon les filières techniques @endif
-                </p>
+        <!-- Répartition par Filière Réelle -->
+        <div class="bg-white p-8 rounded-3xl shadow-card border border-slate-100">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-base font-extrabold text-[#0D1B4B]">Répartition par Filière</h3>
+                    <p class="text-xs font-medium text-slate-400">Dossiers soumis par domaine technique</p>
+                </div>
             </div>
-            <div id="chart-filieres" class="w-full flex justify-center h-64"></div>
+            <div id="chart-filieres" class="w-full h-64 flex items-center justify-center"></div>
         </div>
 
-        <!-- Bar Chart : Activité par École (6 cols) -->
-        <div class="lg:col-span-6 bg-white p-8 rounded-3xl shadow-card border border-slate-100">
-            <div class="mb-6">
-                <h3 class="text-base font-extrabold text-[#0D1B4B]">Dossiers par Université</h3>
-                <p class="text-xs font-medium text-slate-400">
-                    @if($periodLabel !== 'Toutes les périodes') Période : <span class="text-[#1B3A8C] font-bold">{{ $periodLabel }}</span> @else Classement selon les dossiers déposés @endif
-                </p>
+        <!-- Top Écoles Partenaires Réelles -->
+        <div class="bg-white p-8 rounded-3xl shadow-card border border-slate-100">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-base font-extrabold text-[#0D1B4B]">Activité par Établissement</h3>
+                    <p class="text-xs font-medium text-slate-400">Nombre de dossiers soumis par université</p>
+                </div>
             </div>
             <div id="chart-ecoles" class="w-full h-64"></div>
         </div>
     </div>
 
-    <!-- TABLEAU RÉCENT : LISTE DES DERNIERS DOSSIERS DE STAGE -->
+    <!-- TABLEAU RÉCAPITULATIF DES DOSSIERS SOUMIS RÉCENTS -->
     <div class="bg-white rounded-3xl shadow-card border border-slate-100 overflow-hidden">
-        <div class="p-6 sm:p-8 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="p-6 sm:p-8 border-b border-slate-100 flex items-center justify-between">
             <div>
-                <h3 class="text-lg font-extrabold text-[#0D1B4B]">Dossiers Récemment Soumis</h3>
-                <p class="text-xs font-medium text-slate-400">Demandes de stages en provenance des établissements</p>
+                <h3 class="text-lg font-extrabold text-[#0D1B4B]">Derniers Dossiers de Stage Enregistrés</h3>
+                <p class="text-xs font-medium text-slate-400">Liste des demandes récentes soumises par les écoles</p>
             </div>
-            <a href="{{ route('admin.dossiers.index') }}" class="inline-flex items-center space-x-1.5 text-xs font-bold text-[#1B3A8C] hover:text-[#142B6B]">
-                <span>Gérer tous les dossiers</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            <a href="{{ route('admin.dossiers.index') }}" class="text-xs font-bold text-[#1B3A8C] hover:underline">
+                Voir tout ({{ $totalDossiers }}) &rarr;
             </a>
         </div>
 
@@ -280,23 +298,23 @@
             <table class="w-full text-left text-xs">
                 <thead class="bg-slate-50/80 text-slate-500 uppercase tracking-wider font-bold border-b border-slate-100">
                     <tr>
-                        <th class="py-4 px-6">Établissement</th>
+                        <th class="py-4 px-6">ID / École</th>
                         <th class="py-4 px-6">Filière & Cycle</th>
-                        <th class="py-4 px-6">Étudiants</th>
-                        <th class="py-4 px-6">Période de Stage</th>
-                        <th class="py-4 px-6">Statut</th>
-                        <th class="py-4 px-6 text-right">Action</th>
+                        <th class="py-4 px-6">Stagiaires</th>
+                        <th class="py-4 px-6">Période Prévue</th>
+                        <th class="py-4 px-6">Statut TFG</th>
+                        <th class="py-4 px-6 text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
                     @forelse($derniersDossiers as $dossier)
                     <tr class="hover:bg-slate-50/70 transition">
                         <td class="py-4 px-6">
-                            <div class="font-bold text-[#0D1B4B]">{{ $dossier->ecole->nom_ecole ?? 'N/A' }}</div>
-                            <div class="text-[11px] text-slate-400">{{ $dossier->annee_academique }}</div>
+                            <span class="font-mono font-bold text-[#0D1B4B]">{{ $dossier->code_dossier ?? 'STAGE-' . $dossier->id_dossier }}</span>
+                            <div class="font-semibold text-slate-600 mt-0.5">{{ $dossier->ecole->nom_ecole ?? 'N/A' }}</div>
                         </td>
                         <td class="py-4 px-6">
-                            <span class="font-semibold text-slate-800">{{ $dossier->filiere }}</span>
+                            <div class="font-bold text-[#0D1B4B]">{{ $dossier->filiere }}</div>
                             <div class="text-[11px] text-blue-600 font-bold">{{ $dossier->cycle->nom_cycle ?? 'Cycle standard' }}</div>
                         </td>
                         <td class="py-4 px-6">
@@ -310,8 +328,8 @@
                             {{ $dossier->datefin ? $dossier->datefin->locale('fr')->isoFormat('ddd D MMMM YYYY') : '-' }}
                         </td>
                         <td class="py-4 px-6">
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider {{ $dossier->statut === 'valide' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : ($dossier->statut === 'refuse' ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-amber-100 text-amber-700 border border-amber-200') }}">
-                                {{ $dossier->statut === 'valide' ? 'Validé' : ($dossier->statut === 'refuse' ? 'Refusé' : 'En attente') }}
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider {{ $dossier->statut === 'valide' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : ($dossier->statut === 'refuse' ? 'bg-red-100 text-red-700 border border-red-200' : ($dossier->statut === 'sous_reserve' ? 'bg-blue-100 text-[#1B3A8C] border border-blue-200' : 'bg-amber-100 text-amber-700 border border-amber-200')) }}">
+                                {{ $dossier->statut === 'valide' ? 'Validé' : ($dossier->statut === 'refuse' ? 'Refusé' : ($dossier->statut === 'sous_reserve' ? 'Sous réserve' : 'En attente')) }}
                             </span>
                         </td>
                         <td class="py-4 px-6 text-right">
@@ -335,35 +353,127 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Flatpickr date pickers (Thème Image 1)
-    var startPicker = flatpickr('#start_date_display', {
-        locale: 'fr',
-        dateFormat: 'Y-m-d',
-        altInput: true,
-        altFormat: 'D j M Y',
-        maxDate: 'today',
-        defaultDate: document.getElementById('start_date').value || null,
-        onReady: function(selectedDates, dateStr, instance) {
-            instance.calendarContainer.classList.add('flatpickr-range-theme');
-        },
-        onChange: function(selectedDates, dateStr) {
-            document.getElementById('start_date').value = dateStr;
-            endPicker.set('minDate', dateStr);
+let fpRangePicker = null;
+
+function toggleDatePopover() {
+    const pop = document.getElementById('date-popover');
+    pop.classList.toggle('hidden');
+}
+
+function formatDate(d) {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function selectDatePreset(preset) {
+    const today = new Date();
+    let start = null;
+    let end = null;
+
+    if (preset === 'today') {
+        start = new Date(today);
+        end = new Date(today);
+    } else if (preset === 'yesterday') {
+        start = new Date(today);
+        start.setDate(today.getDate() - 1);
+        end = new Date(start);
+    } else if (preset === 'week') {
+        const day = today.getDay();
+        const diff = today.getDate() - day + (day === 0 ? -6 : 1);
+        start = new Date(today);
+        start.setDate(diff);
+        end = new Date();
+    } else if (preset === 'last_week') {
+        const d = new Date();
+        const day = d.getDay();
+        const diffToMon = d.getDate() - day + (day === 0 ? -6 : 1) - 7;
+        start = new Date(d);
+        start.setDate(diffToMon);
+        end = new Date(start);
+        end.setDate(start.getDate() + 6);
+    } else if (preset === 'month') {
+        start = new Date(today.getFullYear(), today.getMonth(), 1);
+        end = new Date();
+    } else if (preset === 'last_month') {
+        start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        end = new Date(today.getFullYear(), today.getMonth(), 0);
+    } else if (preset === 'year') {
+        start = new Date(today.getFullYear(), 0, 1);
+        end = new Date();
+    } else if (preset === 'last_year') {
+        start = new Date(today.getFullYear() - 1, 0, 1);
+        end = new Date(today.getFullYear() - 1, 11, 31);
+    } else if (preset === 'all') {
+        start = null;
+        end = null;
+    }
+
+    if (start && end) {
+        const sStr = formatDate(start);
+        const eStr = formatDate(end);
+        document.getElementById('start_date').value = sStr;
+        document.getElementById('end_date').value = eStr;
+        document.getElementById('popover_start_display').value = sStr;
+        document.getElementById('popover_end_display').value = eStr;
+        if (fpRangePicker) {
+            fpRangePicker.setDate([sStr, eStr], true);
         }
-    });
-    var endPicker = flatpickr('#end_date_display', {
-        locale: 'fr',
-        dateFormat: 'Y-m-d',
-        altInput: true,
-        altFormat: 'D j M Y',
-        maxDate: 'today',
-        defaultDate: document.getElementById('end_date').value || null,
-        onReady: function(selectedDates, dateStr, instance) {
-            instance.calendarContainer.classList.add('flatpickr-range-theme');
-        },
-        onChange: function(selectedDates, dateStr) {
-            document.getElementById('end_date').value = dateStr;
+    } else {
+        clearDatePreset();
+    }
+}
+
+function clearDatePreset() {
+    document.getElementById('start_date').value = '';
+    document.getElementById('end_date').value = '';
+    document.getElementById('popover_start_display').value = '';
+    document.getElementById('popover_end_display').value = '';
+    if (fpRangePicker) {
+        fpRangePicker.clear();
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const sVal = document.getElementById('start_date').value;
+    const eVal = document.getElementById('end_date').value;
+    document.getElementById('popover_start_display').value = sVal || '';
+    document.getElementById('popover_end_display').value = eVal || '';
+
+    // Initialize Flatpickr in range mode inside the popover
+    if (typeof flatpickr !== 'undefined') {
+        flatpickr.localize(flatpickr.l10ns.fr);
+        fpRangePicker = flatpickr("#flatpickr-inline-target", {
+            inline: true,
+            mode: "range",
+            showMonths: window.innerWidth > 768 ? 2 : 1,
+            dateFormat: "Y-m-d",
+            defaultDate: (sVal && eVal) ? [sVal, eVal] : null,
+            locale: "fr",
+            onChange: function(selectedDates, dateStr, instance) {
+                if (selectedDates.length === 1) {
+                    const sStr = formatDate(selectedDates[0]);
+                    document.getElementById('start_date').value = sStr;
+                    document.getElementById('popover_start_display').value = sStr;
+                } else if (selectedDates.length === 2) {
+                    const sStr = formatDate(selectedDates[0]);
+                    const eStr = formatDate(selectedDates[1]);
+                    document.getElementById('start_date').value = sStr;
+                    document.getElementById('end_date').value = eStr;
+                    document.getElementById('popover_start_display').value = sStr;
+                    document.getElementById('popover_end_display').value = eStr;
+                }
+            }
+        });
+    }
+
+    // Fermer le popover si on clique en dehors
+    document.addEventListener('click', function(e) {
+        const pop = document.getElementById('date-popover');
+        const trigger = document.getElementById('btn-date-trigger');
+        if (pop && !pop.classList.contains('hidden') && !pop.contains(e.target) && !trigger.contains(e.target)) {
+            pop.classList.add('hidden');
         }
     });
     

@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Modifier le Dossier - STAGILOG')
-@section('header_title', 'Modifier le Dossier {{ $dossier->code_dossier ?? ("#".$dossier->id_dossier) }}')
+@section('title', 'Modifier le Dossier ' . ($dossier->code_dossier ?? '') . ' - STAGILOG')
+@section('header_title', 'Modifier le Dossier (Brouillon)')
 
 @section('dashboard_content')
 <div class="max-w-4xl mx-auto">
@@ -15,8 +15,8 @@
                 </svg>
             </a>
             <div>
-                <h3 class="text-xl font-black text-[#0D1B4B]">Modification du Dossier Brouillon</h3>
-                <p class="text-xs text-slate-500">Complétez vos informations ou soumettez directement le dossier à TFG SARL.</p>
+                <h3 class="text-xl font-black text-[#0D1B4B]">Modification du Dossier {{ $dossier->code_dossier ?? '' }}</h3>
+                <p class="text-xs text-slate-500">Mettez à jour les informations du stage ou soumettez-le directement à TFG SARL.</p>
             </div>
         </div>
 
@@ -27,7 +27,7 @@
             <!-- SECTION 1 : INFORMATIONS GÉNÉRALES DU STAGE -->
             <div>
                 <h4 class="text-xs font-bold uppercase tracking-wider text-[#1B3A8C] mb-4">
-                    1. Informations Générales
+                    1. Informations Générales &amp; Période Demandée
                 </h4>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -42,7 +42,7 @@
                             @foreach($filieres as $filiere)
                                 <option value="{{ $filiere->id_filiere }}" 
                                         data-sigle="{{ $filiere->sigle }}"
-                                        {{ old('id_filiere', $dossier->id_filiere) == $filiere->id_filiere ? 'selected' : '' }}>
+                                        {{ (old('id_filiere', $dossier->id_filiere) == $filiere->id_filiere) ? 'selected' : '' }}>
                                     {{ $filiere->nom_filiere }} {{ $filiere->sigle ? '('.$filiere->sigle.')' : '' }}
                                 </option>
                             @endforeach
@@ -59,7 +59,7 @@
                                 class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white transition">
                             <option value="">-- Sélectionner un cycle --</option>
                             @foreach($cycles as $cycle)
-                                <option value="{{ $cycle->id_cycle }}" {{ old('id_cycle', $dossier->id_cycle) == $cycle->id_cycle ? 'selected' : '' }}>
+                                <option value="{{ $cycle->id_cycle }}" {{ (old('id_cycle', $dossier->id_cycle) == $cycle->id_cycle) ? 'selected' : '' }}>
                                     {{ $cycle->nom_cycle }}
                                 </option>
                             @endforeach
@@ -75,9 +75,10 @@
                         <select name="type_stage" id="type_stage" required
                                 class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white transition">
                             <option value="">-- Sélectionner le type --</option>
-                            <option value="Stage Académique / Fin d'études" {{ old('type_stage', $dossier->type_stage) == "Stage Académique / Fin d'études" ? 'selected' : '' }}>Stage Académique / Fin d'études</option>
-                            <option value="Stage Pratique / Immersion" {{ old('type_stage', $dossier->type_stage) == 'Stage Pratique / Immersion' ? 'selected' : '' }}>Stage Pratique / Immersion</option>
-                            <option value="Stage Professionnel" {{ old('type_stage', $dossier->type_stage) == 'Stage Professionnel' ? 'selected' : '' }}>Stage Professionnel</option>
+                            @php $currType = old('type_stage', $dossier->type_stage); @endphp
+                            <option value="Stage Académique / Fin d'études" {{ $currType == "Stage Académique / Fin d'études" ? 'selected' : '' }}>Stage Académique / Fin d'études</option>
+                            <option value="Stage Pratique / Immersion" {{ $currType == 'Stage Pratique / Immersion' ? 'selected' : '' }}>Stage Pratique / Immersion</option>
+                            <option value="Stage Professionnel" {{ $currType == 'Stage Professionnel' ? 'selected' : '' }}>Stage Professionnel</option>
                         </select>
                         @error('type_stage') <p class="text-xs text-[#E8001D] mt-1">{{ $message }}</p> @enderror
                     </div>
@@ -94,31 +95,32 @@
                         @error('annee_academique') <p class="text-xs text-[#E8001D] mt-1">{{ $message }}</p> @enderror
                     </div>
 
-                    <!-- Note de Demande Officielle (Format PDF) -->
+                    <!-- Note de Demande Officielle -->
                     <div class="sm:col-span-2">
                         <label for="note_demande_file" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                            Note de Demande Officielle (Format PDF - Remplacer si besoin)
+                            Note de Demande Officielle de l'Établissement (Format PDF)
+                            @if(!$dossier->note_demande) <span class="text-[#E8001D]">*</span> @endif
                         </label>
                         <input type="file" name="note_demande_file" id="note_demande_file" accept=".pdf"
                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#1B3A8C] file:text-white hover:file:bg-[#142B6B] transition">
                         @if($dossier->note_demande)
-                            <p class="text-[11px] text-emerald-600 mt-1 font-semibold flex items-center space-x-1">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                <span>Fichier PDF actuel : {{ $dossier->note_demande }}</span>
+                            <p class="text-[11px] text-emerald-700 mt-1 font-semibold">
+                                &check; Document actuellement enregistré : <a href="{{ asset('uploads/notes/' . $dossier->note_demande) }}" target="_blank" class="underline text-[#1B3A8C]">{{ $dossier->note_demande }}</a> (Laissez vide pour conserver)
                             </p>
                         @endif
+                        @error('note_demande_file') <p class="text-xs text-[#E8001D] mt-1">{{ $message }}</p> @enderror
                     </div>
 
-                    <!-- Période de stage (Calendrier Dynamique Flatpickr) -->
+                    <!-- Période globale du dossier (Calendrier Harmonisé Flatpickr) -->
                     <div>
                         <label for="datedebut" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                            Date de Début Prévue <span class="text-[#E8001D]">*</span>
+                            Date de Début Prévue (Dossier) <span class="text-[#E8001D]">*</span>
                         </label>
                         <div class="relative">
                             <input type="text" name="datedebut" id="datedebut" 
                                    value="{{ old('datedebut', $dossier->datedebut ? $dossier->datedebut->format('Y-m-d') : '') }}" required
                                    placeholder="Sélectionner la date de début..."
-                                   class="datepicker-input w-full pl-10 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white transition">
+                                   class="stagilog-datepicker w-full pl-10 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white transition">
                             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                             </div>
@@ -128,13 +130,13 @@
 
                     <div>
                         <label for="datefin" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                            Date de Fin Prévue <span class="text-[#E8001D]">*</span>
+                            Date de Fin Prévue (Dossier) <span class="text-[#E8001D]">*</span>
                         </label>
                         <div class="relative">
                             <input type="text" name="datefin" id="datefin" 
                                    value="{{ old('datefin', $dossier->datefin ? $dossier->datefin->format('Y-m-d') : '') }}" required
                                    placeholder="Sélectionner la date de fin..."
-                                   class="datepicker-input w-full pl-10 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white transition">
+                                   class="stagilog-datepicker w-full pl-10 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white transition">
                             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                             </div>
@@ -152,13 +154,22 @@
                 </div>
             </div>
 
-            <!-- SECTION 2 : CANDIDATS / ÉTUDIANTS (DYNAMIQUE + RETOUR VISUEL COULEUR + NIVEAU) -->
+            <!-- SECTION 2 : CANDIDATS / ÉTUDIANTS (AVEC PÉRIODE PAR ÉTUDIANT & SYNC GLOBALE) -->
             <div class="pt-6 border-t border-slate-100">
-                <div class="mb-4">
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-[#1B3A8C]">
-                        2. Liste des Candidats / Étudiants
-                    </h4>
-                    <p class="text-[11px] text-slate-400 mt-0.5">Les fiches étudiants passent au vert dès que tous les champs requis sont saisis.</p>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-[#1B3A8C]">
+                            2. Liste des Candidats / Étudiants
+                        </h4>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Renseignez les étudiants et leurs dates de stage respectives.</p>
+                    </div>
+
+                    <!-- Bouton pour appliquer la période globale à tous les étudiants -->
+                    <button type="button" onclick="applyGlobalPeriodToAllStudents()" 
+                            class="inline-flex items-center space-x-2 bg-blue-50 hover:bg-blue-100 text-[#1B3A8C] px-3.5 py-2 rounded-xl text-xs font-bold border border-blue-200 transition shadow-sm">
+                        <svg class="w-4 h-4 text-[#1B3A8C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <span>Appliquer la période du dossier à tous les étudiants</span>
+                    </button>
                 </div>
 
                 <!-- Conteneur des cartes étudiants -->
@@ -166,18 +177,19 @@
                     @php
                         $etudiantsData = old('etudiants');
                         if (!$etudiantsData) {
-                            $etudiantsData = $dossier->etudiants->map(function($e) {
+                            $etudiantsData = $dossier->etudiants->map(function($e) use ($dossier) {
                                 return [
                                     'nom' => $e->nom_etudiant,
                                     'prenom' => $e->prenom_etudiant,
                                     'email' => $e->email_etu,
                                     'niveau_etude' => $e->niveau_etude,
                                     'date_naissance' => $e->date_naissance ? $e->date_naissance->format('Y-m-d') : '',
+                                    'datedebut_stage' => $e->datedebut_stage ? $e->datedebut_stage->format('Y-m-d') : ($dossier->datedebut ? $dossier->datedebut->format('Y-m-d') : ''),
+                                    'datefin_stage' => $e->datefin_stage ? $e->datefin_stage->format('Y-m-d') : ($dossier->datefin ? $dossier->datefin->format('Y-m-d') : ''),
                                     'existing_cv' => $e->cv,
                                 ];
                             })->toArray();
                         }
-                        $maxDate16 = now()->subYears(16)->format('Y-m-d');
                     @endphp
 
                     @foreach($etudiantsData as $index => $etu)
@@ -252,21 +264,41 @@
 
                             <div>
                                 <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
-                                    Date de Naissance (Optionnelle)
+                                    Date de Début du Stage
                                 </label>
-                                <input type="text" name="etudiants[{{ $index }}][date_naissance]" value="{{ $etu['date_naissance'] ?? '' }}"
-                                       placeholder="Sélectionner la date..."
-                                       class="birth-datepicker-input w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]">
+                                <input type="text" name="etudiants[{{ $index }}][datedebut_stage]" value="{{ $etu['datedebut_stage'] ?? '' }}"
+                                       placeholder="Début du stage..."
+                                       class="student-stage-start stagilog-datepicker w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]">
                             </div>
 
                             <div>
                                 <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
-                                    Curriculum Vitae (Optionnel)
+                                    Date de Fin du Stage
+                                </label>
+                                <input type="text" name="etudiants[{{ $index }}][datefin_stage]" value="{{ $etu['datefin_stage'] ?? '' }}"
+                                       placeholder="Fin du stage..."
+                                       class="student-stage-end stagilog-datepicker w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]">
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
+                                    Date de Naissance (Optionnelle)
+                                </label>
+                                <input type="text" name="etudiants[{{ $index }}][date_naissance]" value="{{ $etu['date_naissance'] ?? '' }}"
+                                       placeholder="Sélectionner la date..."
+                                       class="birth-datepicker stagilog-datepicker w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]">
+                            </div>
+
+                            <div class="sm:col-span-2">
+                                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
+                                    Curriculum Vitae
                                 </label>
                                 <input type="file" name="etudiants[{{ $index }}][cv_file]" accept=".pdf,.doc,.docx"
                                        class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-[11px] file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-blue-50 file:text-[#1B3A8C]">
                                 @if(!empty($etu['existing_cv']))
-                                    <p class="text-[10px] text-emerald-600 font-semibold mt-1">CV actuel conservé</p>
+                                    <p class="text-[10px] text-emerald-700 font-semibold mt-1">
+                                        &check; CV joint : <a href="{{ asset('uploads/cv/' . $etu['existing_cv']) }}" target="_blank" class="underline text-[#1B3A8C]">{{ $etu['existing_cv'] }}</a>
+                                    </p>
                                 @endif
                             </div>
                         </div>
@@ -274,7 +306,7 @@
                     @endforeach
                 </div>
 
-                <!-- BOUTON AJOUTER UN ÉTUDIANT (POSITIONNÉ EN BAS DU DERNIER ÉTUDIANT - STYLE CAPSULE) -->
+                <!-- BOUTON AJOUTER UN ÉTUDIANT -->
                 <div class="mt-5 flex items-center">
                     <button type="button" onclick="addStudentCard()" 
                             class="inline-flex items-center space-x-2 bg-[#EEF4FF] hover:bg-blue-100 text-[#1B3A8C] px-6 py-3 rounded-full text-xs font-black transition-all duration-200 shadow-sm border border-blue-200/60 hover:shadow-md transform hover:-translate-y-0.5">
@@ -286,7 +318,7 @@
                 </div>
             </div>
 
-            <!-- BOUTONS D'ACTION (BROUILLON OU SOUMISSION) -->
+            <!-- BOUTONS D'ACTION -->
             <div class="pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <a href="{{ route('ecole.dossiers.index') }}" class="px-6 py-3 rounded-2xl bg-slate-100 text-slate-600 font-bold text-xs hover:bg-slate-200 transition">
                     Annuler
@@ -295,11 +327,11 @@
                 <div class="flex items-center space-x-3 w-full sm:w-auto">
                     <button type="submit" name="action" value="brouillon" formnovalidate
                             class="w-full sm:w-auto px-6 py-3.5 bg-white hover:bg-slate-50 text-[#1B3A8C] border-2 border-[#1B3A8C] rounded-2xl font-bold text-xs shadow-sm transition">
-                        Enregistrer les modifications
+                        Enregistrer les Modifications
                     </button>
                     <button type="submit" name="action" value="soumettre"
                             class="w-full sm:w-auto px-8 py-3.5 bg-[#1B3A8C] hover:bg-[#142B6B] text-white rounded-2xl font-bold text-xs shadow-xl hover:shadow-blue-900/20 transition transform hover:-translate-y-0.5">
-                        Soumettre définitivement à TFG SARL
+                        Soumettre à TFG SARL
                     </button>
                 </div>
             </div>
@@ -309,80 +341,60 @@
 
 @push('scripts')
 <script>
-// Suggestion automatique du sigle au changement de filière
 function updateSigleSuggestion(select) {
     const selectedOption = select.options[select.selectedIndex];
     const sigleValue = selectedOption.getAttribute('data-sigle');
     const sigleInput = document.getElementById('sigle');
-    if (sigleValue && !sigleInput.value) {
+    if (sigleInput && sigleValue && !sigleInput.value) {
         sigleInput.value = sigleValue;
     }
 }
 
-// Initialisation du Calendrier Dynamique Flatpickr
-let startPicker, endPicker;
-document.addEventListener('DOMContentLoaded', function() {
-    if (typeof flatpickr !== 'undefined') {
-        flatpickr.localize(flatpickr.l10ns.fr);
-        
-        startPicker = flatpickr("#datedebut", {
-            dateFormat: "Y-m-d",
-            altInput: true,
-            altFormat: "j F Y",
-            allowInput: true,
-            locale: "fr",
-            onReady: function(selectedDates, dateStr, instance) {
-                instance.calendarContainer.classList.add('flatpickr-range-theme');
-            },
-            onChange: function(selectedDates, dateStr) {
-                if (endPicker) {
-                    endPicker.set('minDate', dateStr);
-                }
-                calculateDuration();
-            }
-        });
+// Fonction unique et universelle pour initialiser les datepickers
+function initStagilogDatepickers() {
+    if (typeof flatpickr === 'undefined') return;
+    flatpickr.localize(flatpickr.l10ns.fr);
 
-        endPicker = flatpickr("#datefin", {
-            dateFormat: "Y-m-d",
-            altInput: true,
-            altFormat: "j F Y",
-            allowInput: true,
-            locale: "fr",
-            onReady: function(selectedDates, dateStr, instance) {
-                instance.calendarContainer.classList.add('flatpickr-range-theme');
-            },
-            onChange: function() {
-                calculateDuration();
-            }
-        });
+    flatpickr("#datedebut", {
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "j F Y",
+        allowInput: true,
+        locale: "fr",
+        onChange: function() {
+            calculateDuration();
+        }
+    });
 
-        // Calculer la durée initiale si les dates existent
-        calculateDuration();
-    }
+    flatpickr("#datefin", {
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "j F Y",
+        allowInput: true,
+        locale: "fr",
+        onChange: function() {
+            calculateDuration();
+        }
+    });
 
-    // Initialiser les datepickers pour les dates de naissance (Image 2)
-    initBirthDatepickers();
+    // Date de naissance
+    flatpickr(".birth-datepicker", {
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "j F Y",
+        allowInput: true,
+        maxDate: "today",
+        locale: "fr"
+    });
 
-    // Activer l'écoute des fiches étudiants
-    attachCardListeners();
-    checkAllCardsStatus();
-});
-
-function initBirthDatepickers() {
-    if (typeof flatpickr !== 'undefined') {
-        flatpickr.localize(flatpickr.l10ns.fr);
-        flatpickr(".birth-datepicker-input", {
-            dateFormat: "Y-m-d",
-            altInput: true,
-            altFormat: "j F Y",
-            allowInput: true,
-            maxDate: "today",
-            locale: "fr",
-            onReady: function(selectedDates, dateStr, instance) {
-                instance.calendarContainer.classList.add('flatpickr-birthdate-theme');
-            }
-        });
-    }
+    // Période individuelle de stage par étudiant
+    flatpickr(".student-stage-start, .student-stage-end", {
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "j F Y",
+        allowInput: true,
+        locale: "fr"
+    });
 }
 
 function calculateDuration() {
@@ -395,7 +407,7 @@ function calculateDuration() {
         const d1 = new Date(d1Val);
         const d2 = new Date(d2Val);
         const diffTime = d2 - d1;
-        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24)); // Math.round au lieu de Math.ceil
+        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
         if (diffDays > 0) {
             const months = Math.round(diffDays / 30);
@@ -410,7 +422,37 @@ function calculateDuration() {
     }
 }
 
-// Gestion dynamique des cartes étudiants et de leur état visuel
+function applyGlobalPeriodToAllStudents() {
+    const globalStart = document.getElementById('datedebut').value;
+    const globalEnd = document.getElementById('datefin').value;
+
+    if (!globalStart || !globalEnd) {
+        alert("Veuillez d'abord sélectionner la date de début et la date de fin prévues du dossier.");
+        document.getElementById('datedebut').focus();
+        return;
+    }
+
+    document.querySelectorAll('.student-card').forEach(card => {
+        const startInput = card.querySelector('.student-stage-start');
+        const endInput = card.querySelector('.student-stage-end');
+
+        if (startInput) {
+            startInput.value = globalStart;
+            if (startInput._flatpickr) {
+                startInput._flatpickr.setDate(globalStart, true);
+            }
+        }
+        if (endInput) {
+            endInput.value = globalEnd;
+            if (endInput._flatpickr) {
+                endInput._flatpickr.setDate(globalEnd, true);
+            }
+        }
+    });
+
+    checkAllCardsStatus();
+}
+
 function checkCardStatus(card) {
     const nom = card.querySelector('input[name*="[nom]"]')?.value.trim();
     const prenom = card.querySelector('input[name*="[prenom]"]')?.value.trim();
@@ -454,7 +496,9 @@ function attachCardListeners() {
 function addStudentCard() {
     const container = document.getElementById('students-container');
     const newIndex = Date.now();
-    const maxDate16 = '{{ $maxDate16 }}';
+
+    const globalStart = document.getElementById('datedebut').value || '';
+    const globalEnd = document.getElementById('datefin').value || '';
 
     const card = document.createElement('div');
     card.className = 'student-card bg-slate-50/80 p-6 rounded-2xl border border-slate-200/80 relative transition-all duration-300';
@@ -527,14 +571,32 @@ function addStudentCard() {
 
             <div>
                 <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
+                    Date de Début du Stage
+                </label>
+                <input type="text" name="etudiants[${newIndex}][datedebut_stage]" value="${globalStart}"
+                       placeholder="Début du stage..."
+                       class="student-stage-start stagilog-datepicker w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]">
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
+                    Date de Fin du Stage
+                </label>
+                <input type="text" name="etudiants[${newIndex}][datefin_stage]" value="${globalEnd}"
+                       placeholder="Fin du stage..."
+                       class="student-stage-end stagilog-datepicker w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]">
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
                     Date de Naissance (Optionnelle)
                 </label>
                 <input type="text" name="etudiants[${newIndex}][date_naissance]"
                        placeholder="Sélectionner la date..."
-                       class="birth-datepicker-input w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]">
+                       class="birth-datepicker stagilog-datepicker w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]">
             </div>
 
-            <div>
+            <div class="sm:col-span-2">
                 <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
                     Curriculum Vitae (Optionnel)
                 </label>
@@ -547,7 +609,7 @@ function addStudentCard() {
     container.appendChild(card);
     updateStudentNumbers();
     attachCardListeners();
-    initBirthDatepickers();
+    initStagilogDatepickers();
 }
 
 function removeStudentCard(btn) {
@@ -570,6 +632,13 @@ function updateStudentNumbers() {
         }
     });
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    initStagilogDatepickers();
+    attachCardListeners();
+    checkAllCardsStatus();
+    calculateDuration();
+});
 </script>
 @endpush
 @endsection

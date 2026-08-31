@@ -125,6 +125,7 @@ Route::middleware(['auth', 'first.login', 'role:admin'])->prefix('admin')->name(
     Route::get('/dossiers', [AdminDossierController::class, 'index'])->name('dossiers.index');
     Route::get('/dossiers/{id}', [AdminDossierController::class, 'show'])->name('dossiers.show');
     Route::post('/dossiers/{id}/modifier-periode', [AdminDossierController::class, 'modifierPeriode'])->name('dossiers.modifier-periode');
+    Route::post('/dossiers/{id}/etudiants/{etudiantId}/modifier-periode', [AdminDossierController::class, 'modifierPeriodeEtudiant'])->name('dossiers.modifier-periode-etudiant');
     Route::post('/dossiers/{id}/valider', [AdminDossierController::class, 'valider'])->name('dossiers.valider');
     Route::post('/dossiers/{id}/refuser', [AdminDossierController::class, 'refuser'])->name('dossiers.refuser');
     Route::delete('/dossiers/{id}', [AdminDossierController::class, 'destroy'])->name('dossiers.destroy');

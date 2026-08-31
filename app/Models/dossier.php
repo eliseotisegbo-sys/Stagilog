@@ -26,6 +26,7 @@ class Dossier extends Model
         'niveau_etude',
         'motif_refus',
         'valide_par',
+        'valide_par_id',
         'refuse_par',
     ];
 

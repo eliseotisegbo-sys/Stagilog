@@ -20,18 +20,46 @@ class DossierController extends Controller
     {
         $idEcole = auth()->user()->id_ecole;
         $search = $request->query('search');
+        $status = $request->query('statut');
 
-        $dossiers = Dossier::where('id_ecole', $idEcole)
-            ->with(['cycle', 'filiereRelation', 'etudiants'])
-            ->when($search, function($query, $search) {
-                $query->where('filiere', 'like', "%{$search}%")
-                      ->orWhere('annee_academique', 'like', "%{$search}%")
-                      ->orWhere('type_stage', 'like', "%{$search}%");
-            })
-            ->latest()
-            ->paginate(15);
+        $query = Dossier::where('id_ecole', $idEcole)
+            ->with(['cycle', 'filiereRelation', 'etudiants']);
 
-        return view('ecole.dossiers.index', compact('dossiers', 'search'));
+        if ($status === 'brouillon') {
+            $query->where('statut_brouillon', 'brouillon');
+        } elseif ($status && in_array($status, ['en_attente', 'valide', 'refuse', 'sous_reserve'])) {
+            $query->where('statut_brouillon', 'soumis')->where('statut', $status);
+        }
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('filiere', 'like', "%{$search}%")
+                  ->orWhere('annee_academique', 'like', "%{$search}%")
+                  ->orWhere('type_stage', 'like', "%{$search}%")
+                  ->orWhere('code_dossier', 'like', "%{$search}%");
+            });
+        }
+
+        $dossiers = $query->latest()->paginate(15);
+
+        $countTotal = Dossier::where('id_ecole', $idEcole)->count();
+        $countBrouillon = Dossier::where('id_ecole', $idEcole)->where('statut_brouillon', 'brouillon')->count();
+        $countAttente = Dossier::where('id_ecole', $idEcole)->where('statut_brouillon', 'soumis')->where('statut', 'en_attente')->count();
+        $countSousReserve = Dossier::where('id_ecole', $idEcole)->where('statut_brouillon', 'soumis')->where('statut', 'sous_reserve')->count();
+        $countValide = Dossier::where('id_ecole', $idEcole)->where('statut_brouillon', 'soumis')->where('statut', 'valide')->count();
+        $countRefuse = Dossier::where('id_ecole', $idEcole)->where('statut_brouillon', 'soumis')->where('statut', 'refuse')->count();
+
+        return view('ecole.dossiers.index', compact(
+            'dossiers', 
+            'search', 
+            'status',
+            'countTotal',
+            'countBrouillon',
+            'countAttente',
+            'countSousReserve',
+            'countValide',
+            'countRefuse'
+        ));
     }
 
     /**
@@ -72,6 +100,8 @@ class DossierController extends Controller
                 'etudiants.*.email' => 'required|email|max:255',
                 'etudiants.*.niveau_etude' => 'required|string|max:100',
                 'etudiants.*.date_naissance' => 'nullable|date',
+                'etudiants.*.datedebut_stage' => 'nullable|date',
+                'etudiants.*.datefin_stage' => 'nullable|date',
                 'etudiants.*.cv_file' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
             ], [
                 'note_demande_file.required' => 'La note de demande officielle de l\'établissement est obligatoire pour soumettre.',
@@ -97,6 +127,8 @@ class DossierController extends Controller
                 'etudiants.*.email' => 'nullable|email|max:255',
                 'etudiants.*.niveau_etude' => 'nullable|string|max:100',
                 'etudiants.*.date_naissance' => 'nullable|date',
+                'etudiants.*.datedebut_stage' => 'nullable|date',
+                'etudiants.*.datefin_stage' => 'nullable|date',
                 'etudiants.*.cv_file' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
             ]);
         }
@@ -144,12 +176,17 @@ class DossierController extends Controller
                         $cvFile->move(public_path('uploads/cv'), $cvName);
                     }
 
+                    $debutEtu = !empty($etuData['datedebut_stage']) ? $etuData['datedebut_stage'] : $request->datedebut;
+                    $finEtu = !empty($etuData['datefin_stage']) ? $etuData['datefin_stage'] : $request->datefin;
+
                     Etudiant::create([
                         'nom_etudiant' => $etuData['nom'] ?? 'Étudiant',
                         'prenom_etudiant' => $etuData['prenom'] ?? '',
                         'email_etu' => $etuData['email'] ?? null,
                         'niveau_etude' => $etuData['niveau_etude'] ?? 'Non spécifié',
                         'date_naissance' => !empty($etuData['date_naissance']) ? $etuData['date_naissance'] : null,
+                        'datedebut_stage' => $debutEtu,
+                        'datefin_stage' => $finEtu,
                         'cv' => $cvName,
                         'id_dossier' => $dossier->id_dossier,
                     ]);
@@ -233,6 +270,8 @@ class DossierController extends Controller
                 'etudiants.*.email' => 'required|email|max:255',
                 'etudiants.*.niveau_etude' => 'required|string|max:100',
                 'etudiants.*.date_naissance' => 'nullable|date',
+                'etudiants.*.datedebut_stage' => 'nullable|date',
+                'etudiants.*.datefin_stage' => 'nullable|date',
                 'etudiants.*.cv_file' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
             ], [
                 'etudiants.min' => 'Vous devez renseigner au moins un étudiant.',
@@ -255,6 +294,8 @@ class DossierController extends Controller
                 'etudiants.*.email' => 'nullable|email|max:255',
                 'etudiants.*.niveau_etude' => 'nullable|string|max:100',
                 'etudiants.*.date_naissance' => 'nullable|date',
+                'etudiants.*.datedebut_stage' => 'nullable|date',
+                'etudiants.*.datefin_stage' => 'nullable|date',
                 'etudiants.*.cv_file' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
             ]);
         }
@@ -302,12 +343,17 @@ class DossierController extends Controller
                         $cvFile->move(public_path('uploads/cv'), $cvName);
                     }
 
+                    $debutEtu = !empty($etuData['datedebut_stage']) ? $etuData['datedebut_stage'] : $request->datedebut;
+                    $finEtu = !empty($etuData['datefin_stage']) ? $etuData['datefin_stage'] : $request->datefin;
+
                     Etudiant::create([
                         'nom_etudiant' => $etuData['nom'] ?? 'Étudiant',
                         'prenom_etudiant' => $etuData['prenom'] ?? '',
                         'email_etu' => $etuData['email'] ?? null,
                         'niveau_etude' => $etuData['niveau_etude'] ?? 'Non spécifié',
                         'date_naissance' => !empty($etuData['date_naissance']) ? $etuData['date_naissance'] : null,
+                        'datedebut_stage' => $debutEtu,
+                        'datefin_stage' => $finEtu,
                         'cv' => $cvName,
                         'id_dossier' => $dossier->id_dossier,
                     ]);
@@ -347,7 +393,7 @@ class DossierController extends Controller
         $idEcole = auth()->user()->id_ecole;
 
         $dossier = Dossier::where('id_ecole', $idEcole)
-            ->with(['cycle', 'filiereRelation', 'etudiants'])
+            ->with(['cycle', 'filiereRelation', 'etudiants.documents'])
             ->findOrFail($id);
 
         return view('ecole.dossiers.show', compact('dossier'));

@@ -6,6 +6,75 @@
 @section('dashboard_content')
 <div class="space-y-6">
     
+    <!-- Filtres rapides par statut -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <a href="{{ route('ecole.dossiers.index') }}" 
+           class="p-3.5 rounded-2xl bg-white border {{ !$status ? 'border-[#1B3A8C] ring-2 ring-[#1B3A8C]/20 shadow-md' : 'border-slate-100 shadow-card hover:bg-slate-50' }} transition flex items-center justify-between">
+            <div>
+                <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Tous</p>
+                <h4 class="text-lg font-black text-[#0D1B4B]">{{ $countTotal }}</h4>
+            </div>
+            <div class="w-7 h-7 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-xs">
+                &Sigma;
+            </div>
+        </a>
+
+        <a href="{{ route('ecole.dossiers.index', ['statut' => 'brouillon']) }}" 
+           class="p-3.5 rounded-2xl bg-white border {{ $status === 'brouillon' ? 'border-slate-600 ring-2 ring-slate-600/20 shadow-md' : 'border-slate-100 shadow-card hover:bg-slate-50' }} transition flex items-center justify-between">
+            <div>
+                <p class="text-[10px] font-bold uppercase tracking-wider text-slate-600">Brouillons</p>
+                <h4 class="text-lg font-black text-slate-700">{{ $countBrouillon }}</h4>
+            </div>
+            <div class="w-7 h-7 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            </div>
+        </a>
+
+        <a href="{{ route('ecole.dossiers.index', ['statut' => 'en_attente']) }}" 
+           class="p-3.5 rounded-2xl bg-white border {{ $status === 'en_attente' ? 'border-amber-500 ring-2 ring-amber-500/20 shadow-md' : 'border-slate-100 shadow-card hover:bg-slate-50' }} transition flex items-center justify-between">
+            <div>
+                <p class="text-[10px] font-bold uppercase tracking-wider text-amber-600">En attente</p>
+                <h4 class="text-lg font-black text-amber-600">{{ $countAttente }}</h4>
+            </div>
+            <div class="w-7 h-7 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+        </a>
+
+        <a href="{{ route('ecole.dossiers.index', ['statut' => 'sous_reserve']) }}" 
+           class="p-3.5 rounded-2xl bg-white border {{ $status === 'sous_reserve' ? 'border-blue-600 ring-2 ring-blue-600/20 shadow-md' : 'border-slate-100 shadow-card hover:bg-slate-50' }} transition flex items-center justify-between">
+            <div>
+                <p class="text-[10px] font-bold uppercase tracking-wider text-[#1B3A8C]">Sous réserve</p>
+                <h4 class="text-lg font-black text-[#1B3A8C]">{{ $countSousReserve }}</h4>
+            </div>
+            <div class="w-7 h-7 rounded-xl bg-blue-50 flex items-center justify-center text-[#1B3A8C]">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+        </a>
+
+        <a href="{{ route('ecole.dossiers.index', ['statut' => 'valide']) }}" 
+           class="p-3.5 rounded-2xl bg-white border {{ $status === 'valide' ? 'border-emerald-500 ring-2 ring-emerald-500/20 shadow-md' : 'border-slate-100 shadow-card hover:bg-slate-50' }} transition flex items-center justify-between">
+            <div>
+                <p class="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Validés</p>
+                <h4 class="text-lg font-black text-emerald-600">{{ $countValide }}</h4>
+            </div>
+            <div class="w-7 h-7 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            </div>
+        </a>
+
+        <a href="{{ route('ecole.dossiers.index', ['statut' => 'refuse']) }}" 
+           class="p-3.5 rounded-2xl bg-white border {{ $status === 'refuse' ? 'border-red-500 ring-2 ring-red-500/20 shadow-md' : 'border-slate-100 shadow-card hover:bg-slate-50' }} transition flex items-center justify-between">
+            <div>
+                <p class="text-[10px] font-bold uppercase tracking-wider text-red-600">Refusés</p>
+                <h4 class="text-lg font-black text-red-600">{{ $countRefuse }}</h4>
+            </div>
+            <div class="w-7 h-7 rounded-xl bg-red-50 flex items-center justify-center text-red-600">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </div>
+        </a>
+    </div>
+
     <!-- Top Action Bar -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <!-- Live Search Instantané -->
@@ -14,7 +83,7 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             </div>
             <input type="text" id="live-search-dossiers"
-                   placeholder="Rechercher instantanément une filière, promotion..." 
+                   placeholder="Rechercher instantanément une filière, promotion, code..." 
                    class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-2xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] shadow-sm">
         </div>
 
@@ -69,10 +138,25 @@
                                     <span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-1.5"></span>
                                     BROUILLON
                                 </span>
+                            @elseif($dossier->statut === 'valide')
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
+                                    VALIDÉ
+                                </span>
+                            @elseif($dossier->statut === 'refuse')
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-red-100 text-red-800 border border-red-200">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>
+                                    REFUSÉ
+                                </span>
+                            @elseif($dossier->statut === 'sous_reserve')
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-blue-100 text-[#1B3A8C] border border-blue-200">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#1B3A8C] mr-1.5"></span>
+                                    SOUS RÉSERVE
+                                </span>
                             @else
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider {{ $dossier->statut === 'valide' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : ($dossier->statut === 'refuse' ? 'bg-red-100 text-red-800 border border-red-200' : 'bg-amber-100 text-amber-800 border border-amber-200') }}">
-                                    <span class="w-1.5 h-1.5 rounded-full {{ $dossier->statut === 'valide' ? 'bg-emerald-500' : ($dossier->statut === 'refuse' ? 'bg-red-500' : 'bg-amber-500') }} mr-1.5"></span>
-                                    {{ $dossier->statut === 'valide' ? 'VALIDÉ' : ($dossier->statut === 'refuse' ? 'REFUSÉ' : 'EN ATTENTE') }}
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-200">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5"></span>
+                                    EN ATTENTE
                                 </span>
                             @endif
                         </td>

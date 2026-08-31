@@ -1,48 +1,48 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Tableau de Bord École - STAGILOG')
-@section('header_title', 'Espace École Partenaire')
+@section('title', 'Espace Établissement - STAGILOG')
+@section('header_title', 'Tableau de Bord Établissement')
 
 @section('dashboard_content')
 <div class="space-y-8">
     
-    <!-- SALUTATION BANNER SANS EMOJI -->
+    <!-- SALUTATION BANNER -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#0D1B4B] tracking-tight">
-                {{ $salutation }}, {{ $userName }}
+                {{ $salutation }}, {{ $ecole->nom_ecole ?? 'École Partenaire' }}
             </h1>
             <p class="text-sm font-medium text-[#6B7AA1] mt-1">
-                {{ $ecole->nom_ecole ?? 'Établissement Partenaire' }} &mdash; Suivi de vos promotions et des évaluations de stage.
+                Suivi de vos demandes de stage et des rapports académiques TFG SARL.
             </p>
         </div>
 
         <div class="flex items-center space-x-3">
-            <a href="{{ route('ecole.dossiers.create') }}" class="inline-flex items-center space-x-2 bg-[#1B3A8C] hover:bg-[#142B6B] text-white px-5 py-2.5 rounded-2xl text-xs font-bold shadow-lg hover:shadow-blue-900/20 transition">
+            <a href="{{ route('ecole.dossiers.create') }}" class="inline-flex items-center space-x-2 bg-[#1B3A8C] hover:bg-[#142B6B] text-white px-5 py-2.5 rounded-2xl text-xs font-bold shadow-lg hover:shadow-blue-900/20 transition transform hover:-translate-y-0.5">
                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                 </svg>
-                <span>Nouveau Dossier de Stage</span>
+                <span>Nouveau Dossier</span>
             </a>
         </div>
     </div>
 
-    <!-- 4 KPI CARDS (Vraies valeurs de la base de données) -->
+    <!-- 4 KPI CARDS -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         
-        <!-- Card 1: Mes Dossiers -->
+        <!-- Card 1: Total Dossiers -->
         <div class="bg-white p-6 rounded-3xl shadow-card border border-slate-100/80 hover:shadow-hover transition-all duration-300">
             <div class="flex items-center justify-between mb-3">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Dossiers</span>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Dossiers Déposés</span>
             </div>
             <div class="flex items-end justify-between">
                 <div>
                     <h3 class="text-3xl font-black text-[#0D1B4B]">{{ $totalDossiers }}</h3>
-                    <p class="text-xs font-medium text-slate-400 mt-1">{{ $dossiersBrouillon }} en brouillon</p>
+                    <p class="text-xs font-medium text-slate-400 mt-1">Total des soumissions</p>
                 </div>
                 <div class="w-12 h-12 rounded-2xl bg-blue-50 text-[#1B3A8C] flex items-center justify-center shadow-inner">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
                 </div>
             </div>
@@ -51,22 +51,22 @@
         <!-- Card 2: Dossiers Validés -->
         <div class="bg-white p-6 rounded-3xl shadow-card border border-slate-100/80 hover:shadow-hover transition-all duration-300">
             <div class="flex items-center justify-between mb-3">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Dossiers Validés</span>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Validés par TFG</span>
             </div>
             <div class="flex items-end justify-between">
                 <div>
                     <h3 class="text-3xl font-black text-emerald-600">{{ $dossiersValides }}</h3>
-                    <p class="text-xs font-medium text-slate-400 mt-1">Acceptés par TFG SARL</p>
+                    <p class="text-xs font-medium text-slate-400 mt-1">Dossiers approuvés</p>
                 </div>
                 <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-inner">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                     </svg>
                 </div>
             </div>
         </div>
 
-        <!-- Card 3: En Cours d'Instruction -->
+        <!-- Card 3: En Attente de Validation -->
         <div class="bg-white p-6 rounded-3xl shadow-card border border-slate-100/80 hover:shadow-hover transition-all duration-300">
             <div class="flex items-center justify-between mb-3">
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-500">En Examen</span>
@@ -74,7 +74,7 @@
             <div class="flex items-end justify-between">
                 <div>
                     <h3 class="text-3xl font-black text-amber-600">{{ $dossiersEnAttente }}</h3>
-                    <p class="text-xs font-medium text-slate-400 mt-1">{{ $dossiersRefuses }} refusés</p>
+                    <p class="text-xs font-medium text-slate-400 mt-1">En cours de traitement</p>
                 </div>
                 <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shadow-inner">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -103,59 +103,75 @@
         </div>
     </div>
 
-    <!-- SÉLECTEUR DE PÉRIODE POUR LES STATISTIQUES & ACTIVITÉ -->
-    <div class="bg-white rounded-3xl border border-slate-100 shadow-card p-5">
+    <!-- SÉLECTEUR DE PÉRIODE AVANCÉ POUR L'ACTIVITÉ (COMBO JOUR / SEMAINE / MOIS / ANNÉE) -->
+    <div class="bg-white rounded-3xl border border-slate-100 shadow-card p-5 relative">
         <form method="GET" action="{{ route('dashboard.ecole') }}" id="period-form" class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+            <input type="hidden" name="start_date" id="start_date" value="{{ request('start_date') }}">
+            <input type="hidden" name="end_date" id="end_date" value="{{ request('end_date') }}">
+
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-2xl bg-[#EEF4FF] text-[#1B3A8C] flex items-center justify-center shadow-inner flex-shrink-0">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                <div class="w-10 h-10 rounded-2xl bg-[#EEF4FF] text-[#1B3A8C] flex items-center justify-center shadow-inner flex-shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 </div>
                 <div>
                     <h4 class="text-xs font-black uppercase tracking-wider text-[#0D1B4B]">Période d'Activité</h4>
-                    <p class="text-[11px] text-slate-400">Filtrer l'historique des soumissions</p>
+                    <p class="text-[11px] text-slate-400">Filtrer par jour, semaine, mois ou année avec double calendrier</p>
                 </div>
             </div>
 
-            <div class="flex flex-col sm:flex-row items-center gap-3 flex-1 max-w-2xl">
-                <div class="relative flex-1 w-full">
-                    <input type="text" id="start_date_display" placeholder="Date de début"
-                        class="w-full pl-3.5 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-[#0D1B4B] focus:ring-2 focus:ring-[#1B3A8C] focus:border-transparent outline-none cursor-pointer bg-slate-50 transition"
-                        readonly>
-                    <input type="hidden" name="start_date" id="start_date" value="{{ request('start_date') }}">
-                </div>
-                
-                <span class="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-xl hidden sm:inline-block">au</span>
+            <!-- Trigger Button & Popover Container -->
+            <div class="relative flex items-center gap-3">
+                <button type="button" onclick="toggleDatePopover()" id="btn-date-trigger"
+                        class="inline-flex items-center space-x-3 px-4 py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-2xl text-xs font-bold text-[#0D1B4B] shadow-sm transition">
+                    <svg class="w-4 h-4 text-[#1B3A8C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <span id="date-summary-label">{{ $periodLabel }}</span>
+                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </button>
 
-                <div class="relative flex-1 w-full">
-                    <input type="text" id="end_date_display" placeholder="Date de fin"
-                        class="w-full pl-3.5 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-[#0D1B4B] focus:ring-2 focus:ring-[#1B3A8C] focus:border-transparent outline-none cursor-pointer bg-slate-50 transition"
-                        readonly>
-                    <input type="hidden" name="end_date" id="end_date" value="{{ request('end_date') }}">
-                </div>
+                @if(request('start_date'))
+                <a href="{{ route('dashboard.ecole') }}" class="inline-flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <span>Réinitialiser</span>
+                </a>
+                @endif
 
-                <div class="flex items-center gap-2 w-full sm:w-auto">
-                    <button type="submit" class="inline-flex items-center justify-center gap-1.5 bg-[#1B3A8C] hover:bg-[#142B6B] text-white px-5 py-2.5 rounded-xl text-xs font-bold transition shadow-md flex-1 sm:flex-initial">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/></svg>
-                        Filtrer
-                    </button>
+                <!-- POPOVER ADVANCED CALENDAR & PRESETS (Image 3 Style) -->
+                <div id="date-popover" class="hidden absolute right-0 top-full mt-3 z-50 bg-white rounded-3xl shadow-2xl border border-slate-200 p-6 flex flex-col md:flex-row gap-6 w-full sm:w-[680px]">
+                    <!-- Colonne des raccourcis pré-programmés -->
+                    <div class="w-full md:w-44 border-b md:border-b-0 md:border-r border-slate-100 pb-4 md:pb-0 md:pr-4 flex flex-col space-y-1">
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-2">Raccourcis</span>
+                        <button type="button" onclick="selectDatePreset('today')" class="preset-btn text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-blue-50 hover:text-[#1B3A8C] transition">Aujourd'hui</button>
+                        <button type="button" onclick="selectDatePreset('yesterday')" class="preset-btn text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-blue-50 hover:text-[#1B3A8C] transition">Hier</button>
+                        <button type="button" onclick="selectDatePreset('week')" class="preset-btn text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-blue-50 hover:text-[#1B3A8C] transition">Cette semaine</button>
+                        <button type="button" onclick="selectDatePreset('last_week')" class="preset-btn text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-blue-50 hover:text-[#1B3A8C] transition">Semaine dernière</button>
+                        <button type="button" onclick="selectDatePreset('month')" class="preset-btn text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-blue-50 hover:text-[#1B3A8C] transition">Ce mois</button>
+                        <button type="button" onclick="selectDatePreset('last_month')" class="preset-btn text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-blue-50 hover:text-[#1B3A8C] transition">Mois dernier</button>
+                        <button type="button" onclick="selectDatePreset('year')" class="preset-btn text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-blue-50 hover:text-[#1B3A8C] transition">Cette année</button>
+                        <button type="button" onclick="selectDatePreset('last_year')" class="preset-btn text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-blue-50 hover:text-[#1B3A8C] transition">Année dernière</button>
+                        <button type="button" onclick="selectDatePreset('all')" class="preset-btn text-left px-3 py-2 rounded-xl text-xs font-bold text-[#1B3A8C] bg-blue-50/60 hover:bg-blue-100 transition">Toutes les périodes</button>
+                    </div>
 
-                    @if(request('start_date'))
-                    <a href="{{ route('dashboard.ecole') }}" class="inline-flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2.5 rounded-xl text-xs font-bold transition">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                        Réinitialiser
-                    </a>
-                    @endif
+                    <!-- Zone Calendrier & Barre de validation -->
+                    <div class="flex-1 flex flex-col justify-between">
+                        <div>
+                            <div id="flatpickr-inline-target" class="flex justify-center"></div>
+                        </div>
+
+                        <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 mt-4">
+                            <div class="flex items-center space-x-2 text-xs">
+                                <span class="font-bold text-slate-400">Du :</span>
+                                <input type="text" id="popover_start_display" readonly class="w-24 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-center font-bold text-[#0D1B4B] text-[11px]">
+                                <span class="font-bold text-slate-400">Au :</span>
+                                <input type="text" id="popover_end_display" readonly class="w-24 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-center font-bold text-[#0D1B4B] text-[11px]">
+                            </div>
+                            <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+                                <button type="button" onclick="clearDatePreset()" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 font-bold text-xs hover:bg-slate-200 transition">Effacer</button>
+                                <button type="submit" class="px-5 py-2 rounded-xl bg-[#1B3A8C] text-white font-bold text-xs hover:bg-[#142B6B] shadow-md transition">Appliquer</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            @if($periodLabel !== 'Toutes les périodes')
-            <div class="flex items-center gap-2">
-                <span class="inline-flex items-center gap-1.5 bg-[#EEF4FF] text-[#1B3A8C] text-[11px] font-bold px-3 py-1.5 rounded-full border border-[#BFDBFE]">
-                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
-                    {{ $periodLabel }}
-                </span>
-            </div>
-            @endif
         </form>
     </div>
 
@@ -169,7 +185,7 @@
                     <h3 class="text-lg font-extrabold text-[#0D1B4B]">Activité des Soumissions</h3>
                     <p class="text-xs font-medium text-slate-400">
                         @if($periodLabel !== 'Toutes les périodes')
-                            Période : <span class="text-[#1B3A8C] font-bold">{{ $periodLabel }}</span>
+                            Période sélectionnée : <span class="text-[#1B3A8C] font-bold">{{ $periodLabel }}</span>
                         @else
                             Dossiers déposés par votre établissement (6 derniers mois)
                         @endif
@@ -191,7 +207,7 @@
                 </div>
                 <h4 class="text-lg font-bold mb-1">Inscrire une nouvelle promotion ?</h4>
                 <p class="text-xs text-blue-200 mb-6 leading-relaxed">
-                    Créez un dossier complet avec les CVs des étudiants et la note de demande officielle.
+                    Créez un dossier complet avec les dates de stage individuelles des étudiants et la note officielle.
                 </p>
                 <a href="{{ route('ecole.dossiers.create') }}" class="inline-flex items-center justify-center w-full bg-white text-[#1B3A8C] hover:bg-blue-50 py-3 rounded-2xl text-xs font-black shadow transition">
                     Créer un nouveau dossier
@@ -200,16 +216,15 @@
         </div>
     </div>
 
-    <!-- TABLEAU DE VOS DOSSIERS -->
+    <!-- TABLEAU RÉCENT -->
     <div class="bg-white rounded-3xl shadow-card border border-slate-100 overflow-hidden">
-        <div class="p-6 sm:p-8 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="p-6 sm:p-8 border-b border-slate-100 flex items-center justify-between">
             <div>
-                <h3 class="text-lg font-extrabold text-[#0D1B4B]">Mes Dossiers Récents</h3>
-                <p class="text-xs font-medium text-slate-400">Statut de traitement de vos demandes de stages</p>
+                <h3 class="text-lg font-extrabold text-[#0D1B4B]">Derniers Dossiers Enregistrés</h3>
+                <p class="text-xs font-medium text-slate-400">Historique de vos dossiers de stage soumis à TFG SARL</p>
             </div>
-            <a href="{{ route('ecole.dossiers.index') }}" class="inline-flex items-center space-x-1.5 text-xs font-bold text-[#1B3A8C] hover:text-[#142B6B]">
-                <span>Voir la liste complète</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            <a href="{{ route('ecole.dossiers.index') }}" class="text-xs font-bold text-[#1B3A8C] hover:underline">
+                Voir tous mes dossiers &rarr;
             </a>
         </div>
 
@@ -217,29 +232,31 @@
             <table class="w-full text-left text-xs">
                 <thead class="bg-slate-50/80 text-slate-500 uppercase tracking-wider font-bold border-b border-slate-100">
                     <tr>
-                        <th class="py-4 px-6">Filière & Promotion</th>
-                        <th class="py-4 px-6">Cycle</th>
+                        <th class="py-4 px-6">Réf Dossier</th>
+                        <th class="py-4 px-6">Filière / Spécialité</th>
+                        <th class="py-4 px-6">Promotion</th>
                         <th class="py-4 px-6">Étudiants</th>
-                        <th class="py-4 px-6">Période Prévue</th>
-                        <th class="py-4 px-6">Statut Soumission</th>
-                        <th class="py-4 px-6">Validation TFG</th>
-                        <th class="py-4 px-6 text-right">Actions</th>
+                        <th class="py-4 px-6">Période Demandée</th>
+                        <th class="py-4 px-6">Statut TFG</th>
+                        <th class="py-4 px-6 text-right">Action</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
-                    @forelse($recentsDossiers as $dossier)
+                    @forelse($derniersDossiers as $dossier)
                     <tr class="hover:bg-slate-50/70 transition">
-                        <td class="py-4 px-6">
-                            <div class="font-bold text-[#0D1B4B]">{{ $dossier->filiere }}</div>
-                            <div class="text-[11px] text-slate-400">Année : {{ $dossier->annee_academique }}</div>
+                        <td class="py-4 px-6 font-mono font-bold text-[#0D1B4B]">
+                            {{ $dossier->code_dossier ?? ($ecole->sigle . '-' . ($dossier->created_at ? $dossier->created_at->format('dmYHi') : '')) }}
+                        </td>
+                        <td class="py-4 px-6 font-bold text-[#0D1B4B]">
+                            {{ $dossier->filiere }}
+                        </td>
+                        <td class="py-4 px-6 text-slate-600">
+                            {{ $dossier->annee_academique }}
                         </td>
                         <td class="py-4 px-6">
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-blue-50 text-[#1B3A8C] font-bold text-[11px]">
-                                {{ $dossier->cycle->nom_cycle ?? 'Licence / Master' }}
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-blue-50 text-[#1B3A8C] font-bold">
+                                {{ $dossier->etudiants->count() }} étudiant(s)
                             </span>
-                        </td>
-                        <td class="py-4 px-6">
-                            <span class="font-semibold">{{ $dossier->etudiants->count() }} étudiant(s)</span>
                         </td>
                         <td class="py-4 px-6 text-slate-600 text-xs lowercase">
                             {{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('ddd D MMMM YYYY') : '-' }}
@@ -247,16 +264,29 @@
                             {{ $dossier->datefin ? $dossier->datefin->locale('fr')->isoFormat('ddd D MMMM YYYY') : '-' }}
                         </td>
                         <td class="py-4 px-6">
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase {{ $dossier->statut_brouillon === 'soumis' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-700' }}">
-                                {{ $dossier->statut_brouillon === 'soumis' ? 'Soumis' : 'Brouillon' }}
-                            </span>
+                            @if($dossier->statut_brouillon === 'brouillon')
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600">
+                                    Brouillon
+                                </span>
+                            @elseif($dossier->statut === 'valide')
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700">
+                                    Validé
+                                </span>
+                            @elseif($dossier->statut === 'refuse')
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-100 text-red-700">
+                                    Refusé
+                                </span>
+                            @elseif($dossier->statut === 'sous_reserve')
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-[#1B3A8C]">
+                                    Sous réserve
+                                </span>
+                            @else
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-700">
+                                    En attente
+                                </span>
+                            @endif
                         </td>
-                        <td class="py-4 px-6">
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider {{ $dossier->statut === 'valide' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : ($dossier->statut === 'refuse' ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-amber-100 text-amber-700 border border-amber-200') }}">
-                                {{ $dossier->statut === 'valide' ? 'Validé' : ($dossier->statut === 'refuse' ? 'Refusé' : 'En attente') }}
-                            </span>
-                        </td>
-                        <td class="py-4 px-6 text-right space-x-2">
+                        <td class="py-4 px-6 text-right">
                             <a href="{{ route('ecole.dossiers.show', $dossier->id_dossier) }}" 
                                class="inline-flex items-center text-xs font-bold text-[#1B3A8C] hover:underline">
                                 Voir détails
@@ -276,34 +306,126 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    var startPicker = flatpickr('#start_date_display', {
-        locale: 'fr',
-        dateFormat: 'Y-m-d',
-        altInput: true,
-        altFormat: 'D j M Y',
-        maxDate: 'today',
-        defaultDate: document.getElementById('start_date').value || null,
-        onReady: function(selectedDates, dateStr, instance) {
-            instance.calendarContainer.classList.add('flatpickr-range-theme');
-        },
-        onChange: function(selectedDates, dateStr) {
-            document.getElementById('start_date').value = dateStr;
-            endPicker.set('minDate', dateStr);
+let fpRangePicker = null;
+
+function toggleDatePopover() {
+    const pop = document.getElementById('date-popover');
+    pop.classList.toggle('hidden');
+}
+
+function formatDate(d) {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function selectDatePreset(preset) {
+    const today = new Date();
+    let start = null;
+    let end = null;
+
+    if (preset === 'today') {
+        start = new Date(today);
+        end = new Date(today);
+    } else if (preset === 'yesterday') {
+        start = new Date(today);
+        start.setDate(today.getDate() - 1);
+        end = new Date(start);
+    } else if (preset === 'week') {
+        const day = today.getDay();
+        const diff = today.getDate() - day + (day === 0 ? -6 : 1);
+        start = new Date(today);
+        start.setDate(diff);
+        end = new Date();
+    } else if (preset === 'last_week') {
+        const d = new Date();
+        const day = d.getDay();
+        const diffToMon = d.getDate() - day + (day === 0 ? -6 : 1) - 7;
+        start = new Date(d);
+        start.setDate(diffToMon);
+        end = new Date(start);
+        end.setDate(start.getDate() + 6);
+    } else if (preset === 'month') {
+        start = new Date(today.getFullYear(), today.getMonth(), 1);
+        end = new Date();
+    } else if (preset === 'last_month') {
+        start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        end = new Date(today.getFullYear(), today.getMonth(), 0);
+    } else if (preset === 'year') {
+        start = new Date(today.getFullYear(), 0, 1);
+        end = new Date();
+    } else if (preset === 'last_year') {
+        start = new Date(today.getFullYear() - 1, 0, 1);
+        end = new Date(today.getFullYear() - 1, 11, 31);
+    } else if (preset === 'all') {
+        start = null;
+        end = null;
+    }
+
+    if (start && end) {
+        const sStr = formatDate(start);
+        const eStr = formatDate(end);
+        document.getElementById('start_date').value = sStr;
+        document.getElementById('end_date').value = eStr;
+        document.getElementById('popover_start_display').value = sStr;
+        document.getElementById('popover_end_display').value = eStr;
+        if (fpRangePicker) {
+            fpRangePicker.setDate([sStr, eStr], true);
         }
-    });
-    var endPicker = flatpickr('#end_date_display', {
-        locale: 'fr',
-        dateFormat: 'Y-m-d',
-        altInput: true,
-        altFormat: 'D j M Y',
-        maxDate: 'today',
-        defaultDate: document.getElementById('end_date').value || null,
-        onReady: function(selectedDates, dateStr, instance) {
-            instance.calendarContainer.classList.add('flatpickr-range-theme');
-        },
-        onChange: function(selectedDates, dateStr) {
-            document.getElementById('end_date').value = dateStr;
+    } else {
+        clearDatePreset();
+    }
+}
+
+function clearDatePreset() {
+    document.getElementById('start_date').value = '';
+    document.getElementById('end_date').value = '';
+    document.getElementById('popover_start_display').value = '';
+    document.getElementById('popover_end_display').value = '';
+    if (fpRangePicker) {
+        fpRangePicker.clear();
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const sVal = document.getElementById('start_date').value;
+    const eVal = document.getElementById('end_date').value;
+    document.getElementById('popover_start_display').value = sVal || '';
+    document.getElementById('popover_end_display').value = eVal || '';
+
+    // Initialize Flatpickr in range mode inside the popover
+    if (typeof flatpickr !== 'undefined') {
+        flatpickr.localize(flatpickr.l10ns.fr);
+        fpRangePicker = flatpickr("#flatpickr-inline-target", {
+            inline: true,
+            mode: "range",
+            showMonths: window.innerWidth > 768 ? 2 : 1,
+            dateFormat: "Y-m-d",
+            defaultDate: (sVal && eVal) ? [sVal, eVal] : null,
+            locale: "fr",
+            onChange: function(selectedDates, dateStr, instance) {
+                if (selectedDates.length === 1) {
+                    const sStr = formatDate(selectedDates[0]);
+                    document.getElementById('start_date').value = sStr;
+                    document.getElementById('popover_start_display').value = sStr;
+                } else if (selectedDates.length === 2) {
+                    const sStr = formatDate(selectedDates[0]);
+                    const eStr = formatDate(selectedDates[1]);
+                    document.getElementById('start_date').value = sStr;
+                    document.getElementById('end_date').value = eStr;
+                    document.getElementById('popover_start_display').value = sStr;
+                    document.getElementById('popover_end_display').value = eStr;
+                }
+            }
+        });
+    }
+
+    document.addEventListener('click', function(e) {
+        const pop = document.getElementById('date-popover');
+        const trigger = document.getElementById('btn-date-trigger');
+        if (pop && !pop.classList.contains('hidden') && !pop.contains(e.target) && !trigger.contains(e.target)) {
+            pop.classList.add('hidden');
         }
     });
 

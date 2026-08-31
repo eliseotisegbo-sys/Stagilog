@@ -17,6 +17,8 @@ class Etudiant extends Model
         'niveau_etude',
         'photo_profil',
         'cv',
+        'datedebut_stage',
+        'datefin_stage',
         'contrat',
         'autres_documents',
         'rapport',
@@ -26,7 +28,9 @@ class Etudiant extends Model
     ];
     
     protected $casts = [
-        'date_naissance' => 'date',
+        'date_naissance'  => 'date',
+        'datedebut_stage' => 'date',
+        'datefin_stage'   => 'date',
         'autres_documents' => 'array',
     ];
 

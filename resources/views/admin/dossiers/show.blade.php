@@ -19,8 +19,8 @@
 
         <!-- Action Decision Buttons -->
         <div class="flex items-center space-x-3">
-            @if($dossier->statut === 'en_attente')
-                <form action="{{ route('admin.dossiers.valider', $dossier->id_dossier) }}" method="POST">
+            @if($dossier->statut !== 'valide')
+                <form action="{{ route('admin.dossiers.valider', $dossier->id_dossier) }}" method="POST" id="form-valider-dossier" onsubmit="return confirm('Confirmez-vous la validation de ce dossier ? Un email officiel sera transmis à l\'école et à tous les étudiants.');">
                     @csrf
                     <button type="submit" 
                             class="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-2xl text-xs font-bold shadow-lg hover:shadow-emerald-600/30 transition transform hover:-translate-y-0.5">
@@ -28,7 +28,9 @@
                         <span>Valider le Dossier</span>
                     </button>
                 </form>
+            @endif
 
+            @if($dossier->statut !== 'refuse')
                 <button type="button" onclick="document.getElementById('modal-refus').classList.remove('hidden')" 
                         class="inline-flex items-center space-x-2 bg-red-50 hover:bg-red-100 text-[#E8001D] border border-red-200 px-5 py-2.5 rounded-2xl text-xs font-bold transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -49,10 +51,27 @@
                 Dossier Validé par la Direction @if($dossier->valide_par) <span class="font-normal text-emerald-800 text-xs">— Validé par <strong>{{ $dossier->valide_par }}</strong></span> @endif
             </h4>
             <p class="text-xs text-emerald-700 mt-0.5">
-                Les stagiaires de cette promotion peuvent démarrer leur stage directement à partir du 
+                Les stagiaires de cette promotion peuvent démarrer leur stage à partir du 
                 <strong>{{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('ddd D MMMM YYYY') : '-' }}</strong> 
                 au 
                 <strong>{{ $dossier->datefin ? $dossier->datefin->locale('fr')->isoFormat('ddd D MMMM YYYY') : '-' }}</strong>.
+            </p>
+        </div>
+    </div>
+    @endif
+
+    <!-- Alert si Sous Réserve -->
+    @if($dossier->statut === 'sous_reserve')
+    <div class="p-5 bg-blue-50 border border-blue-200 rounded-3xl text-[#0D1B4B] flex items-center space-x-4 shadow-sm">
+        <div class="w-10 h-10 rounded-2xl bg-blue-100 text-[#1B3A8C] flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        </div>
+        <div>
+            <h4 class="text-sm font-extrabold text-[#1B3A8C]">
+                Dossier Sous Réserve (Période Réajustée)
+            </h4>
+            <p class="text-xs text-slate-600 mt-0.5">
+                Des dates de stage ont été ajustées par l'administration. Le dossier peut être validé définitivement une fois les disponibilités confirmées.
             </p>
         </div>
     </div>
@@ -64,10 +83,15 @@
         <div class="w-8 h-8 rounded-xl bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0 mt-0.5">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
         </div>
-        <div>
-            <h4 class="text-sm font-bold text-red-800">
-                Dossier Refusé par l'Administration @if($dossier->refuse_par) <span class="font-normal text-red-700 text-xs">— Refusé par <strong>{{ $dossier->refuse_par }}</strong></span> @endif
-            </h4>
+        <div class="flex-1">
+            <div class="flex items-center justify-between">
+                <h4 class="text-sm font-bold text-red-800">
+                    Dossier Refusé par l'Administration @if($dossier->refuse_par) <span class="font-normal text-red-700 text-xs">— Refusé par <strong>{{ $dossier->refuse_par }}</strong></span> @endif
+                </h4>
+                <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200">
+                    Vous pouvez toujours valider ce dossier via le bouton en haut
+                </span>
+            </div>
             <p class="text-xs text-red-700 mt-1"><strong>Motif :</strong> {{ $dossier->motif_refus }}</p>
         </div>
     </div>
@@ -83,8 +107,8 @@
                     <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Établissement Demandeur</span>
                     <h3 class="text-xl font-black text-[#0D1B4B] mt-0.5">{{ $dossier->ecole->nom_ecole ?? 'N/A' }}</h3>
                 </div>
-                <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider {{ $dossier->statut === 'valide' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : ($dossier->statut === 'refuse' ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-amber-100 text-amber-700 border border-amber-200') }}">
-                    Statut : {{ $dossier->statut === 'valide' ? 'Validé' : ($dossier->statut === 'refuse' ? 'Refusé' : 'En attente') }}
+                <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider {{ $dossier->statut === 'valide' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : ($dossier->statut === 'refuse' ? 'bg-red-100 text-red-700 border border-red-200' : ($dossier->statut === 'sous_reserve' ? 'bg-blue-100 text-[#1B3A8C] border border-blue-200' : 'bg-amber-100 text-amber-700 border border-amber-200')) }}">
+                    Statut : {{ $dossier->statut === 'valide' ? 'Validé' : ($dossier->statut === 'refuse' ? 'Refusé' : ($dossier->statut === 'sous_reserve' ? 'Sous réserve' : 'En attente')) }}
                 </span>
             </div>
 
@@ -102,7 +126,7 @@
                 <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 sm:col-span-2">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Période de Stage Définie</p>
+                            <p class="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Période Globale du Dossier</p>
                             <p class="text-sm font-bold text-slate-800 mt-1 lowercase">
                                 {{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('ddd D MMMM YYYY') : '-' }} 
                                 <span class="text-slate-400 mx-1">au</span>
@@ -112,7 +136,7 @@
                         <button type="button" onclick="openModifierPeriodeModal()" 
                                 class="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-[#1B3A8C]/10 hover:bg-[#1B3A8C] text-[#1B3A8C] hover:text-white rounded-xl text-xs font-bold transition">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                            <span>Modifier les dates</span>
+                            <span>Modifier période globale</span>
                         </button>
                     </div>
                 </div>
@@ -159,12 +183,12 @@
         </div>
     </div>
 
-    <!-- LISTE DES ÉTUDIANTS CANDIDATS -->
+    <!-- LISTE DES ÉTUDIANTS CANDIDATS AVEC LEURS PÉRIODES INDIVIDUELLES -->
     <div class="bg-white rounded-3xl shadow-card border border-slate-100 overflow-hidden">
         <div class="p-6 sm:p-8 border-b border-slate-100 flex items-center justify-between">
             <div>
                 <h3 class="text-lg font-extrabold text-[#0D1B4B]">Étudiants Rattachés ({{ $dossier->etudiants->count() }})</h3>
-                <p class="text-xs font-medium text-slate-400">Liste des stagiaires proposés par l'université</p>
+                <p class="text-xs font-medium text-slate-400">Périodes individuelles et documents de chaque candidat</p>
             </div>
             @if($dossier->statut === 'valide')
             <a href="{{ route('admin.rapports.index') }}" class="text-xs font-bold text-[#1B3A8C] hover:underline">
@@ -179,13 +203,19 @@
                     <tr>
                         <th class="py-4 px-6">Nom & Prénom</th>
                         <th class="py-4 px-6">Email Étudiant</th>
-                        <th class="py-4 px-6">Niveau & Date Naissance</th>
+                        <th class="py-4 px-6">Niveau & Naissance</th>
+                        <th class="py-4 px-6">Période de Stage</th>
                         <th class="py-4 px-6">Curriculum Vitae</th>
-                        <th class="py-4 px-6 text-right">Rapport & Documents</th>
+                        <th class="py-4 px-6 text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
                     @forelse($dossier->etudiants as $etudiant)
+                    @php
+                        $debutEtu = $etudiant->datedebut_stage ?? $dossier->datedebut;
+                        $finEtu = $etudiant->datefin_stage ?? $dossier->datefin;
+                        $hasCustomDates = ($etudiant->datedebut_stage && $etudiant->datefin_stage);
+                    @endphp
                     <tr class="hover:bg-slate-50/70 transition">
                         <td class="py-4 px-6">
                             <div class="font-bold text-[#0D1B4B] text-sm">{{ $etudiant->nom_etudiant }} {{ $etudiant->prenom_etudiant }}</div>
@@ -196,6 +226,21 @@
                         <td class="py-4 px-6">
                             <div class="font-semibold">{{ $etudiant->niveau_etude ?? $dossier->niveau_etude }}</div>
                             <div class="text-[11px] text-slate-400">{{ $etudiant->date_naissance ? $etudiant->date_naissance->format('d/m/Y') : '-' }}</div>
+                        </td>
+                        <td class="py-4 px-6">
+                            <div class="font-bold text-[#0D1B4B]">
+                                {{ $debutEtu ? $debutEtu->format('d/m/Y') : '-' }} 
+                                <span class="text-slate-400 font-normal">au</span> 
+                                {{ $finEtu ? $finEtu->format('d/m/Y') : '-' }}
+                            </div>
+                            <div class="mt-1">
+                                <button type="button" 
+                                        onclick="openModifierPeriodeEtudiantModal('{{ $etudiant->id_etudiant }}', '{{ addslashes($etudiant->nom_etudiant . ' ' . $etudiant->prenom_etudiant) }}', '{{ $debutEtu ? $debutEtu->format('Y-m-d') : '' }}', '{{ $finEtu ? $finEtu->format('Y-m-d') : '' }}')"
+                                        class="inline-flex items-center space-x-1 text-[11px] font-bold text-[#1B3A8C] hover:underline bg-blue-50/80 px-2.5 py-0.5 rounded-lg">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                    <span>Ajuster dates</span>
+                                </button>
+                            </div>
                         </td>
                         <td class="py-4 px-6">
                             @if($etudiant->cv)
@@ -222,7 +267,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="py-8 text-center text-slate-400">Aucun étudiant renseigné dans ce dossier.</td>
+                        <td colspan="6" class="py-8 text-center text-slate-400">Aucun étudiant renseigné dans ce dossier.</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -231,7 +276,7 @@
     </div>
 </div>
 
-<!-- MODAL REFUS DU DOSSIER -->
+<!-- MODAL REFUS DU DOSSIER AVEC CONFIRMATION PRÉALABLE -->
 <div id="modal-refus" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-lg w-full p-8 shadow-2xl border border-slate-100">
         <div class="flex items-center space-x-3 text-red-600 mb-4">
@@ -242,10 +287,10 @@
         </div>
 
         <p class="text-xs text-slate-500 mb-4">
-            Veuillez renseigner le motif de refus. Cette justification sera transmise à l'école partenaire.
+            Veuillez renseigner le motif de refus. Cette justification sera transmise à l'école partenaire et aux étudiants par email.
         </p>
 
-        <form method="POST" action="{{ route('admin.dossiers.refuser', $dossier->id_dossier) }}">
+        <form method="POST" action="{{ route('admin.dossiers.refuser', $dossier->id_dossier) }}" id="form-refus-dossier">
             @csrf
             <div class="mb-6">
                 <label for="motif_refus" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
@@ -253,24 +298,34 @@
                 </label>
                 <textarea name="motif_refus" id="motif_refus" rows="4" 
                           class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs focus:outline-none focus:ring-2 focus:ring-red-500 focus:bg-white transition"
-                          placeholder="Ex: Capacité d'accueil atteinte pour cette période, documents manquants..." required></textarea>
+                          placeholder="Ex: Capacité d'accueil atteinte pour cette période, calendrier incompatible..." required></textarea>
+            </div>
+
+            <!-- Boîte de confirmation préalable -->
+            <div id="box-confirm-refus" class="hidden mb-6 p-4 rounded-2xl bg-red-50 border border-red-200">
+                <p class="text-xs font-extrabold text-red-900 mb-1">Confirmation Requise :</p>
+                <p class="text-xs text-red-700">Êtes-vous certain de vouloir appliquer le refus de ce dossier ? L'école et tous les candidats recevront un email officiel avec ce motif.</p>
             </div>
 
             <div class="flex items-center justify-end space-x-3">
-                <button type="button" onclick="document.getElementById('modal-refus').classList.add('hidden')"
+                <button type="button" onclick="cancelRefusModal()"
                         class="px-5 py-2.5 rounded-2xl bg-slate-100 text-slate-600 font-bold text-xs hover:bg-slate-200 transition">
                     Annuler
                 </button>
-                <button type="submit" 
+                <button type="button" id="btn-pre-refus" onclick="askRefusConfirmation()"
                         class="px-6 py-2.5 bg-[#E8001D] hover:bg-red-700 text-white rounded-2xl font-bold text-xs shadow-lg transition">
-                    Confirmer le Refus
+                    Continuer vers le Refus
+                </button>
+                <button type="submit" id="btn-submit-refus"
+                        class="hidden px-6 py-2.5 bg-red-700 hover:bg-red-800 text-white rounded-2xl font-bold text-xs shadow-xl transition animate-pulse">
+                    Oui, Confirmer et Envoyer les Mails
                 </button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- MODAL MODIFICATION DE LA PÉRIODE DE STAGE -->
+<!-- MODAL MODIFICATION DE LA PÉRIODE GLOBALE DU DOSSIER -->
 <div id="modal-modifier-periode" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100 relative">
         <div class="flex items-center space-x-3 text-[#1B3A8C] mb-4">
@@ -278,13 +333,13 @@
                 <svg class="w-6 h-6 text-[#1B3A8C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             </div>
             <div>
-                <h3 class="text-lg font-black text-[#0D1B4B]">Ajuster la Période</h3>
+                <h3 class="text-lg font-black text-[#0D1B4B]">Ajuster la Période Globale</h3>
                 <p class="text-[11px] text-slate-400 font-semibold">{{ $codeDossier }}</p>
             </div>
         </div>
 
         <p class="text-xs text-slate-500 mb-6 leading-relaxed">
-            En tant qu'administrateur, vous pouvez adapter les dates officielles de début et de fin de stage avant validation.
+            Adaptez les dates officielles globales de début et de fin de stage pour l'ensemble du dossier.
         </p>
 
         <form method="POST" action="{{ route('admin.dossiers.modifier-periode', $dossier->id_dossier) }}" class="space-y-4">
@@ -314,7 +369,58 @@
                 </button>
                 <button type="submit" 
                         class="px-6 py-2.5 bg-[#1B3A8C] hover:bg-[#142B6B] text-white rounded-2xl font-bold text-xs shadow-lg transition">
-                    Enregistrer la période
+                    Enregistrer &amp; Notifier
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL MODIFICATION DE LA PÉRIODE D'UN ÉTUDIANT SPÉCIFIQUE -->
+<div id="modal-modifier-periode-etudiant" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100 relative">
+        <div class="flex items-center space-x-3 text-[#1B3A8C] mb-4">
+            <div class="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center">
+                <svg class="w-6 h-6 text-[#1B3A8C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            </div>
+            <div>
+                <h3 class="text-lg font-black text-[#0D1B4B]">Période de l'Étudiant</h3>
+                <p class="text-[11px] text-slate-500 font-semibold" id="modal-etu-name">Nom de l'étudiant</p>
+            </div>
+        </div>
+
+        <p class="text-xs text-slate-500 mb-6 leading-relaxed">
+            Ajustez les dates de stage attribuées spécifiquement à cet étudiant. Un email sera envoyé à l'étudiant et à son école.
+        </p>
+
+        <form method="POST" id="form-modifier-periode-etudiant" action="" class="space-y-4">
+            @csrf
+            <div>
+                <label for="modal_etu_datedebut" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                    Date de Début du Stage <span class="text-[#E8001D]">*</span>
+                </label>
+                <input type="text" name="datedebut_stage" id="modal_etu_datedebut" required
+                       placeholder="YYYY-MM-DD"
+                       class="datepicker-input w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-[#0D1B4B] focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]">
+            </div>
+
+            <div>
+                <label for="modal_etu_datefin" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                    Date de Fin du Stage <span class="text-[#E8001D]">*</span>
+                </label>
+                <input type="text" name="datefin_stage" id="modal_etu_datefin" required
+                       placeholder="YYYY-MM-DD"
+                       class="datepicker-input w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-[#0D1B4B] focus:outline-none focus:ring-2 focus:ring-[#1B3A8C]">
+            </div>
+
+            <div class="flex items-center justify-end space-x-3 pt-4 border-t border-slate-100">
+                <button type="button" onclick="closeModifierPeriodeEtudiantModal()"
+                        class="px-5 py-2.5 rounded-2xl bg-slate-100 text-slate-600 font-bold text-xs hover:bg-slate-200 transition">
+                    Annuler
+                </button>
+                <button type="submit" 
+                        class="px-6 py-2.5 bg-[#1B3A8C] hover:bg-[#142B6B] text-white rounded-2xl font-bold text-xs shadow-lg transition">
+                    Enregistrer la Période
                 </button>
             </div>
         </form>
@@ -325,12 +431,51 @@
 <script>
 function openModifierPeriodeModal() {
     document.getElementById('modal-modifier-periode').classList.remove('hidden');
-    if (window.initCustomDatepickers) {
-        window.initCustomDatepickers();
+    if (typeof flatpickr !== 'undefined') {
+        flatpickr("#modal_datedebut", { dateFormat: "Y-m-d", altInput: true, altFormat: "j F Y", locale: "fr" });
+        flatpickr("#modal_datefin", { dateFormat: "Y-m-d", altInput: true, altFormat: "j F Y", locale: "fr" });
     }
 }
 function closeModifierPeriodeModal() {
     document.getElementById('modal-modifier-periode').classList.add('hidden');
+}
+
+function openModifierPeriodeEtudiantModal(etudiantId, etudiantNom, dateDebut, dateFin) {
+    document.getElementById('modal-etu-name').innerText = etudiantNom;
+    const form = document.getElementById('form-modifier-periode-etudiant');
+    form.action = "{{ url('/admin/dossiers/' . $dossier->id_dossier . '/etudiants') }}/" + etudiantId + "/modifier-periode";
+    
+    document.getElementById('modal_etu_datedebut').value = dateDebut;
+    document.getElementById('modal_etu_datefin').value = dateFin;
+
+    document.getElementById('modal-modifier-periode-etudiant').classList.remove('hidden');
+
+    if (typeof flatpickr !== 'undefined') {
+        flatpickr("#modal_etu_datedebut", { dateFormat: "Y-m-d", altInput: true, altFormat: "j F Y", defaultDate: dateDebut || null, locale: "fr" });
+        flatpickr("#modal_etu_datefin", { dateFormat: "Y-m-d", altInput: true, altFormat: "j F Y", defaultDate: dateFin || null, locale: "fr" });
+    }
+}
+function closeModifierPeriodeEtudiantModal() {
+    document.getElementById('modal-modifier-periode-etudiant').classList.add('hidden');
+}
+
+function askRefusConfirmation() {
+    const motif = document.getElementById('motif_refus').value.trim();
+    if (!motif || motif.length < 5) {
+        alert("Veuillez renseigner un motif de refus valide (au moins 5 caractères).");
+        document.getElementById('motif_refus').focus();
+        return;
+    }
+    document.getElementById('box-confirm-refus').classList.remove('hidden');
+    document.getElementById('btn-pre-refus').classList.add('hidden');
+    document.getElementById('btn-submit-refus').classList.remove('hidden');
+}
+
+function cancelRefusModal() {
+    document.getElementById('modal-refus').classList.add('hidden');
+    document.getElementById('box-confirm-refus').classList.add('hidden');
+    document.getElementById('btn-pre-refus').classList.remove('hidden');
+    document.getElementById('btn-submit-refus').classList.add('hidden');
 }
 </script>
 @endpush

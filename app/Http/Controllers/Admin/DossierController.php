@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Dossier;
 use App\Models\Ecole;
+use App\Models\Etudiant;
 use App\Mail\DossierValideMail;
 use App\Mail\DossierRefuseMail;
 use App\Mail\EtudiantStageValideMail;
+use App\Mail\PeriodeStageModifieeMail;
+use App\Mail\PeriodeEtudiantModifieeMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
@@ -24,17 +27,18 @@ class DossierController extends Controller
 
         $dossiers = Dossier::with(['ecole', 'cycle', 'filiereRelation', 'etudiants'])
             ->where('statut_brouillon', 'soumis')
-            ->when($status && in_array($status, ['en_attente', 'valide', 'refuse']), function($q) use ($status) {
+            ->when($status && in_array($status, ['en_attente', 'valide', 'refuse', 'sous_reserve']), function($q) use ($status) {
                 $q->where('statut', $status);
             })
             ->when($ecoleId, function($q) use ($ecoleId) {
                 $q->where('id_ecole', $ecoleId);
             })
             ->latest()
-            ->paginate(10);
+            ->paginate(15);
 
         $ecoles = Ecole::all();
         $countAttente = Dossier::where('statut_brouillon', 'soumis')->where('statut', 'en_attente')->count();
+        $countSousReserve = Dossier::where('statut_brouillon', 'soumis')->where('statut', 'sous_reserve')->count();
         $countValide = Dossier::where('statut_brouillon', 'soumis')->where('statut', 'valide')->count();
         $countRefuse = Dossier::where('statut_brouillon', 'soumis')->where('statut', 'refuse')->count();
         $countTotal = Dossier::where('statut_brouillon', 'soumis')->count();
@@ -45,6 +49,7 @@ class DossierController extends Controller
             'ecoleId', 
             'ecoles', 
             'countAttente', 
+            'countSousReserve',
             'countValide', 
             'countRefuse', 
             'countTotal'
@@ -56,16 +61,13 @@ class DossierController extends Controller
      */
     public function show($id)
     {
-        $dossier = Dossier::with(['ecole', 'cycle', 'filiereRelation', 'etudiants'])->findOrFail($id);
+        $dossier = Dossier::with(['ecole', 'cycle', 'filiereRelation', 'etudiants.documents'])->findOrFail($id);
 
         return view('admin.dossiers.show', compact('dossier'));
     }
 
     /**
-     * Modifier la durée / dates de stage par l'administrateur
-     */
-    /**
-     * Modifier la durée / dates de stage par l'administrateur
+     * Modifier la durée / dates de stage globales par l'administrateur
      */
     public function modifierPeriode(Request $request, $id)
     {
@@ -84,6 +86,11 @@ class DossierController extends Controller
         $dossier = Dossier::with(['ecole', 'etudiants'])->findOrFail($id);
         $dossier->datedebut = $request->datedebut;
         $dossier->datefin = $request->datefin;
+        
+        // Si le dossier n'est pas encore validé, passer en statut "sous_reserve"
+        if ($dossier->statut !== 'valide') {
+            $dossier->statut = 'sous_reserve';
+        }
         $dossier->save();
 
         $codeDossier = $dossier->code_dossier ?? 'STAGE-' . $dossier->id_dossier;
@@ -91,7 +98,7 @@ class DossierController extends Controller
         // Notification envoyée à l'école
         \App\Models\AppNotification::notifier(
             'ecole',
-            'Période de Stage Réajustée',
+            'Période de Stage Réajustée (Sous Réserve)',
             "La période du dossier {$codeDossier} a été réajustée sous réserve par l'administrateur {$adminName} (du " . \Carbon\Carbon::parse($request->datedebut)->format('d/m/Y') . " au " . \Carbon\Carbon::parse($request->datefin)->format('d/m/Y') . ").",
             route('ecole.dossiers.show', $dossier->id_dossier),
             'dossier_modifie',
@@ -108,11 +115,11 @@ class DossierController extends Controller
             null
         );
 
-        // Envoi d'email à l'école avec bouton de refus & création d'un nouveau dossier
+        // Envoi d'email à l'école
         if ($dossier->ecole && ($dossier->ecole->email || $dossier->ecole->mail)) {
             $destEmail = $dossier->ecole->email ?? $dossier->ecole->mail;
             try {
-                Mail::to($destEmail)->send(new \App\Mail\PeriodeStageModifieeMail($dossier, $adminName));
+                Mail::to($destEmail)->send(new PeriodeStageModifieeMail($dossier, $adminName));
             } catch (\Exception $e) {
                 Log::warning("Erreur envoi email modification période école ({$codeDossier}) : " . $e->getMessage());
             }
@@ -122,18 +129,92 @@ class DossierController extends Controller
         foreach ($dossier->etudiants as $etudiant) {
             if ($etudiant->email_etu && filter_var($etudiant->email_etu, FILTER_VALIDATE_EMAIL)) {
                 try {
-                    Mail::to($etudiant->email_etu)->send(new \App\Mail\PeriodeStageModifieeMail($dossier, $adminName));
+                    Mail::to($etudiant->email_etu)->send(new PeriodeStageModifieeMail($dossier, $adminName));
                 } catch (\Exception $e) {
                     Log::warning("Erreur envoi email modification période étudiant ({$etudiant->email_etu}) : " . $e->getMessage());
                 }
             }
         }
 
-        return back()->with('success', "La période de stage a été mise à jour par l'administrateur {$adminName}. Un email d'information avec option de déclin a été transmis à l'école et aux étudiants.");
+        return back()->with('success', "La période globale de stage a été mise à jour par l'administrateur {$adminName}. Le dossier est classé sous réserve et un email de notification a été envoyé à l'école et aux candidats.");
     }
 
     /**
-     * Valider le dossier
+     * Modifier la période individuelle de stage d'un étudiant par l'administrateur
+     */
+    public function modifierPeriodeEtudiant(Request $request, $id, $etudiantId)
+    {
+        $request->validate([
+            'datedebut_stage' => 'required|date',
+            'datefin_stage' => 'required|date|after:datedebut_stage',
+        ], [
+            'datedebut_stage.required' => 'La date de début est obligatoire.',
+            'datefin_stage.required' => 'La date de fin est obligatoire.',
+            'datefin_stage.after' => 'La date de fin doit être postérieure à la date de début.',
+        ]);
+
+        $adminUser = auth()->user();
+        $adminName = session('user_session_name') ?? ($adminUser->name ?? 'Administrateur TFG SARL');
+
+        $dossier = Dossier::with(['ecole'])->findOrFail($id);
+        $etudiant = Etudiant::where('id_dossier', $id)->findOrFail($etudiantId);
+
+        $etudiant->datedebut_stage = $request->datedebut_stage;
+        $etudiant->datefin_stage = $request->datefin_stage;
+        $etudiant->save();
+
+        if ($dossier->statut !== 'valide') {
+            $dossier->statut = 'sous_reserve';
+            $dossier->save();
+        }
+
+        $codeDossier = $dossier->code_dossier ?? 'STAGE-' . $dossier->id_dossier;
+        $etuName = $etudiant->nom_etudiant . ' ' . $etudiant->prenom_etudiant;
+
+        // Notification interne école
+        \App\Models\AppNotification::notifier(
+            'ecole',
+            "Période réajustée pour {$etuName}",
+            "La période de stage de {$etuName} (Dossier {$codeDossier}) a été modifiée par l'administrateur {$adminName} (du " . \Carbon\Carbon::parse($request->datedebut_stage)->format('d/m/Y') . " au " . \Carbon\Carbon::parse($request->datefin_stage)->format('d/m/Y') . ").",
+            route('ecole.dossiers.show', $dossier->id_dossier),
+            'dossier_modifie',
+            $dossier->id_ecole
+        );
+
+        // Notification interne admin
+        \App\Models\AppNotification::notifier(
+            'admin',
+            "Période ajustée pour {$etuName}",
+            "L'administrateur {$adminName} a ajusté la période de {$etuName} dans le dossier {$codeDossier}.",
+            route('admin.dossiers.show', $dossier->id_dossier),
+            'dossier_modifie',
+            null
+        );
+
+        // Mail à l'étudiant
+        if ($etudiant->email_etu && filter_var($etudiant->email_etu, FILTER_VALIDATE_EMAIL)) {
+            try {
+                Mail::to($etudiant->email_etu)->send(new PeriodeEtudiantModifieeMail($dossier, $etudiant, $adminName, 'etudiant'));
+            } catch (\Exception $e) {
+                Log::warning("Erreur envoi email modification période étudiant ({$etudiant->email_etu}) : " . $e->getMessage());
+            }
+        }
+
+        // Mail à l'école
+        if ($dossier->ecole && ($dossier->ecole->email || $dossier->ecole->mail)) {
+            $destEmail = $dossier->ecole->email ?? $dossier->ecole->mail;
+            try {
+                Mail::to($destEmail)->send(new PeriodeEtudiantModifieeMail($dossier, $etudiant, $adminName, 'ecole'));
+            } catch (\Exception $e) {
+                Log::warning("Erreur envoi email modification période étudiant à l'école ({$codeDossier}) : " . $e->getMessage());
+            }
+        }
+
+        return back()->with('success', "La période de stage pour {$etuName} a été enregistrée avec succès. Un email de notification a été adressé à l'étudiant et à l'école.");
+    }
+
+    /**
+     * Valider le dossier (même s'il était précédemment refusé ou sous réserve)
      */
     public function valider($id)
     {
@@ -143,6 +224,7 @@ class DossierController extends Controller
         $dossier = Dossier::with(['ecole', 'cycle', 'etudiants'])->findOrFail($id);
         $dossier->statut = 'valide';
         $dossier->valide_par = $adminName;
+        $dossier->valide_par_id = $adminUser ? $adminUser->id : null;
         $dossier->motif_refus = null;
         $dossier->save();
 
@@ -152,7 +234,7 @@ class DossierController extends Controller
         \App\Models\AppNotification::notifier(
             'ecole',
             'Dossier de Stage Validé',
-            "Excellente nouvelle ! Le dossier {$codeDossier} ({$dossier->filiere}) a été validé par l'administrateur {$adminName} de la direction TFG SARL.",
+            "Excellente nouvelle ! Le dossier {$codeDossier} ({$dossier->filiere}) a été validé par la direction TFG SARL.",
             route('ecole.dossiers.show', $dossier->id_dossier),
             'dossier_valide',
             $dossier->id_ecole
@@ -168,7 +250,7 @@ class DossierController extends Controller
             null
         );
 
-        // 3. Envoi réel d'email de validation à l'école via stagilogtfg@gmail.com
+        // 3. Envoi réel d'email de validation à l'école
         if ($dossier->ecole && ($dossier->ecole->email || $dossier->ecole->mail)) {
             $destEmail = $dossier->ecole->email ?? $dossier->ecole->mail;
             try {
@@ -190,7 +272,7 @@ class DossierController extends Controller
         }
 
         return redirect()->route('admin.dossiers.show', $id)
-            ->with('success', "Le dossier {$codeDossier} ({$dossier->filiere}) a été VALIDÉ par {$adminName} ! Un email de confirmation a été transmis à l'école et à tous les étudiants candidats.");
+            ->with('success', "Le dossier {$codeDossier} ({$dossier->filiere}) a été VALIDÉ avec succès ! Un email de confirmation a été transmis à l'école et à tous les étudiants candidats.");
     }
 
     /**
@@ -215,11 +297,11 @@ class DossierController extends Controller
 
         $codeDossier = $dossier->code_dossier ?? ($dossier->ecole->sigle ?? 'STG') . '-' . ($dossier->created_at ? $dossier->created_at->format('dmYHi') : '');
 
-        // 1. Notification interne envoyée à l'école avec motif et nom d'admin
+        // 1. Notification interne envoyée à l'école avec motif
         \App\Models\AppNotification::notifier(
             'ecole',
             'Dossier de Stage Non Retenu',
-            "Le dossier {$codeDossier} ({$dossier->filiere}) n'a pas été retenu par l'administrateur {$adminName}. Motif : {$request->motif_refus}",
+            "Le dossier {$codeDossier} ({$dossier->filiere}) n'a pas été retenu par la direction. Motif : {$request->motif_refus}",
             route('ecole.dossiers.show', $dossier->id_dossier),
             'dossier_refuse',
             $dossier->id_ecole
@@ -235,7 +317,7 @@ class DossierController extends Controller
             null
         );
 
-        // 3. Envoi réel d'email de refus avec motif à l'école via stagilogtfg@gmail.com
+        // 3. Envoi réel d'email de refus avec motif à l'école
         if ($dossier->ecole && ($dossier->ecole->email || $dossier->ecole->mail)) {
             $destEmail = $dossier->ecole->email ?? $dossier->ecole->mail;
             try {
@@ -257,7 +339,7 @@ class DossierController extends Controller
         }
 
         return redirect()->route('admin.dossiers.show', $id)
-            ->with('error', "Le dossier {$codeDossier} a été REFUSÉ par {$adminName}. L'école et tous les étudiants ont été notifiés par email avec le motif enregistré.");
+            ->with('error', "Le dossier {$codeDossier} a été REFUSÉ. L'école et tous les étudiants ont été notifiés par email avec le motif enregistré.");
     }
 
     /**
