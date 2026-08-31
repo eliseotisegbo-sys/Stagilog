@@ -111,7 +111,7 @@
         </div>
     </div>
 
-    <!-- SÉLECTEUR DE PÉRIODE AVANCÉ POUR LES STATISTIQUES (COMBO JOUR / SEMAINE / MOIS / ANNÉE) -->
+    <!-- SÉLECTEUR DE PÉRIODE AVANCÉ POUR LES STATISTIQUES (COMBO JOUR / SEMAINE / ANNÉE) -->
     <div class="bg-white rounded-3xl border border-slate-100 shadow-card p-5 relative">
         <form method="GET" action="{{ route('dashboard.admin') }}" id="period-form" class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
             <input type="hidden" name="start_date" id="start_date" value="{{ request('start_date') }}">
@@ -123,7 +123,7 @@
                 </div>
                 <div>
                     <h4 class="text-xs font-black uppercase tracking-wider text-[#0D1B4B]">Période des Statistiques</h4>
-                    <p class="text-[11px] text-slate-400">Filtrer par jour, semaine, mois ou année avec double calendrier</p>
+                    <p class="text-[11px] text-slate-400">Filtrer par jour, semaine ou année avec double calendrier</p>
                 </div>
             </div>
 
@@ -143,26 +143,34 @@
                 </a>
                 @endif
 
-                <!-- POPOVER ADVANCED CALENDAR & PRESETS (Image 3 Style) -->
-                <div id="date-popover" class="hidden absolute right-0 top-full mt-3 z-50 bg-white rounded-3xl shadow-2xl border border-slate-200 p-6 flex flex-col md:flex-row gap-6 w-full sm:w-[680px]">
-                    <!-- Colonne des raccourcis pré-programmés -->
-                    <div class="w-full md:w-44 border-b md:border-b-0 md:border-r border-slate-100 pb-4 md:pb-0 md:pr-4 flex flex-col space-y-1">
-                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-2">Raccourcis</span>
-                        <button type="button" onclick="selectDatePreset('today')" class="preset-btn text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-blue-50 hover:text-[#1B3A8C] transition">Aujourd'hui</button>
-                        <button type="button" onclick="selectDatePreset('yesterday')" class="preset-btn text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-blue-50 hover:text-[#1B3A8C] transition">Hier</button>
-                        <button type="button" onclick="selectDatePreset('week')" class="preset-btn text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-blue-50 hover:text-[#1B3A8C] transition">Cette semaine</button>
-                        <button type="button" onclick="selectDatePreset('last_week')" class="preset-btn text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-blue-50 hover:text-[#1B3A8C] transition">Semaine dernière</button>
-                        <button type="button" onclick="selectDatePreset('month')" class="preset-btn text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-blue-50 hover:text-[#1B3A8C] transition">Ce mois</button>
-                        <button type="button" onclick="selectDatePreset('last_month')" class="preset-btn text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-blue-50 hover:text-[#1B3A8C] transition">Mois dernier</button>
-                        <button type="button" onclick="selectDatePreset('year')" class="preset-btn text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-blue-50 hover:text-[#1B3A8C] transition">Cette année</button>
-                        <button type="button" onclick="selectDatePreset('last_year')" class="preset-btn text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-blue-50 hover:text-[#1B3A8C] transition">Année dernière</button>
-                        <button type="button" onclick="selectDatePreset('all')" class="preset-btn text-left px-3 py-2 rounded-xl text-xs font-bold text-[#1B3A8C] bg-blue-50/60 hover:bg-blue-100 transition">Toutes les périodes</button>
+                <!-- POPOVER ADVANCED CALENDAR & PRESETS (Sélectionneurs Jour, Semaine, Année) -->
+                <div id="date-popover" class="hidden absolute right-0 top-full mt-3 z-50 bg-white rounded-3xl shadow-2xl border border-slate-200 p-6 flex flex-col md:flex-row gap-6 w-full sm:w-[740px]">
+                    <!-- Colonne des raccourcis : Jour, Semaine, Année, Toutes les périodes -->
+                    <div class="w-full md:w-44 border-b md:border-b-0 md:border-r border-slate-100 pb-4 md:pb-0 md:pr-4 flex flex-col space-y-2">
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Raccourcis</span>
+                        <button type="button" onclick="selectDatePreset('jour')" class="preset-btn text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:bg-blue-50 hover:text-[#1B3A8C] transition flex items-center justify-between">
+                            <span>Jour</span>
+                            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </button>
+                        <button type="button" onclick="selectDatePreset('semaine')" class="preset-btn text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:bg-blue-50 hover:text-[#1B3A8C] transition flex items-center justify-between">
+                            <span>Semaine</span>
+                            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </button>
+                        <button type="button" onclick="selectDatePreset('annee')" class="preset-btn text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:bg-blue-50 hover:text-[#1B3A8C] transition flex items-center justify-between">
+                            <span>Année</span>
+                            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </button>
+                        <div class="pt-2 border-t border-slate-100 mt-2">
+                            <button type="button" onclick="selectDatePreset('all')" class="preset-btn text-left px-3.5 py-2 rounded-xl text-xs font-bold text-[#1B3A8C] bg-blue-50/60 hover:bg-blue-100 transition w-full">
+                                Toutes les périodes
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Zone Calendrier & Barre de validation -->
+                    <!-- Zone Calendrier Double Mois & Barre de validation -->
                     <div class="flex-1 flex flex-col justify-between">
-                        <div>
-                            <div id="flatpickr-inline-target" class="flex justify-center"></div>
+                        <div class="overflow-x-auto">
+                            <div id="flatpickr-inline-target" class="flex justify-center min-h-[290px]"></div>
                         </div>
 
                         <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 mt-4">
@@ -367,47 +375,25 @@ function formatDate(d) {
     return `${year}-${month}-${day}`;
 }
 
-function selectDatePreset(preset) {
+function selectDatePreset(mode) {
     const today = new Date();
     let start = null;
     let end = null;
 
-    if (preset === 'today') {
+    if (mode === 'jour') {
         start = new Date(today);
         end = new Date(today);
-    } else if (preset === 'yesterday') {
-        start = new Date(today);
-        start.setDate(today.getDate() - 1);
-        end = new Date(start);
-    } else if (preset === 'week') {
+    } else if (mode === 'semaine') {
         const day = today.getDay();
-        const diff = today.getDate() - day + (day === 0 ? -6 : 1);
-        start = new Date(today);
-        start.setDate(diff);
-        end = new Date();
-    } else if (preset === 'last_week') {
-        const d = new Date();
-        const day = d.getDay();
-        const diffToMon = d.getDate() - day + (day === 0 ? -6 : 1) - 7;
-        start = new Date(d);
-        start.setDate(diffToMon);
-        end = new Date(start);
-        end.setDate(start.getDate() + 6);
-    } else if (preset === 'month') {
-        start = new Date(today.getFullYear(), today.getMonth(), 1);
-        end = new Date();
-    } else if (preset === 'last_month') {
-        start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-        end = new Date(today.getFullYear(), today.getMonth(), 0);
-    } else if (preset === 'year') {
+        const diffToMon = today.getDate() - day + (day === 0 ? -6 : 1);
+        start = new Date(today.getFullYear(), today.getMonth(), diffToMon);
+        end = new Date(today.getFullYear(), today.getMonth(), diffToMon + 6);
+    } else if (mode === 'annee') {
         start = new Date(today.getFullYear(), 0, 1);
-        end = new Date();
-    } else if (preset === 'last_year') {
-        start = new Date(today.getFullYear() - 1, 0, 1);
-        end = new Date(today.getFullYear() - 1, 11, 31);
-    } else if (preset === 'all') {
-        start = null;
-        end = null;
+        end = new Date(today.getFullYear(), 11, 31);
+    } else if (mode === 'all') {
+        clearDatePreset();
+        return;
     }
 
     if (start && end) {
@@ -420,8 +406,6 @@ function selectDatePreset(preset) {
         if (fpRangePicker) {
             fpRangePicker.setDate([sStr, eStr], true);
         }
-    } else {
-        clearDatePreset();
     }
 }
 
@@ -441,13 +425,13 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('popover_start_display').value = sVal || '';
     document.getElementById('popover_end_display').value = eVal || '';
 
-    // Initialize Flatpickr in range mode inside the popover
+    // Initialize Flatpickr in range mode with dual month view
     if (typeof flatpickr !== 'undefined') {
         flatpickr.localize(flatpickr.l10ns.fr);
         fpRangePicker = flatpickr("#flatpickr-inline-target", {
             inline: true,
             mode: "range",
-            showMonths: window.innerWidth > 768 ? 2 : 1,
+            showMonths: 2,
             dateFormat: "Y-m-d",
             defaultDate: (sVal && eVal) ? [sVal, eVal] : null,
             locale: "fr",

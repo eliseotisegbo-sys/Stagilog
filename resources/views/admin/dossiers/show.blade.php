@@ -48,7 +48,7 @@
         </div>
         <div>
             <h4 class="text-sm font-extrabold text-emerald-900">
-                Dossier Validé par la Direction @if($dossier->valide_par) <span class="font-normal text-emerald-800 text-xs">— Validé par <strong>{{ $dossier->valide_par }}</strong></span> @endif
+                Dossier Validé par la Direction
             </h4>
             <p class="text-xs text-emerald-700 mt-0.5">
                 Les stagiaires de cette promotion peuvent démarrer leur stage à partir du 
@@ -88,9 +88,6 @@
                 <h4 class="text-sm font-bold text-red-800">
                     Dossier Refusé par l'Administration @if($dossier->refuse_par) <span class="font-normal text-red-700 text-xs">— Refusé par <strong>{{ $dossier->refuse_par }}</strong></span> @endif
                 </h4>
-                <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200">
-                    Vous pouvez toujours valider ce dossier via le bouton en haut
-                </span>
             </div>
             <p class="text-xs text-red-700 mt-1"><strong>Motif :</strong> {{ $dossier->motif_refus }}</p>
         </div>
@@ -238,7 +235,7 @@
                                         onclick="openModifierPeriodeEtudiantModal('{{ $etudiant->id_etudiant }}', '{{ addslashes($etudiant->nom_etudiant . ' ' . $etudiant->prenom_etudiant) }}', '{{ $debutEtu ? $debutEtu->format('Y-m-d') : '' }}', '{{ $finEtu ? $finEtu->format('Y-m-d') : '' }}')"
                                         class="inline-flex items-center space-x-1 text-[11px] font-bold text-[#1B3A8C] hover:underline bg-blue-50/80 px-2.5 py-0.5 rounded-lg">
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                                    <span>Ajuster dates</span>
+                                    <span>Modifier la période de stage </span>
                                 </button>
                             </div>
                         </td>

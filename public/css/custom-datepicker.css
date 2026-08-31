@@ -1,118 +1,212 @@
-/* STAGILOG CUSTOM DATEPICKER (Conforme au design minimaliste et cinématique) */
-.custom-datepicker-popup {
+/* STAGILOG CUSTOM DATEPICKER & FLATPICKR THEME */
+@import url("https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css");
+
+/* Popover & Containers */
+.stagilog-date-popover {
     position: absolute;
-    z-index: 99999;
+    z-index: 9999;
     background: #FFFFFF;
     border-radius: 28px;
-    box-shadow: 0 20px 45px -10px rgba(13, 27, 75, 0.18), 0 0 0 1px rgba(13, 27, 75, 0.06);
+    box-shadow: 0 25px 60px -15px rgba(13, 27, 75, 0.2), 0 0 0 1px rgba(13, 27, 75, 0.08);
     padding: 24px;
-    width: 320px;
-    font-family: inherit;
-    animation: datepickerPop 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    user-select: none;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    animation: popoverFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@keyframes datepickerPop {
-    from { opacity: 0; transform: translateY(-8px) scale(0.96); }
+@keyframes popoverFadeIn {
+    from { opacity: 0; transform: translateY(-8px) scale(0.97); }
     to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-.custom-datepicker-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    padding: 0 4px;
+/* Flatpickr Container Overrides */
+.flatpickr-calendar {
+    background: #FFFFFF !important;
+    border: none !important;
+    box-shadow: none !important;
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    width: auto !important;
 }
 
-.custom-datepicker-title {
-    font-size: 20px;
-    font-weight: 800;
-    color: #0D1B4B;
-    letter-spacing: -0.5px;
+.flatpickr-calendar.inline {
+    display: block !important;
+    position: relative !important;
+    top: auto !important;
 }
 
-.custom-datepicker-nav-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    border: 1px solid #F1F5F9;
-    background: #FFFFFF;
-    color: #475569;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
+.flatpickr-months {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin-bottom: 12px !important;
+    position: relative !important;
+    padding: 0 4px !important;
 }
 
-.custom-datepicker-nav-btn:hover {
-    background: #F8FAFC;
-    color: #1B3A8C;
-    border-color: #CBD5E1;
-    transform: scale(1.08);
+.flatpickr-months .flatpickr-prev-month, 
+.flatpickr-months .flatpickr-next-month {
+    position: static !important;
+    width: 36px !important;
+    height: 36px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 12px !important;
+    border: 1.5px solid #E2E8F0 !important;
+    background: #FFFFFF !important;
+    color: #475569 !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    transition: all 0.2s ease !important;
 }
 
-.custom-datepicker-weekdays {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    text-align: center;
-    font-size: 11px;
-    font-weight: 700;
-    color: #64748B;
-    margin-bottom: 12px;
+.flatpickr-months .flatpickr-prev-month:hover, 
+.flatpickr-months .flatpickr-next-month:hover {
+    background: #F8FAFC !important;
+    color: #1B3A8C !important;
+    border-color: #CBD5E1 !important;
+    transform: scale(1.05);
 }
 
-.custom-datepicker-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
-    text-align: center;
+.flatpickr-months .flatpickr-month {
+    height: auto !important;
+    overflow: visible !important;
 }
 
-.custom-datepicker-day {
-    height: 38px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: 600;
-    color: #0D1B4B;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.15s ease;
+.flatpickr-current-month {
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    color: #0D1B4B !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    padding: 0 !important;
+    position: static !important;
+    width: auto !important;
 }
 
-.custom-datepicker-day:hover:not(.empty):not(.disabled) {
-    background: #EEF4FF;
-    color: #1B3A8C;
-    font-weight: 700;
+.flatpickr-current-month .cur-month {
+    font-weight: 800 !important;
+    color: #0D1B4B !important;
 }
 
-.custom-datepicker-day.other-month {
-    color: #CBD5E1;
-    font-weight: 500;
+.flatpickr-current-month .numInputWrapper {
+    width: 75px !important;
+    background: #F8FAFC !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 12px !important;
+    padding: 3px 6px !important;
+    display: inline-flex !important;
+    align-items: center !important;
 }
 
-.custom-datepicker-day.other-month:hover {
-    background: #F8FAFC;
-    color: #94A3B8;
+.flatpickr-current-month input.cur-year {
+    font-weight: 800 !important;
+    color: #0D1B4B !important;
+    font-size: 13px !important;
+    padding: 0 !important;
 }
 
-.custom-datepicker-day.selected {
+.flatpickr-innerContainer {
+    display: flex !important;
+    gap: 20px !important;
+    justify-content: center !important;
+}
+
+.flatpickr-rContainer {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.flatpickr-weekdays {
+    display: flex !important;
+    width: 100% !important;
+    margin-bottom: 8px !important;
+    height: auto !important;
+}
+
+.flatpickr-weekdaycontainer {
+    display: grid !important;
+    grid-template-columns: repeat(7, 36px) !important;
+    gap: 4px !important;
+    width: 100% !important;
+    justify-content: center !important;
+}
+
+span.flatpickr-weekday {
+    font-size: 10px !important;
+    font-weight: 800 !important;
+    text-transform: uppercase !important;
+    color: #94A3B8 !important;
+    letter-spacing: 0.5px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 24px !important;
+}
+
+.flatpickr-days {
+    width: auto !important;
+}
+
+.dayContainer {
+    display: grid !important;
+    grid-template-columns: repeat(7, 36px) !important;
+    gap: 4px !important;
+    width: auto !important;
+    min-width: auto !important;
+    max-width: auto !important;
+    justify-content: center !important;
+}
+
+.flatpickr-day {
+    width: 36px !important;
+    height: 36px !important;
+    line-height: 36px !important;
+    margin: 0 !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: #0D1B4B !important;
+    border-radius: 12px !important;
+    border: 1.5px solid transparent !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.15s ease !important;
+}
+
+.flatpickr-day:hover {
+    background: #EEF4FF !important;
+    color: #1B3A8C !important;
+    border-color: #BFDBFE !important;
+}
+
+.flatpickr-day.prevMonthDay, 
+.flatpickr-day.nextMonthDay {
+    color: #CBD5E1 !important;
+    font-weight: 500 !important;
+}
+
+.flatpickr-day.selected, 
+.flatpickr-day.startRange, 
+.flatpickr-day.endRange {
     background: #1B3A8C !important;
     color: #FFFFFF !important;
     font-weight: 900 !important;
-    box-shadow: 0 4px 12px rgba(27, 58, 140, 0.3);
+    border-radius: 12px !important;
+    border-color: #1B3A8C !important;
+    box-shadow: 0 4px 12px rgba(27, 58, 140, 0.3) !important;
 }
 
-.custom-datepicker-day.today:not(.selected) {
-    border: 2px solid #E8001D;
-    color: #E8001D;
-    font-weight: 800;
+.flatpickr-day.inRange {
+    background: #EEF4FF !important;
+    color: #1B3A8C !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
 }
 
-.custom-datepicker-day.disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
+.flatpickr-day.today:not(.selected):not(.startRange):not(.endRange) {
+    border-color: #E8001D !important;
+    color: #E8001D !important;
+    font-weight: 800 !important;
 }
