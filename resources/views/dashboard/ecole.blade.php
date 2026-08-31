@@ -250,7 +250,7 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
-                    @forelse($derniersDossiers as $dossier)
+                    @forelse(($derniersDossiers ?? $recentsDossiers ?? []) as $dossier)
                     <tr class="hover:bg-slate-50/70 transition">
                         <td class="py-4 px-6 font-mono font-bold text-[#0D1B4B]">
                             {{ $dossier->code_dossier ?? ($ecole->sigle . '-' . ($dossier->created_at ? $dossier->created_at->format('dmYHi') : '')) }}

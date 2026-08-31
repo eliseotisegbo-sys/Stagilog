@@ -72,6 +72,7 @@ class DashboardController extends Controller
             ->latest()
             ->take(5)
             ->get();
+        $derniersDossiers = $recentsDossiers;
 
         // --- Graphique mensuel adaptatif ---
         $months      = [];
@@ -116,6 +117,7 @@ class DashboardController extends Controller
             'totalEtudiants',
             'rapportsDisponibles',
             'recentsDossiers',
+            'derniersDossiers',
             'months',
             'dossiersData',
             'startDate',
