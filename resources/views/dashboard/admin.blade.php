@@ -181,11 +181,11 @@
     </div>
 
     <!-- GRAPHIQUE PRINCIPAL & DERNIÈRES NOTIFICATIONS -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         <!-- Courbe Principale Réelle (8 cols) -->
-        <div class="lg:col-span-8 bg-white p-8 rounded-3xl shadow-card border border-slate-100">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div class="lg:col-span-8 bg-white p-6 sm:p-8 rounded-3xl shadow-card border border-slate-100">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                 <div>
                     <h3 class="text-lg font-extrabold text-[#0D1B4B]">Historique des Dossiers Soumis</h3>
                     <p class="text-xs font-medium text-slate-400">
@@ -203,11 +203,11 @@
             </div>
 
             <!-- Conteneur Graphique ApexCharts -->
-            <div id="chart-timeline" class="w-full h-80"></div>
+            <div id="chart-timeline" class="w-full"></div>
         </div>
 
         <!-- Colonne Droite : Demandes Récentes & Taux (4 cols) -->
-        <div class="lg:col-span-4 bg-white p-8 rounded-3xl shadow-card border border-slate-100 flex flex-col justify-between">
+        <div class="lg:col-span-4 bg-white p-6 sm:p-8 rounded-3xl shadow-card border border-slate-100">
             <div>
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-base font-extrabold text-[#0D1B4B]">Demandes Récentes</h3>
@@ -254,28 +254,28 @@
     </div>
 
     <!-- 2 GRAPHES SECONDAIRES RÉELS : RÉPARTITION PAR FILIÈRE & PAR ÉCOLE -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
         
         <!-- Répartition par Filière Réelle -->
-        <div class="bg-white p-8 rounded-3xl shadow-card border border-slate-100">
-            <div class="flex items-center justify-between mb-6">
+        <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-card border border-slate-100">
+            <div class="flex items-center justify-between mb-4">
                 <div>
                     <h3 class="text-base font-extrabold text-[#0D1B4B]">Répartition par Filière</h3>
                     <p class="text-xs font-medium text-slate-400">Dossiers soumis par domaine technique</p>
                 </div>
             </div>
-            <div id="chart-filieres" class="w-full h-64 flex items-center justify-center"></div>
+            <div id="chart-filieres" class="w-full flex items-center justify-center"></div>
         </div>
 
         <!-- Top Écoles Partenaires Réelles -->
-        <div class="bg-white p-8 rounded-3xl shadow-card border border-slate-100">
-            <div class="flex items-center justify-between mb-6">
+        <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-card border border-slate-100">
+            <div class="flex items-center justify-between mb-4">
                 <div>
                     <h3 class="text-base font-extrabold text-[#0D1B4B]">Activité par Établissement</h3>
                     <p class="text-xs font-medium text-slate-400">Nombre de dossiers soumis par université</p>
                 </div>
             </div>
-            <div id="chart-ecoles" class="w-full h-64"></div>
+            <div id="chart-ecoles" class="w-full"></div>
         </div>
     </div>
 
