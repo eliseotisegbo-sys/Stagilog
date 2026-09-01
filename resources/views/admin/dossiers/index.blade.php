@@ -21,7 +21,7 @@
 
             <div>
                 <div class="flex items-center gap-2.5 flex-wrap">
-                    <h3 class="text-sm font-extrabold text-[#0D1B4B] uppercase tracking-wider">Campagne de Dépôt des Dossiers</h3>
+                    <h3 class="text-sm font-extrabold text-[#0D1B4B] uppercase tracking-wider">Période de Dépôt des Dossiers</h3>
                     @if($depotActif)
                         <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -65,7 +65,7 @@
             <button type="button" onclick="openModalPeriodeDepot()" 
                     class="px-4 py-2.5 bg-[#1B3A8C] hover:bg-[#142B6B] text-white rounded-2xl text-xs font-bold shadow-md hover:shadow-lg transition flex items-center space-x-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                <span>Définir Période & Notifier Écoles</span>
+                <span>Définir une Période </span>
             </button>
         </div>
     </div>

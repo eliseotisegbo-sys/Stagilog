@@ -10,7 +10,7 @@
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#0D1B4B] tracking-tight">
-                {{ $salutation }}, {{ $ecole->nom_ecole ?? 'École Partenaire' }}
+                {{ $salutation }}, {{ $userName }}
             </h1>
             <p class="text-sm font-medium text-[#6B7AA1] mt-1">
                 Suivi de vos demandes de stage et des rapports académiques TFG SARL.
@@ -205,6 +205,51 @@
                 <a href="{{ route('ecole.dossiers.create') }}" class="inline-flex items-center justify-center w-full bg-white text-[#1B3A8C] hover:bg-blue-50 py-3 rounded-2xl text-xs font-black shadow transition">
                     Créer un nouveau dossier
                 </a>
+            </div>
+
+            <!-- Demandes Récentes -->
+            <div class="bg-white rounded-3xl shadow-card border border-slate-100 overflow-hidden">
+                <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                    <h3 class="text-sm font-extrabold text-[#0D1B4B]">Demandes Récentes</h3>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Temps Réel</span>
+                </div>
+                <div class="divide-y divide-slate-100">
+                    @forelse($recentsDossiers as $dossier)
+                    <a href="{{ route('ecole.dossiers.show', $dossier->id_dossier) }}" class="block p-4 hover:bg-slate-50/60 transition group">
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="min-w-0">
+                                <p class="font-bold text-[#0D1B4B] group-hover:text-[#1B3A8C] text-xs transition truncate">
+                                    {{ $dossier->ecole->nom_ecole ?? $ecole->nom_ecole ?? 'École' }}
+                                </p>
+                                <p class="text-[10px] text-slate-500 mt-0.5">
+                                    {{ $dossier->filiere }} ({{ $dossier->etudiants->count() }} stagiaires)
+                                </p>
+                            </div>
+                            <span class="inline-block px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider flex-shrink-0
+                                {{ $dossier->statut === 'valide' ? 'bg-emerald-100 text-emerald-700'
+                                    : ($dossier->statut === 'refuse' ? 'bg-red-100 text-red-700'
+                                    : ($dossier->statut === 'sous_reserve' ? 'bg-blue-100 text-[#1B3A8C]'
+                                    : 'bg-amber-100 text-amber-700')) }}">
+                                {{ $dossier->statut === 'valide' ? 'Validé'
+                                    : ($dossier->statut === 'refuse' ? 'Refusé'
+                                    : ($dossier->statut === 'sous_reserve' ? 'Sous réserve'
+                                    : 'En attente')) }}
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between mt-2">
+                            <span class="text-[10px] text-slate-400">{{ $dossier->cycle->nom_cycle ?? $dossier->niveau ?? '' }}</span>
+                            <span class="text-[10px] text-slate-400">{{ $dossier->created_at->diffForHumans() }}</span>
+                        </div>
+                    </a>
+                    @empty
+                    <p class="text-center text-slate-400 text-xs py-6">Aucun dossier pour le moment.</p>
+                    @endforelse
+                </div>
+                @if($recentsDossiers->count() > 0)
+                <div class="px-5 py-3 border-t border-slate-100">
+                    <a href="{{ route('ecole.dossiers.index') }}" class="text-xs font-bold text-[#1B3A8C] hover:underline">Voir tous mes dossiers &rarr;</a>
+                </div>
+                @endif
             </div>
         </div>
     </div>

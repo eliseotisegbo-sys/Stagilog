@@ -23,15 +23,6 @@
                 </div>
             </div>
             <div class="text-center sm:text-left">
-                @if($isSuperAdmin)
-                <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-red-100 text-[#E8001D] mb-2">
-                    Super Administrateur
-                </div>
-                @else
-                <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-blue-100 text-[#1B3A8C] mb-2">
-                    Administrateur
-                </div>
-                @endif
                 <h2 class="text-2xl font-black text-[#0D1B4B]">{{ $user->name }}</h2>
                 <p class="text-xs text-slate-500 mt-0.5">{{ $user->email }} — Technology Forever Group SARL</p>
             </div>
@@ -131,7 +122,7 @@
                         <!-- Nouveau mot de passe -->
                         <div>
                             <label for="new_password" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                                Nouveau mot de passe (min. 6 caractères)
+                                Nouveau mot de passe
                             </label>
                             <input type="password" name="new_password" id="new_password"
                                    class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white transition"

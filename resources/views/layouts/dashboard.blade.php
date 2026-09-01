@@ -183,9 +183,6 @@
                     @if(auth()->user()->photo_profil)
                         <img src="{{ asset('uploads/avatars/' . auth()->user()->photo_profil) }}" alt="{{ auth()->user()->name }}"
                              class="w-10 h-10 rounded-2xl object-cover border-2 border-white/30 shadow-md flex-shrink-0">
-                    @elseif(auth()->user()->ecole && auth()->user()->ecole->logo)
-                        <img src="{{ asset('uploads/logos/' . auth()->user()->ecole->logo) }}" alt="{{ auth()->user()->ecole->nom_ecole }}"
-                             class="w-10 h-10 rounded-2xl object-contain bg-white p-0.5 border-2 border-white/30 shadow-md flex-shrink-0">
                     @else
                         <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#E8001D] to-orange-500 flex items-center justify-center text-white font-bold shadow-md flex-shrink-0 text-xs">
                             {{ strtoupper(substr(session('user_session_name', auth()->user()->name), 0, 2)) }}
@@ -276,9 +273,6 @@
                     @if(auth()->user()->photo_profil)
                         <img src="{{ asset('uploads/avatars/' . auth()->user()->photo_profil) }}" alt="{{ auth()->user()->name }}"
                              class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl object-cover border-2 border-slate-200 shadow-md">
-                    @elseif(auth()->user()->ecole && auth()->user()->ecole->logo)
-                        <img src="{{ asset('uploads/logos/' . auth()->user()->ecole->logo) }}" alt="{{ auth()->user()->ecole->nom_ecole }}"
-                             class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl object-contain bg-white p-0.5 border-2 border-slate-200 shadow-md">
                     @else
                         <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-[#1B3A8C] text-white flex items-center justify-center font-black text-sm shadow-md">
                             {{ strtoupper(substr(session('user_session_name', auth()->user()->name), 0, 1)) }}

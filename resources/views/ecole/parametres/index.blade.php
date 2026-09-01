@@ -135,11 +135,6 @@
                         <label for="logo" class="block text-xs font-bold uppercase tracking-wider text-slate-700">
                             Logo officiel de l'établissement ({{ $ecole->nom_ecole ?? 'École' }})
                         </label>
-                        @if($isPrimaryEcoleUser ?? true)
-                            <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Compte Principal</span>
-                        @else
-                            <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">Lecture seule</span>
-                        @endif
                     </div>
 
                     @if($isPrimaryEcoleUser ?? true)

@@ -81,7 +81,7 @@ class DashboardController extends Controller
 
         // 5 Derniers dossiers (toujours les plus récents, non filtrés par la période)
         $recentsDossiers = Dossier::where('id_ecole', $idEcole)
-            ->with(['cycle', 'filiereRelation', 'etudiants'])
+            ->with(['cycle', 'filiereRelation', 'etudiants', 'ecole'])
             ->latest()
             ->take(5)
             ->get();
