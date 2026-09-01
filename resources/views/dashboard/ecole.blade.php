@@ -168,11 +168,11 @@
         </form>
     </div>
 
-    <!-- GRAPHIQUE & ACTIONS RAPIDES -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    <!-- 1. GRAPHIQUE D'ACTIVITÉ + ACTION RAPIDE (PARFAITEMENT ÉQUILIBRÉS) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
         
         <!-- Courbe Activité École Réelle (8 cols) -->
-        <div class="lg:col-span-8 bg-white p-6 sm:p-8 rounded-3xl shadow-card border border-slate-100">
+        <div class="lg:col-span-8 bg-white p-6 sm:p-8 rounded-3xl shadow-card border border-slate-100 flex flex-col justify-between">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                 <div>
                     <h3 class="text-lg font-extrabold text-[#0D1B4B]">Activité des Soumissions</h3>
@@ -184,77 +184,85 @@
                         @endif
                     </p>
                 </div>
-                <div class="flex items-center space-x-2">
-                    <span class="inline-block w-3 h-3 rounded-full bg-[#10B981]"></span>
-                    <span class="text-xs font-bold text-slate-600">Dossiers</span>
+                <div class="flex items-center space-x-2 bg-emerald-50 px-3.5 py-1.5 rounded-2xl border border-emerald-100/60">
+                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#10B981]"></span>
+                    <span class="text-xs font-bold text-emerald-800">Dossiers soumis</span>
                 </div>
             </div>
 
             <div id="chart-ecole-timeline" class="w-full"></div>
         </div>
 
-        <!-- Raccourcis & Assistance (4 cols) -->
-        <div class="lg:col-span-4 space-y-6">
-            <!-- Box Action Rapide -->
-            <div class="bg-gradient-to-br from-[#1B3A8C] to-[#0D1B4B] p-6 rounded-3xl text-white shadow-xl">
-                <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-4">
+        <!-- Box Action Rapide (4 cols) -->
+        <div class="lg:col-span-4 bg-gradient-to-br from-[#1B3A8C] to-[#0D1B4B] p-6 sm:p-8 rounded-3xl text-white shadow-xl flex flex-col justify-between">
+            <div>
+                <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-4 border border-white/10">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                 </div>
-                <h4 class="text-lg font-bold mb-1">Inscrire une nouvelle promotion ?</h4>
-                <p class="text-xs text-blue-200 mb-6 leading-relaxed">
-                    Créez un dossier complet avec les dates de stage individuelles des étudiants et la note officielle.
+                <h4 class="text-lg font-extrabold mb-1">Inscrire une nouvelle promotion ?</h4>
+                <p class="text-xs text-blue-200 leading-relaxed mb-6">
+                    Créez un dossier complet avec les périodes de stage personnalisées pour chaque étudiant et la note officielle de votre école.
                 </p>
-                <a href="{{ route('ecole.dossiers.create') }}" class="inline-flex items-center justify-center w-full bg-white text-[#1B3A8C] hover:bg-blue-50 py-3 rounded-2xl text-xs font-black shadow transition">
-                    Créer un nouveau dossier
-                </a>
             </div>
+            
+            <a href="{{ route('ecole.dossiers.create') }}" class="inline-flex items-center justify-center w-full bg-white text-[#1B3A8C] hover:bg-blue-50 py-3.5 rounded-2xl text-xs font-black shadow-lg transition transform hover:-translate-y-0.5">
+                Créer un nouveau dossier
+            </a>
+        </div>
+    </div>
 
-            <!-- Demandes Récentes -->
-            <div class="bg-white rounded-3xl shadow-card border border-slate-100 overflow-hidden">
-                <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-                    <h3 class="text-sm font-extrabold text-[#0D1B4B]">Demandes Récentes</h3>
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Temps Réel</span>
+    <!-- 2. DEMANDES RÉCENTES (SOUS LA COURBE) -->
+    <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-card border border-slate-100">
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center shadow-inner">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
-                <div class="divide-y divide-slate-100">
-                    @forelse($recentsDossiers as $dossier)
-                    <a href="{{ route('ecole.dossiers.show', $dossier->id_dossier) }}" class="block p-4 hover:bg-slate-50/60 transition group">
-                        <div class="flex items-start justify-between gap-2">
-                            <div class="min-w-0">
-                                <p class="font-bold text-[#0D1B4B] group-hover:text-[#1B3A8C] text-xs transition truncate">
-                                    {{ $dossier->ecole->nom_ecole ?? $ecole->nom_ecole ?? 'École' }}
-                                </p>
-                                <p class="text-[10px] text-slate-500 mt-0.5">
-                                    {{ $dossier->filiere }} ({{ $dossier->etudiants->count() }} stagiaires)
-                                </p>
-                            </div>
-                            <span class="inline-block px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider flex-shrink-0
-                                {{ $dossier->statut === 'valide' ? 'bg-emerald-100 text-emerald-700'
-                                    : ($dossier->statut === 'refuse' ? 'bg-red-100 text-red-700'
-                                    : ($dossier->statut === 'sous_reserve' ? 'bg-blue-100 text-[#1B3A8C]'
-                                    : 'bg-amber-100 text-amber-700')) }}">
-                                {{ $dossier->statut === 'valide' ? 'Validé'
-                                    : ($dossier->statut === 'refuse' ? 'Refusé'
-                                    : ($dossier->statut === 'sous_reserve' ? 'Sous réserve'
-                                    : 'En attente')) }}
-                            </span>
-                        </div>
-                        <div class="flex items-center justify-between mt-2">
-                            <span class="text-[10px] text-slate-400">{{ $dossier->cycle->nom_cycle ?? $dossier->niveau ?? '' }}</span>
-                            <span class="text-[10px] text-slate-400">{{ $dossier->created_at->diffForHumans() }}</span>
-                        </div>
-                    </a>
-                    @empty
-                    <p class="text-center text-slate-400 text-xs py-6">Aucun dossier pour le moment.</p>
-                    @endforelse
+                <div>
+                    <h3 class="text-base font-extrabold text-[#0D1B4B]">Demandes Récentes de l'Établissement</h3>
+                    <p class="text-xs font-medium text-slate-400">Statut en direct de vos derniers dossiers envoyés à TFG</p>
                 </div>
-                @if($recentsDossiers->count() > 0)
-                <div class="px-5 py-3 border-t border-slate-100">
-                    <a href="{{ route('ecole.dossiers.index') }}" class="text-xs font-bold text-[#1B3A8C] hover:underline">Voir tous mes dossiers &rarr;</a>
-                </div>
-                @endif
             </div>
+            <a href="{{ route('ecole.dossiers.index') }}" class="text-xs font-bold text-[#1B3A8C] hover:underline flex items-center gap-1">
+                <span>Voir tous mes dossiers ({{ $totalDossiers }})</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            @forelse($recentsDossiers as $dossier)
+            <a href="{{ route('ecole.dossiers.show', $dossier->id_dossier) }}" 
+               class="p-4 rounded-2xl bg-slate-50/70 hover:bg-blue-50/50 border border-slate-100 hover:border-blue-200 transition-all duration-200 group flex flex-col justify-between">
+                <div>
+                    <div class="flex items-start justify-between gap-2 mb-2">
+                        <span class="font-bold text-[#0D1B4B] group-hover:text-[#1B3A8C] text-xs transition truncate" title="{{ $dossier->filiere }}">
+                            {{ $dossier->filiere }}
+                        </span>
+                        <span class="inline-block px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider flex-shrink-0
+                            {{ $dossier->statut === 'valide' ? 'bg-emerald-100 text-emerald-700'
+                                : ($dossier->statut === 'refuse' ? 'bg-red-100 text-red-700'
+                                : ($dossier->statut === 'sous_reserve' ? 'bg-blue-100 text-[#1B3A8C]'
+                                : 'bg-amber-100 text-amber-700')) }}">
+                            {{ $dossier->statut === 'valide' ? 'Validé'
+                                : ($dossier->statut === 'refuse' ? 'Refusé'
+                                : ($dossier->statut === 'sous_reserve' ? 'Sous réserve'
+                                : 'En attente')) }}
+                        </span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 font-medium">{{ $dossier->etudiants->count() }} stagiaire(s) &bull; {{ $dossier->annee_academique }}</p>
+                </div>
+                <div class="flex items-center justify-between mt-3 pt-2.5 border-t border-slate-200/60 text-[10px] text-slate-400">
+                    <span class="font-semibold text-slate-500">{{ $dossier->cycle->nom_cycle ?? $dossier->niveau ?? 'Cycle standard' }}</span>
+                    <span>{{ $dossier->created_at ? $dossier->created_at->diffForHumans() : '' }}</span>
+                </div>
+            </a>
+            @empty
+            <div class="col-span-full py-8 text-center text-slate-400 text-xs">
+                Aucun dossier enregistré pour le moment.
+            </div>
+            @endforelse
         </div>
     </div>
 

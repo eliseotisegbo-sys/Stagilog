@@ -180,80 +180,42 @@
         </form>
     </div>
 
-    <!-- GRAPHIQUE PRINCIPAL & DERNIÈRES NOTIFICATIONS -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
-        <!-- Courbe Principale Réelle (8 cols) -->
-        <div class="lg:col-span-8 bg-white p-6 sm:p-8 rounded-3xl shadow-card border border-slate-100">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-                <div>
-                    <h3 class="text-lg font-extrabold text-[#0D1B4B]">Historique des Dossiers Soumis</h3>
-                    <p class="text-xs font-medium text-slate-400">
-                        @if($periodLabel !== 'Toutes les périodes')
-                            Période sélectionnée : <span class="text-[#1B3A8C] font-bold">{{ $periodLabel }}</span>
-                        @else
-                            Nombre réel de dossiers enregistrés par mois (6 derniers mois)
-                        @endif
-                    </p>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <span class="inline-block w-3 h-3 rounded-full bg-[#1B3A8C]"></span>
-                    <span class="text-xs font-bold text-slate-600">Dossiers</span>
-                </div>
-            </div>
-
-            <!-- Conteneur Graphique ApexCharts -->
-            <div id="chart-timeline" class="w-full"></div>
-        </div>
-
-        <!-- Colonne Droite : Demandes Récentes & Taux (4 cols) -->
-        <div class="lg:col-span-4 bg-white p-6 sm:p-8 rounded-3xl shadow-card border border-slate-100">
+    <!-- 1. GRAPHIQUE PRINCIPAL : PLEINE LARGEUR AVEC TAUX D'APPROBATION INTÉGRÉ -->
+    <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-card border border-slate-100">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
             <div>
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-base font-extrabold text-[#0D1B4B]">Demandes Récentes</h3>
-                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Temps Réel</span>
-                </div>
-
-                <div class="space-y-4">
-                    @forelse($derniersDossiers as $dossier)
-                    <a href="{{ route('admin.dossiers.show', $dossier->id_dossier) }}" class="block p-4 rounded-2xl bg-slate-50/70 hover:bg-blue-50/50 border border-slate-100 transition group">
-                        <div class="flex items-start justify-between">
-                            <div>
-                                <span class="font-bold text-[#0D1B4B] group-hover:text-[#1B3A8C] text-xs transition">
-                                    {{ $dossier->ecole->nom_ecole ?? 'École Partenaire' }}
-                                </span>
-                                <p class="text-[11px] text-slate-500 mt-0.5">{{ $dossier->filiere }} ({{ $dossier->etudiants->count() }} stagiaires)</p>
-                            </div>
-                            <span class="inline-block px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider {{ $dossier->statut === 'valide' ? 'bg-emerald-100 text-emerald-700' : ($dossier->statut === 'refuse' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700') }}">
-                                {{ $dossier->statut === 'valide' ? 'Validé' : ($dossier->statut === 'refuse' ? 'Refusé' : 'En attente') }}
-                            </span>
-                        </div>
-                        <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-[10px] text-slate-400">
-                            <span>{{ $dossier->cycle->nom_cycle ?? 'Cycle standard' }}</span>
-                            <span>{{ $dossier->created_at ? $dossier->created_at->diffForHumans() : '' }}</span>
-                        </div>
-                    </a>
-                    @empty
-                    <p class="text-xs text-slate-400 text-center py-6">Aucune demande récente.</p>
-                    @endforelse
-                </div>
+                <h3 class="text-lg font-extrabold text-[#0D1B4B]">Historique des Dossiers Soumis</h3>
+                <p class="text-xs font-medium text-slate-400">
+                    @if($periodLabel !== 'Toutes les périodes')
+                        Période sélectionnée : <span class="text-[#1B3A8C] font-bold">{{ $periodLabel }}</span>
+                    @else
+                        Nombre réel de dossiers enregistrés par mois (6 derniers mois)
+                    @endif
+                </p>
             </div>
+            
+            <div class="flex flex-wrap items-center gap-4">
+                <!-- Taux d'approbation réel compact -->
+                <div class="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100">
+                    <div class="text-right">
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">Taux d'Approbation</span>
+                        <span class="text-xs font-bold text-slate-600">{{ $dossiersValides }}/{{ $totalDossiers }} validés</span>
+                    </div>
+                    <span class="text-base font-black text-emerald-600">{{ $tauxApprobation }}%</span>
+                </div>
 
-            <!-- Taux d'approbation réel -->
-            <div class="mt-6 pt-6 border-t border-slate-100">
-                <div class="flex items-center justify-between text-xs font-bold text-slate-600 mb-2">
-                    <span>Taux d'Approbation Réel</span>
-                    <span class="text-[#1B3A8C] font-black">{{ $tauxApprobation }}%</span>
+                <div class="flex items-center space-x-2 bg-blue-50/60 px-3.5 py-2 rounded-2xl border border-blue-100/50">
+                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#1B3A8C]"></span>
+                    <span class="text-xs font-bold text-[#1B3A8C]">Dossiers soumis</span>
                 </div>
-                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                    <div class="bg-[#1B3A8C] h-full rounded-full transition-all duration-500" style="width: {{ $tauxApprobation }}%"></div>
-                </div>
-                <p class="text-[10px] text-slate-400 mt-1.5">{{ $dossiersValides }} validés sur {{ $totalDossiers }} dossiers soumis au total.</p>
             </div>
         </div>
+
+        <!-- Conteneur Graphique ApexCharts -->
+        <div id="chart-timeline" class="w-full"></div>
     </div>
 
-    <!-- 2 GRAPHES SECONDAIRES RÉELS : RÉPARTITION PAR FILIÈRE & PAR ÉCOLE -->
+    <!-- 2. GRAPHES SECONDAIRES RÉELS : RÉPARTITION PAR FILIÈRE & PAR ÉCOLE -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
         
         <!-- Répartition par Filière Réelle -->
@@ -276,6 +238,52 @@
                 </div>
             </div>
             <div id="chart-ecoles" class="w-full"></div>
+        </div>
+    </div>
+
+    <!-- 3. SECTION DEMANDES RÉCENTES (SOUS LES GRAPHIQUES) -->
+    <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-card border border-slate-100">
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-blue-50 text-[#1B3A8C] flex items-center justify-center shadow-inner">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div>
+                    <h3 class="text-base font-extrabold text-[#0D1B4B]">Demandes Récentes</h3>
+                    <p class="text-xs font-medium text-slate-400">Derniers dossiers soumis en attente ou traités</p>
+                </div>
+            </div>
+            <a href="{{ route('admin.dossiers.index') }}" class="text-xs font-bold text-[#1B3A8C] hover:underline flex items-center gap-1">
+                <span>Voir tout ({{ $totalDossiers }})</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            @forelse($derniersDossiers as $dossier)
+            <a href="{{ route('admin.dossiers.show', $dossier->id_dossier) }}" 
+               class="p-4 rounded-2xl bg-slate-50/70 hover:bg-blue-50/50 border border-slate-100 hover:border-blue-200 transition-all duration-200 group flex flex-col justify-between">
+                <div>
+                    <div class="flex items-start justify-between gap-2 mb-2">
+                        <span class="font-bold text-[#0D1B4B] group-hover:text-[#1B3A8C] text-xs transition truncate" title="{{ $dossier->ecole->nom_ecole ?? 'École Partenaire' }}">
+                            {{ $dossier->ecole->nom_ecole ?? 'École Partenaire' }}
+                        </span>
+                        <span class="inline-block px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider flex-shrink-0 {{ $dossier->statut === 'valide' ? 'bg-emerald-100 text-emerald-700' : ($dossier->statut === 'refuse' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700') }}">
+                            {{ $dossier->statut === 'valide' ? 'Validé' : ($dossier->statut === 'refuse' ? 'Refusé' : 'En attente') }}
+                        </span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 font-medium">{{ $dossier->filiere }} ({{ $dossier->etudiants->count() }} stagiaires)</p>
+                </div>
+                <div class="flex items-center justify-between mt-3 pt-2.5 border-t border-slate-200/60 text-[10px] text-slate-400">
+                    <span class="font-semibold text-slate-500">{{ $dossier->cycle->nom_cycle ?? 'Cycle standard' }}</span>
+                    <span>{{ $dossier->created_at ? $dossier->created_at->diffForHumans() : '' }}</span>
+                </div>
+            </a>
+            @empty
+            <div class="col-span-full py-8 text-center text-slate-400 text-xs">
+                Aucune demande récente pour le moment.
+            </div>
+            @endforelse
         </div>
     </div>
 
