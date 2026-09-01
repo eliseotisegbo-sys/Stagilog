@@ -19,6 +19,8 @@ class Etudiant extends Model
         'cv',
         'datedebut_stage',
         'datefin_stage',
+        'statut_etudiant',
+        'motif_refus',
         'contrat',
         'autres_documents',
         'rapport',

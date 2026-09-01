@@ -199,8 +199,8 @@
                 <thead class="bg-slate-50/80 text-slate-500 uppercase tracking-wider font-bold border-b border-slate-100">
                     <tr>
                         <th class="py-4 px-6">Nom & Prénom</th>
-                        <th class="py-4 px-6">Email Étudiant</th>
-                        <th class="py-4 px-6">Niveau & Naissance</th>
+                        <th class="py-4 px-6">Statut Candidat</th>
+                        <th class="py-4 px-6">Email & Niveau</th>
                         <th class="py-4 px-6">Période de Stage</th>
                         <th class="py-4 px-6">Curriculum Vitae</th>
                         <th class="py-4 px-6 text-right">Actions</th>
@@ -212,17 +212,36 @@
                         $debutEtu = $etudiant->datedebut_stage ?? $dossier->datedebut;
                         $finEtu = $etudiant->datefin_stage ?? $dossier->datefin;
                         $hasCustomDates = ($etudiant->datedebut_stage && $etudiant->datefin_stage);
+                        $isRefuse = ($etudiant->statut_etudiant === 'refuse');
                     @endphp
-                    <tr class="hover:bg-slate-50/70 transition">
+                    <tr class="hover:bg-slate-50/70 transition {{ $isRefuse ? 'bg-red-50/30' : '' }}">
                         <td class="py-4 px-6">
                             <div class="font-bold text-[#0D1B4B] text-sm">{{ $etudiant->nom_etudiant }} {{ $etudiant->prenom_etudiant }}</div>
-                        </td>
-                        <td class="py-4 px-6 text-slate-600">
-                            {{ $etudiant->email_etu }}
+                            <div class="text-[11px] text-slate-400 mt-0.5">Né(e) le : {{ $etudiant->date_naissance ? $etudiant->date_naissance->format('d/m/Y') : '-' }}</div>
                         </td>
                         <td class="py-4 px-6">
-                            <div class="font-semibold">{{ $etudiant->niveau_etude ?? $dossier->niveau_etude }}</div>
-                            <div class="text-[11px] text-slate-400">{{ $etudiant->date_naissance ? $etudiant->date_naissance->format('d/m/Y') : '-' }}</div>
+                            @if($isRefuse)
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black uppercase bg-red-100 text-red-800 border border-red-200">
+                                    Refusé / Non retenu
+                                </span>
+                                @if($etudiant->motif_refus)
+                                <div class="text-[11px] text-red-700 font-medium mt-1">
+                                    <strong>Motif :</strong> {{ $etudiant->motif_refus }}
+                                </div>
+                                @endif
+                            @elseif($etudiant->statut_etudiant === 'valide' || $dossier->statut === 'valide')
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                    Validé / Retenu
+                                </span>
+                            @else
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black uppercase bg-amber-100 text-amber-800 border border-amber-200">
+                                    En attente
+                                </span>
+                            @endif
+                        </td>
+                        <td class="py-4 px-6 text-slate-600">
+                            <div class="font-semibold text-slate-800">{{ $etudiant->email_etu }}</div>
+                            <div class="text-[11px] text-[#1B3A8C] font-bold mt-0.5">{{ $etudiant->niveau_etude ?? $dossier->niveau_etude }}</div>
                         </td>
                         <td class="py-4 px-6">
                             <div class="font-bold text-[#0D1B4B]">
@@ -235,7 +254,7 @@
                                         onclick="openModifierPeriodeEtudiantModal('{{ $etudiant->id_etudiant }}', '{{ addslashes($etudiant->nom_etudiant . ' ' . $etudiant->prenom_etudiant) }}', '{{ $debutEtu ? $debutEtu->format('Y-m-d') : '' }}', '{{ $finEtu ? $finEtu->format('Y-m-d') : '' }}')"
                                         class="inline-flex items-center space-x-1 text-[11px] font-bold text-[#1B3A8C] hover:underline bg-blue-50/80 px-2.5 py-0.5 rounded-lg">
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                                    <span>Modifier la période de stage </span>
+                                    <span>Modifier la période</span>
                                 </button>
                             </div>
                         </td>
@@ -251,15 +270,34 @@
                             @endif
                         </td>
                         <td class="py-4 px-6 text-right">
-                            @if($dossier->statut === 'valide')
-                                <a href="{{ route('admin.rapports.depot', $etudiant->id_etudiant) }}" 
-                                   class="inline-flex items-center space-x-1 text-xs font-bold text-[#1B3A8C] hover:text-[#E8001D] transition">
-                                    <span>Gérer documents ({{ $etudiant->documents->count() }})</span>
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                                </a>
-                            @else
-                                <span class="text-slate-400 text-[11px]">En attente de validation</span>
-                            @endif
+                            <div class="flex items-center justify-end space-x-2">
+                                @if($isRefuse)
+                                    <!-- Bouton Rétablir -->
+                                    <form action="{{ route('admin.dossiers.etudiants.retablir', [$dossier->id_dossier, $etudiant->id_etudiant]) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="inline-flex items-center space-x-1 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition" title="Rétablir cet étudiant">
+                                            <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                            <span>Rétablir</span>
+                                        </button>
+                                    </form>
+                                @else
+                                    <!-- Bouton Refuser -->
+                                    <button type="button" 
+                                            onclick="openRefusEtudiantModal('{{ $etudiant->id_etudiant }}', '{{ addslashes($etudiant->nom_etudiant . ' ' . $etudiant->prenom_etudiant) }}')"
+                                            class="inline-flex items-center space-x-1 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 rounded-xl text-xs font-bold transition" title="Refuser individuellement cet étudiant">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                        <span>Refuser</span>
+                                    </button>
+                                @endif
+
+                                @if($dossier->statut === 'valide' && !$isRefuse)
+                                    <a href="{{ route('admin.rapports.depot', $etudiant->id_etudiant) }}" 
+                                       class="inline-flex items-center space-x-1 text-xs font-bold text-[#1B3A8C] hover:text-[#E8001D] transition ml-2">
+                                        <span>Documents ({{ $etudiant->documents->count() }})</span>
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                    </a>
+                                @endif
+                            </div>
                         </td>
                     </tr>
                     @empty
@@ -424,8 +462,61 @@
     </div>
 </div>
 
+<!-- MODAL REFUS INDIVIDUEL D'UN ÉTUDIANT -->
+<div id="modal-refus-etudiant" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100 relative">
+        <div class="flex items-center space-x-3 text-red-600 mb-4">
+            <div class="w-10 h-10 rounded-2xl bg-red-50 flex items-center justify-center">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            </div>
+            <div>
+                <h3 class="text-lg font-black text-[#0D1B4B]">Refuser le Candidat</h3>
+                <p class="text-[11px] text-slate-500 font-semibold" id="modal-refus-etu-name">Nom de l'étudiant</p>
+            </div>
+        </div>
+
+        <p class="text-xs text-slate-500 mb-4 leading-relaxed">
+            Spécifiez le motif de refus pour cet étudiant. Lors de la validation finale du dossier, un email officiel avec ce motif lui sera transmis et l'école sera informée.
+        </p>
+
+        <form method="POST" id="form-refus-etudiant" action="" class="space-y-4">
+            @csrf
+            <div>
+                <label for="modal_motif_refus_etu" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                    Motif du Refus <span class="text-[#E8001D]">*</span>
+                </label>
+                <textarea name="motif_refus" id="modal_motif_refus_etu" rows="3" required
+                          placeholder="Ex: Profil ne correspondant pas aux prérequis techniques, capacité d'accueil limitée pour ce profil..."
+                          class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-[#0D1B4B] focus:outline-none focus:ring-2 focus:ring-red-500 focus:bg-white transition"></textarea>
+            </div>
+
+            <div class="flex items-center justify-end space-x-3 pt-2">
+                <button type="button" onclick="closeRefusEtudiantModal()"
+                        class="px-5 py-2.5 rounded-2xl bg-slate-100 text-slate-600 font-bold text-xs hover:bg-slate-200 transition">
+                    Annuler
+                </button>
+                <button type="submit" 
+                        class="px-6 py-2.5 bg-[#E8001D] hover:bg-red-700 text-white rounded-2xl font-bold text-xs shadow-lg transition">
+                    Confirmer le Refus
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 @push('scripts')
 <script>
+function openRefusEtudiantModal(etudiantId, etudiantNom) {
+    document.getElementById('modal-refus-etu-name').innerText = etudiantNom;
+    const form = document.getElementById('form-refus-etudiant');
+    form.action = "{{ url('/admin/dossiers/' . $dossier->id_dossier . '/etudiants') }}/" + etudiantId + "/refuser";
+    document.getElementById('modal_motif_refus_etu').value = '';
+    document.getElementById('modal-refus-etudiant').classList.remove('hidden');
+}
+function closeRefusEtudiantModal() {
+    document.getElementById('modal-refus-etudiant').classList.add('hidden');
+}
+
 function openModifierPeriodeModal() {
     document.getElementById('modal-modifier-periode').classList.remove('hidden');
     if (typeof flatpickr !== 'undefined') {

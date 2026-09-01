@@ -280,6 +280,40 @@ class DossierController extends Controller
     }
 
     /**
+     * Refuser individuellement un étudiant dans un dossier avec motif
+     */
+    public function refuserEtudiant(Request $request, $id, $etudiantId)
+    {
+        $request->validate([
+            'motif_refus' => 'required|string|min:3|max:1000',
+        ], [
+            'motif_refus.required' => 'Veuillez préciser le motif du refus pour cet étudiant.',
+        ]);
+
+        $etudiant = Etudiant::where('id_dossier', $id)->findOrFail($etudiantId);
+        $etudiant->statut_etudiant = 'refuse';
+        $etudiant->motif_refus = $request->motif_refus;
+        $etudiant->save();
+
+        $etuName = $etudiant->nom_etudiant . ' ' . $etudiant->prenom_etudiant;
+        return back()->with('success', "L'étudiant {$etuName} a été marqué comme non retenu (refusé). Le motif a été enregistré.");
+    }
+
+    /**
+     * Rétablir un étudiant préalablement refusé
+     */
+    public function retablirEtudiant($id, $etudiantId)
+    {
+        $etudiant = Etudiant::where('id_dossier', $id)->findOrFail($etudiantId);
+        $etudiant->statut_etudiant = 'en_attente';
+        $etudiant->motif_refus = null;
+        $etudiant->save();
+
+        $etuName = $etudiant->nom_etudiant . ' ' . $etudiant->prenom_etudiant;
+        return back()->with('success', "L'étudiant {$etuName} a été rétabli dans la liste des candidats.");
+    }
+
+    /**
      * Valider le dossier (même s'il était précédemment refusé ou sous réserve)
      */
     public function valider($id)
@@ -316,7 +350,7 @@ class DossierController extends Controller
             null
         );
 
-        // 3. Envoi réel d'email de validation à l'école
+        // 3. Envoi réel d'email récapitulatif à l'école
         if ($dossier->ecole && ($dossier->ecole->email || $dossier->ecole->mail)) {
             $destEmail = $dossier->ecole->email ?? $dossier->ecole->mail;
             try {
@@ -326,19 +360,30 @@ class DossierController extends Controller
             }
         }
 
-        // 4. Envoi réel d'email automatique à CHAQUE étudiant du dossier
+        // 4. Envoi réel d'email automatique à CHAQUE étudiant du dossier selon son statut
         foreach ($dossier->etudiants as $etudiant) {
             if ($etudiant->email_etu && filter_var($etudiant->email_etu, FILTER_VALIDATE_EMAIL)) {
                 try {
-                    Mail::to($etudiant->email_etu)->send(new EtudiantStageValideMail($dossier, $etudiant));
+                    if ($etudiant->statut_etudiant === 'refuse') {
+                        Mail::to($etudiant->email_etu)->send(new \App\Mail\EtudiantStageRefuseMail($dossier, $etudiant, $etudiant->motif_refus));
+                    } else {
+                        $etudiant->statut_etudiant = 'valide';
+                        $etudiant->save();
+                        Mail::to($etudiant->email_etu)->send(new EtudiantStageValideMail($dossier, $etudiant));
+                    }
                 } catch (\Exception $e) {
-                    Log::warning("Erreur envoi email validation étudiant ({$etudiant->email_etu}) : " . $e->getMessage());
+                    Log::warning("Erreur envoi email étudiant ({$etudiant->email_etu}) : " . $e->getMessage());
+                }
+            } else {
+                if ($etudiant->statut_etudiant !== 'refuse') {
+                    $etudiant->statut_etudiant = 'valide';
+                    $etudiant->save();
                 }
             }
         }
 
         return redirect()->route('admin.dossiers.show', $id)
-            ->with('success', "Le dossier {$codeDossier} ({$dossier->filiere}) a été VALIDÉ avec succès ! Un email de confirmation a été transmis à l'école et à tous les étudiants candidats.");
+            ->with('success', "Le dossier {$codeDossier} ({$dossier->filiere}) a été VALIDÉ avec succès ! Les emails de confirmation et d'information ont été transmis à l'école et à l'ensemble des candidats.");
     }
 
     /**

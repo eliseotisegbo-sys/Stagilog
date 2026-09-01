@@ -127,68 +127,55 @@
                 </div>
             </div>
 
-            <!-- Palette des raccourcis directs & Sélecteur Personnalisé -->
+            <!-- Palette des raccourcis + sélecteur inline sur la même ligne -->
             <div class="flex flex-wrap items-center gap-2">
-                <!-- Raccourci Direct: Aujourd'hui -->
+
+                <!-- Raccourci: Aujourd'hui -->
                 <button type="button" onclick="applyDirectPreset('jour')"
-                        class="px-3.5 py-2 rounded-2xl text-xs font-bold transition flex items-center space-x-1.5 {{ request('start_date') === now()->format('Y-m-d') && request('end_date') === now()->format('Y-m-d') ? 'bg-[#1B3A8C] text-white shadow-md' : 'bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-[#1B3A8C] border border-slate-200' }}">
-                    <span>Aujourd'hui</span>
+                        class="px-3.5 py-2 rounded-2xl text-xs font-bold transition {{ request('start_date') === now()->format('Y-m-d') && request('end_date') === now()->format('Y-m-d') ? 'bg-[#1B3A8C] text-white shadow-md' : 'bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-[#1B3A8C] border border-slate-200' }}">
+                    Aujourd'hui
                 </button>
 
-                <!-- Raccourci Direct: Semaine (7 jours en arrière) -->
+                <!-- Raccourci: Semaine -->
                 <button type="button" onclick="applyDirectPreset('semaine')"
-                        class="px-3.5 py-2 rounded-2xl text-xs font-bold transition flex items-center space-x-1.5 {{ request('start_date') === now()->subDays(7)->format('Y-m-d') ? 'bg-[#1B3A8C] text-white shadow-md' : 'bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-[#1B3A8C] border border-slate-200' }}">
-                    <span>Semaine</span>
+                        class="px-3.5 py-2 rounded-2xl text-xs font-bold transition {{ request('start_date') === now()->subDays(7)->format('Y-m-d') ? 'bg-[#1B3A8C] text-white shadow-md' : 'bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-[#1B3A8C] border border-slate-200' }}">
+                    Semaine
                 </button>
 
-                <!-- Raccourci Direct: Année (1 an en arrière) -->
+                <!-- Raccourci: Année -->
                 <button type="button" onclick="applyDirectPreset('annee')"
-                        class="px-3.5 py-2 rounded-2xl text-xs font-bold transition flex items-center space-x-1.5 {{ request('start_date') === now()->subYear()->format('Y-m-d') ? 'bg-[#1B3A8C] text-white shadow-md' : 'bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-[#1B3A8C] border border-slate-200' }}">
-                    <span>Année</span>
+                        class="px-3.5 py-2 rounded-2xl text-xs font-bold transition {{ request('start_date') === now()->subYear()->format('Y-m-d') ? 'bg-[#1B3A8C] text-white shadow-md' : 'bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-[#1B3A8C] border border-slate-200' }}">
+                    Année
                 </button>
 
-                <!-- Trigger Popover Période Personnalisée -->
-                <div class="relative">
-                    <button type="button" onclick="toggleDatePopover()" id="btn-date-trigger"
-                            class="inline-flex items-center space-x-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-2xl text-xs font-bold text-[#0D1B4B] shadow-sm transition">
-                        <svg class="w-4 h-4 text-[#1B3A8C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        <span id="date-summary-label">{{ $periodLabel }}</span>
-                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                    </button>
+                <!-- Séparateur vertical -->
+                <div class="h-6 w-px bg-slate-200 mx-1"></div>
 
-                    <!-- POPOVER ADVANCED CALENDAR (Double Calendrier sans dates futures) -->
-                    <div id="date-popover" class="hidden absolute right-0 top-full mt-3 z-50 bg-white rounded-3xl shadow-2xl border border-slate-200 p-6 flex flex-col gap-4 w-full sm:w-[640px]">
-                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                            <span class="text-xs font-black uppercase tracking-wider text-[#0D1B4B]">Sélectionner une Plage Personnalisée</span>
-                            <span class="text-[10px] font-bold text-slate-400">Dates antérieures ou égales à aujourd'hui</span>
-                        </div>
-
-                        <!-- Double Calendrier Flatpickr -->
-                        <div class="overflow-x-auto">
-                            <div id="flatpickr-inline-target" class="flex justify-center min-h-[290px]"></div>
-                        </div>
-
-                        <div class="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-                            <div class="flex items-center space-x-2 text-xs">
-                                <span class="font-bold text-slate-400">Du :</span>
-                                <input type="text" id="popover_start_display" readonly class="w-24 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-center font-bold text-[#0D1B4B] text-[11px]">
-                                <span class="font-bold text-slate-400">Au :</span>
-                                <input type="text" id="popover_end_display" readonly class="w-24 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-center font-bold text-[#0D1B4B] text-[11px]">
-                            </div>
-                            <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
-                                <button type="button" onclick="clearDatePreset()" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 font-bold text-xs hover:bg-slate-200 transition">Effacer</button>
-                                <button type="submit" class="px-5 py-2 rounded-xl bg-[#1B3A8C] text-white font-bold text-xs hover:bg-[#142B6B] shadow-md transition">Appliquer</button>
-                            </div>
-                        </div>
+                <!-- Période personnalisée inline: Du / Au / Effacer / Appliquer -->
+                <div class="flex items-center gap-1.5 relative">
+                    <span class="text-xs font-bold text-slate-400 whitespace-nowrap">Du&nbsp;:</span>
+                    <div class="relative">
+                        <input type="text" id="inline_start_date" placeholder="jj/mm/aaaa" autocomplete="off"
+                               class="w-28 px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl text-[11px] font-bold text-[#0D1B4B] text-center focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] cursor-pointer"
+                               value="{{ request('start_date') ? \Carbon\Carbon::parse(request('start_date'))->format('d/m/Y') : '' }}">
+                        <!-- Micro calendrier Du -->
+                        <div id="cal-start" class="hidden absolute left-0 top-full mt-2 z-50 bg-white rounded-2xl shadow-2xl border border-slate-200 p-1"></div>
                     </div>
-                </div>
 
-                @if(request('start_date'))
-                <a href="{{ route('dashboard.admin') }}" class="inline-flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 px-3.5 py-2 rounded-2xl text-xs font-bold transition" title="Réinitialiser à toutes les périodes">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                    <span>Toutes</span>
-                </a>
-                @endif
+                    <span class="text-xs font-bold text-slate-400 whitespace-nowrap">Au&nbsp;:</span>
+                    <div class="relative">
+                        <input type="text" id="inline_end_date" placeholder="jj/mm/aaaa" autocomplete="off"
+                               class="w-28 px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl text-[11px] font-bold text-[#0D1B4B] text-center focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] cursor-pointer"
+                               value="{{ request('end_date') ? \Carbon\Carbon::parse(request('end_date'))->format('d/m/Y') : '' }}">
+                        <!-- Micro calendrier Au -->
+                        <div id="cal-end" class="hidden absolute left-0 top-full mt-2 z-50 bg-white rounded-2xl shadow-2xl border border-slate-200 p-1"></div>
+                    </div>
+
+                    <button type="button" onclick="clearInlineDates()"
+                            class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-xl transition whitespace-nowrap">Effacer</button>
+                    <button type="button" onclick="applyInlineDates()"
+                            class="px-4 py-1.5 bg-[#1B3A8C] hover:bg-[#142B6B] text-white font-bold text-xs rounded-xl shadow transition whitespace-nowrap">Appliquer</button>
+                </div>
             </div>
         </form>
     </div>
@@ -363,94 +350,110 @@
 
 @push('scripts')
 <script>
-let fpRangePicker = null;
-
-function toggleDatePopover() {
-    const pop = document.getElementById('date-popover');
-    pop.classList.toggle('hidden');
-}
-
+/* ──── Helpers ──── */
 function formatDate(d) {
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    return `${y}-${m}-${day}`;
+}
+function parseDisplayDate(str) {
+    // Parse dd/mm/yyyy
+    const parts = str.split('/');
+    if (parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]);
+    return null;
+}
+function toDisplay(isoStr) {
+    if (!isoStr) return '';
+    const parts = isoStr.split('-');
+    if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    return isoStr;
 }
 
+/* ──── Presets rapides ──── */
 function applyDirectPreset(preset) {
     const today = new Date();
-    let start = null;
+    let start = new Date(today);
     let end = new Date(today);
-
-    if (preset === 'jour') {
-        start = new Date(today);
-    } else if (preset === 'semaine') {
-        start = new Date(today);
-        start.setDate(today.getDate() - 7);
-    } else if (preset === 'annee') {
-        start = new Date(today);
-        start.setFullYear(today.getFullYear() - 1);
-    }
-
-    if (start && end) {
-        document.getElementById('start_date').value = formatDate(start);
-        document.getElementById('end_date').value = formatDate(end);
-        document.getElementById('period-form').submit();
-    }
+    if (preset === 'semaine') start.setDate(today.getDate() - 7);
+    if (preset === 'annee') start.setFullYear(today.getFullYear() - 1);
+    document.getElementById('start_date').value = formatDate(start);
+    document.getElementById('end_date').value = formatDate(end);
+    document.getElementById('period-form').submit();
 }
 
-function clearDatePreset() {
-    document.getElementById('start_date').value = '';
-    document.getElementById('end_date').value = '';
-    document.getElementById('popover_start_display').value = '';
-    document.getElementById('popover_end_display').value = '';
-    if (fpRangePicker) {
-        fpRangePicker.clear();
+/* ──── Inline date inputs ──── */
+function applyInlineDates() {
+    const startRaw = document.getElementById('inline_start_date').value.trim();
+    const endRaw   = document.getElementById('inline_end_date').value.trim();
+    let startIso = '';
+    let endIso   = '';
+    if (startRaw) {
+        const d = parseDisplayDate(startRaw);
+        if (d && !isNaN(d)) startIso = formatDate(d);
+        else { startIso = startRaw; } // fallback if already Y-m-d
     }
+    if (endRaw) {
+        const d = parseDisplayDate(endRaw);
+        if (d && !isNaN(d)) endIso = formatDate(d);
+        else { endIso = endRaw; }
+    }
+    document.getElementById('start_date').value = startIso;
+    document.getElementById('end_date').value   = endIso;
+    document.getElementById('period-form').submit();
+}
+
+function clearInlineDates() {
+    document.getElementById('start_date').value = '';
+    document.getElementById('end_date').value   = '';
+    document.getElementById('inline_start_date').value = '';
+    document.getElementById('inline_end_date').value   = '';
+    if (window.fpStart) window.fpStart.clear();
+    if (window.fpEnd)   window.fpEnd.clear();
+    document.getElementById('period-form').submit();
 }
 
 document.addEventListener('DOMContentLoaded', function() {
     const sVal = document.getElementById('start_date').value;
     const eVal = document.getElementById('end_date').value;
-    document.getElementById('popover_start_display').value = sVal || '';
-    document.getElementById('popover_end_display').value = eVal || '';
 
-    // Initialize Flatpickr in range mode with dual month view (maxDate: today)
+    // Sync display fields on load
+    if (sVal) document.getElementById('inline_start_date').value = toDisplay(sVal);
+    if (eVal) document.getElementById('inline_end_date').value   = toDisplay(eVal);
+
+    // Initialise Flatpickr mini-calendars (maxDate: today, no future)
     if (typeof flatpickr !== 'undefined') {
         flatpickr.localize(flatpickr.l10ns.fr);
-        fpRangePicker = flatpickr("#flatpickr-inline-target", {
-            inline: true,
-            mode: "range",
-            showMonths: 2,
-            maxDate: "today",
-            dateFormat: "Y-m-d",
-            defaultDate: (sVal && eVal) ? [sVal, eVal] : null,
-            locale: "fr",
-            onChange: function(selectedDates, dateStr, instance) {
-                if (selectedDates.length === 1) {
-                    const sStr = formatDate(selectedDates[0]);
-                    document.getElementById('start_date').value = sStr;
-                    document.getElementById('popover_start_display').value = sStr;
-                } else if (selectedDates.length === 2) {
-                    const sStr = formatDate(selectedDates[0]);
-                    const eStr = formatDate(selectedDates[1]);
-                    document.getElementById('start_date').value = sStr;
-                    document.getElementById('end_date').value = eStr;
-                    document.getElementById('popover_start_display').value = sStr;
-                    document.getElementById('popover_end_display').value = eStr;
+
+        const commonOpts = {
+            dateFormat: 'd/m/Y',
+            maxDate: 'today',
+            locale: 'fr',
+            disableMobile: true,
+            appendTo: undefined, // use the inline container
+        };
+
+        window.fpStart = flatpickr('#inline_start_date', {
+            ...commonOpts,
+            defaultDate: sVal || null,
+            onChange: function(dates) {
+                if (dates[0] && window.fpEnd) {
+                    window.fpEnd.set('minDate', dates[0]);
+                }
+            }
+        });
+
+        window.fpEnd = flatpickr('#inline_end_date', {
+            ...commonOpts,
+            defaultDate: eVal || null,
+            minDate: sVal || null,
+            onChange: function(dates) {
+                if (dates[0] && window.fpStart) {
+                    window.fpStart.set('maxDate', dates[0]);
                 }
             }
         });
     }
-
-    // Fermer le popover si on clique en dehors
-    document.addEventListener('click', function(e) {
-        const pop = document.getElementById('date-popover');
-        const trigger = document.getElementById('btn-date-trigger');
-        if (pop && !pop.classList.contains('hidden') && !pop.contains(e.target) && !trigger.contains(e.target)) {
-            pop.classList.add('hidden');
-        }
-    });
     
     // 1. Timeline Area Chart (Données réelles de la BD)
     var optionsTimeline = {

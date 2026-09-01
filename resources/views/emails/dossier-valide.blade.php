@@ -94,7 +94,7 @@
                         <span class="detail-value">{{ $dossier->etudiants->count() }} candidat(s)</span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label">Période de Stage :</span>
+                        <span class="detail-label">Période Globale :</span>
                         <span class="detail-value period">
                             {{ $dossier->datedebut ? $dossier->datedebut->locale('fr')->isoFormat('ddd D MMMM YYYY') : '-' }}
                             au
@@ -103,12 +103,37 @@
                     </div>
                 </div>
 
+                <!-- Liste Détaillée des Candidats -->
+                <div class="section-title">Décisions individuelles par candidat</div>
+                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 16px; padding: 16px; margin-bottom: 24px;">
+                    @foreach($dossier->etudiants as $etu)
+                    <div style="padding: 10px 0; border-bottom: 1px dashed #E2E8F0; display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+                        <div>
+                            <strong style="color: #0D1B4B;">{{ $etu->nom_etudiant }} {{ $etu->prenom_etudiant }}</strong>
+                            <div style="font-size: 11px; color: #64748B;">{{ $etu->email_etu }}</div>
+                            @if($etu->statut_etudiant === 'refuse')
+                            <div style="font-size: 11px; color: #DC2626; margin-top: 2px;"><strong>Motif :</strong> {{ $etu->motif_refus ?? 'Non retenu' }}</div>
+                            @else
+                            <div style="font-size: 11px; color: #059669; margin-top: 2px;">Période : {{ ($etu->datedebut_stage ?? $dossier->datedebut) ? \Carbon\Carbon::parse($etu->datedebut_stage ?? $dossier->datedebut)->format('d/m/Y') : '-' }} au {{ ($etu->datefin_stage ?? $dossier->datefin) ? \Carbon\Carbon::parse($etu->datefin_stage ?? $dossier->datefin)->format('d/m/Y') : '-' }}</div>
+                            @endif
+                        </div>
+                        <div>
+                            @if($etu->statut_etudiant === 'refuse')
+                            <span style="background: #FEE2E2; color: #991B1B; font-weight: 800; font-size: 10px; padding: 3px 8px; border-radius: 6px; text-transform: uppercase;">Non Retenu</span>
+                            @else
+                            <span style="background: #DCFCE7; color: #166534; font-weight: 800; font-size: 10px; padding: 3px 8px; border-radius: 6px; text-transform: uppercase;">Validé</span>
+                            @endif
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+
                 <div class="cta-center">
                     <a href="{{ route('login.ecole') }}" class="cta-btn">Accéder à mon Espace École</a>
                 </div>
 
                 <p class="info-text">
-                    Vous pourrez consulter les rapports, fiches d'évaluation et documents liés à cette promotion directement depuis votre espace partenaire STAGILOG. Pour toute question, contactez-nous à <a href="mailto:stagilogtfg@gmail.com" style="color: #1B3A8C;">stagilogtfg@gmail.com</a>.
+                    Vous pourrez consulter les rapports, fiches d'évaluation et documents liés à cette promotion directement depuis votre espace partenaire STAGILOG. Les candidats dont la demande n'a pas été retenue ont été invités à se rapprocher de votre secrétariat. Pour toute question, contactez-nous à <a href="mailto:stagilogtfg@gmail.com" style="color: #1B3A8C;">stagilogtfg@gmail.com</a>.
                 </p>
             </div>
 
