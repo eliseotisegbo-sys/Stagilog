@@ -111,9 +111,9 @@
         </div>
     </div>
 
-    <!-- SÉLECTEUR DE PÉRIODE AVANCÉ POUR LES STATISTIQUES (COMBO JOUR / SEMAINE / ANNÉE) -->
+    <!-- SÉLECTEUR DE PÉRIODE AVANCÉ POUR LES STATISTIQUES (PALETTE AVEC BOUTONS DIRECTS & DOUBLE CALENDRIER) -->
     <div class="bg-white rounded-3xl border border-slate-100 shadow-card p-5 relative">
-        <form method="GET" action="{{ route('dashboard.admin') }}" id="period-form" class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+        <form method="GET" action="{{ route('dashboard.admin') }}" id="period-form" class="flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-4">
             <input type="hidden" name="start_date" id="start_date" value="{{ request('start_date') }}">
             <input type="hidden" name="end_date" id="end_date" value="{{ request('end_date') }}">
 
@@ -127,53 +127,48 @@
                 </div>
             </div>
 
-            <!-- Trigger Button & Popover Container -->
-            <div class="relative flex items-center gap-3">
-                <button type="button" onclick="toggleDatePopover()" id="btn-date-trigger"
-                        class="inline-flex items-center space-x-3 px-4 py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-2xl text-xs font-bold text-[#0D1B4B] shadow-sm transition">
-                    <svg class="w-4 h-4 text-[#1B3A8C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    <span id="date-summary-label">{{ $periodLabel }}</span>
-                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            <!-- Palette des raccourcis directs & Sélecteur Personnalisé -->
+            <div class="flex flex-wrap items-center gap-2">
+                <!-- Raccourci Direct: Aujourd'hui -->
+                <button type="button" onclick="applyDirectPreset('jour')"
+                        class="px-3.5 py-2 rounded-2xl text-xs font-bold transition flex items-center space-x-1.5 {{ request('start_date') === now()->format('Y-m-d') && request('end_date') === now()->format('Y-m-d') ? 'bg-[#1B3A8C] text-white shadow-md' : 'bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-[#1B3A8C] border border-slate-200' }}">
+                    <span>Aujourd'hui</span>
                 </button>
 
-                @if(request('start_date'))
-                <a href="{{ route('dashboard.admin') }}" class="inline-flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                    <span>Réinitialiser</span>
-                </a>
-                @endif
+                <!-- Raccourci Direct: Semaine (7 jours en arrière) -->
+                <button type="button" onclick="applyDirectPreset('semaine')"
+                        class="px-3.5 py-2 rounded-2xl text-xs font-bold transition flex items-center space-x-1.5 {{ request('start_date') === now()->subDays(7)->format('Y-m-d') ? 'bg-[#1B3A8C] text-white shadow-md' : 'bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-[#1B3A8C] border border-slate-200' }}">
+                    <span>Semaine</span>
+                </button>
 
-                <!-- POPOVER ADVANCED CALENDAR & PRESETS (Sélectionneurs Jour, Semaine, Année) -->
-                <div id="date-popover" class="hidden absolute right-0 top-full mt-3 z-50 bg-white rounded-3xl shadow-2xl border border-slate-200 p-6 flex flex-col md:flex-row gap-6 w-full sm:w-[740px]">
-                    <!-- Colonne des raccourcis : Jour, Semaine, Année, Toutes les périodes -->
-                    <div class="w-full md:w-44 border-b md:border-b-0 md:border-r border-slate-100 pb-4 md:pb-0 md:pr-4 flex flex-col space-y-2">
-                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Raccourcis</span>
-                        <button type="button" onclick="selectDatePreset('jour')" class="preset-btn text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:bg-blue-50 hover:text-[#1B3A8C] transition flex items-center justify-between">
-                            <span>Jour</span>
-                            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                        </button>
-                        <button type="button" onclick="selectDatePreset('semaine')" class="preset-btn text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:bg-blue-50 hover:text-[#1B3A8C] transition flex items-center justify-between">
-                            <span>Semaine</span>
-                            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                        </button>
-                        <button type="button" onclick="selectDatePreset('annee')" class="preset-btn text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:bg-blue-50 hover:text-[#1B3A8C] transition flex items-center justify-between">
-                            <span>Année</span>
-                            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                        </button>
-                        <div class="pt-2 border-t border-slate-100 mt-2">
-                            <button type="button" onclick="selectDatePreset('all')" class="preset-btn text-left px-3.5 py-2 rounded-xl text-xs font-bold text-[#1B3A8C] bg-blue-50/60 hover:bg-blue-100 transition w-full">
-                                Toutes les périodes
-                            </button>
+                <!-- Raccourci Direct: Année (1 an en arrière) -->
+                <button type="button" onclick="applyDirectPreset('annee')"
+                        class="px-3.5 py-2 rounded-2xl text-xs font-bold transition flex items-center space-x-1.5 {{ request('start_date') === now()->subYear()->format('Y-m-d') ? 'bg-[#1B3A8C] text-white shadow-md' : 'bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-[#1B3A8C] border border-slate-200' }}">
+                    <span>Année</span>
+                </button>
+
+                <!-- Trigger Popover Période Personnalisée -->
+                <div class="relative">
+                    <button type="button" onclick="toggleDatePopover()" id="btn-date-trigger"
+                            class="inline-flex items-center space-x-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-2xl text-xs font-bold text-[#0D1B4B] shadow-sm transition">
+                        <svg class="w-4 h-4 text-[#1B3A8C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <span id="date-summary-label">{{ $periodLabel }}</span>
+                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+
+                    <!-- POPOVER ADVANCED CALENDAR (Double Calendrier sans dates futures) -->
+                    <div id="date-popover" class="hidden absolute right-0 top-full mt-3 z-50 bg-white rounded-3xl shadow-2xl border border-slate-200 p-6 flex flex-col gap-4 w-full sm:w-[640px]">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                            <span class="text-xs font-black uppercase tracking-wider text-[#0D1B4B]">Sélectionner une Plage Personnalisée</span>
+                            <span class="text-[10px] font-bold text-slate-400">Dates antérieures ou égales à aujourd'hui</span>
                         </div>
-                    </div>
 
-                    <!-- Zone Calendrier Double Mois & Barre de validation -->
-                    <div class="flex-1 flex flex-col justify-between">
+                        <!-- Double Calendrier Flatpickr -->
                         <div class="overflow-x-auto">
                             <div id="flatpickr-inline-target" class="flex justify-center min-h-[290px]"></div>
                         </div>
 
-                        <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 mt-4">
+                        <div class="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
                             <div class="flex items-center space-x-2 text-xs">
                                 <span class="font-bold text-slate-400">Du :</span>
                                 <input type="text" id="popover_start_display" readonly class="w-24 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-center font-bold text-[#0D1B4B] text-[11px]">
@@ -187,6 +182,13 @@
                         </div>
                     </div>
                 </div>
+
+                @if(request('start_date'))
+                <a href="{{ route('dashboard.admin') }}" class="inline-flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 px-3.5 py-2 rounded-2xl text-xs font-bold transition" title="Réinitialiser à toutes les périodes">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <span>Toutes</span>
+                </a>
+                @endif
             </div>
         </form>
     </div>
@@ -375,37 +377,25 @@ function formatDate(d) {
     return `${year}-${month}-${day}`;
 }
 
-function selectDatePreset(mode) {
+function applyDirectPreset(preset) {
     const today = new Date();
     let start = null;
-    let end = null;
+    let end = new Date(today);
 
-    if (mode === 'jour') {
+    if (preset === 'jour') {
         start = new Date(today);
-        end = new Date(today);
-    } else if (mode === 'semaine') {
-        const day = today.getDay();
-        const diffToMon = today.getDate() - day + (day === 0 ? -6 : 1);
-        start = new Date(today.getFullYear(), today.getMonth(), diffToMon);
-        end = new Date(today.getFullYear(), today.getMonth(), diffToMon + 6);
-    } else if (mode === 'annee') {
-        start = new Date(today.getFullYear(), 0, 1);
-        end = new Date(today.getFullYear(), 11, 31);
-    } else if (mode === 'all') {
-        clearDatePreset();
-        return;
+    } else if (preset === 'semaine') {
+        start = new Date(today);
+        start.setDate(today.getDate() - 7);
+    } else if (preset === 'annee') {
+        start = new Date(today);
+        start.setFullYear(today.getFullYear() - 1);
     }
 
     if (start && end) {
-        const sStr = formatDate(start);
-        const eStr = formatDate(end);
-        document.getElementById('start_date').value = sStr;
-        document.getElementById('end_date').value = eStr;
-        document.getElementById('popover_start_display').value = sStr;
-        document.getElementById('popover_end_display').value = eStr;
-        if (fpRangePicker) {
-            fpRangePicker.setDate([sStr, eStr], true);
-        }
+        document.getElementById('start_date').value = formatDate(start);
+        document.getElementById('end_date').value = formatDate(end);
+        document.getElementById('period-form').submit();
     }
 }
 
@@ -425,13 +415,14 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('popover_start_display').value = sVal || '';
     document.getElementById('popover_end_display').value = eVal || '';
 
-    // Initialize Flatpickr in range mode with dual month view
+    // Initialize Flatpickr in range mode with dual month view (maxDate: today)
     if (typeof flatpickr !== 'undefined') {
         flatpickr.localize(flatpickr.l10ns.fr);
         fpRangePicker = flatpickr("#flatpickr-inline-target", {
             inline: true,
             mode: "range",
             showMonths: 2,
+            maxDate: "today",
             dateFormat: "Y-m-d",
             defaultDate: (sVal && eVal) ? [sVal, eVal] : null,
             locale: "fr",

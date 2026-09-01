@@ -20,6 +20,27 @@
             </div>
         </div>
 
+        @if(!$isDepotOpen)
+        <div class="mb-8 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 flex items-start space-x-3.5">
+            <svg class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            <div class="text-xs">
+                <strong class="font-bold block mb-0.5">Campagne de Dépôt Actuellement Fermée</strong>
+                {{ $depotClosedReason }} Vous pouvez néanmoins préparer et <strong>enregistrer ce dossier en tant que Brouillon</strong> pour le soumettre dès l'ouverture officielle.
+            </div>
+        </div>
+        @elseif($depotDebut && $depotFin)
+        <div class="mb-8 p-4 rounded-2xl bg-blue-50 border border-blue-200 text-[#0D1B4B] flex items-start space-x-3.5">
+            <svg class="w-5 h-5 text-[#1B3A8C] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <div class="text-xs">
+                <strong class="font-bold block mb-0.5">Période Officielle de Dépôt en Cours</strong>
+                Les dépôts pour cette session sont ouverts du <strong>{{ \Carbon\Carbon::parse($depotDebut)->locale('fr')->isoFormat('D MMMM YYYY') }}</strong> au <strong>{{ \Carbon\Carbon::parse($depotFin)->locale('fr')->isoFormat('D MMMM YYYY') }}</strong>.
+                @if($depotInstructions)
+                <span class="block mt-1 text-slate-600"><em>Note TFG : {{ $depotInstructions }}</em></span>
+                @endif
+            </div>
+        </div>
+        @endif
+
         <form method="POST" action="{{ route('ecole.dossiers.store') }}" enctype="multipart/form-data" id="dossier-form" class="space-y-8">
             @csrf
             
@@ -301,10 +322,17 @@
                             class="w-full sm:w-auto px-6 py-3.5 bg-white hover:bg-slate-50 text-[#1B3A8C] border-2 border-[#1B3A8C] rounded-2xl font-bold text-xs shadow-sm transition">
                         Enregistrer en Brouillon
                     </button>
+                    @if($isDepotOpen)
                     <button type="submit" name="action" value="soumettre"
                             class="w-full sm:w-auto px-8 py-3.5 bg-[#1B3A8C] hover:bg-[#142B6B] text-white rounded-2xl font-bold text-xs shadow-xl hover:shadow-blue-900/20 transition transform hover:-translate-y-0.5">
                         Soumettre à TFG SARL
                     </button>
+                    @else
+                    <button type="button" disabled title="Dépôts actuellement fermés. Enregistrez ce dossier en tant que Brouillon."
+                            class="w-full sm:w-auto px-8 py-3.5 bg-slate-300 text-slate-500 rounded-2xl font-bold text-xs cursor-not-allowed shadow-none">
+                        Soumettre à TFG SARL (Fermé)
+                    </button>
+                    @endif
                 </div>
             </div>
         </form>

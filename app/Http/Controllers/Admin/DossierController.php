@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Dossier;
 use App\Models\Ecole;
 use App\Models\Etudiant;
+use App\Models\AppSetting;
 use App\Mail\DossierValideMail;
 use App\Mail\DossierRefuseMail;
 use App\Mail\EtudiantStageValideMail;
 use App\Mail\PeriodeStageModifieeMail;
 use App\Mail\PeriodeEtudiantModifieeMail;
+use App\Mail\PeriodeDepotDossiersMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
@@ -43,6 +45,12 @@ class DossierController extends Controller
         $countRefuse = Dossier::where('statut_brouillon', 'soumis')->where('statut', 'refuse')->count();
         $countTotal = Dossier::where('statut_brouillon', 'soumis')->count();
 
+        // Paramètres de la campagne de dépôt
+        $depotActif = AppSetting::get('depot_dossiers_actif', '1') === '1';
+        $depotDebut = AppSetting::get('depot_date_debut');
+        $depotFin = AppSetting::get('depot_date_fin');
+        $depotInstructions = AppSetting::get('depot_instructions');
+
         return view('admin.dossiers.index', compact(
             'dossiers', 
             'status', 
@@ -52,8 +60,66 @@ class DossierController extends Controller
             'countSousReserve',
             'countValide', 
             'countRefuse', 
-            'countTotal'
+            'countTotal',
+            'depotActif',
+            'depotDebut',
+            'depotFin',
+            'depotInstructions'
         ));
+    }
+
+    /**
+     * Définir la période officielle de dépôt des dossiers et notifier les écoles par email
+     */
+    public function configurerDepots(Request $request)
+    {
+        $request->validate([
+            'date_debut' => 'required|date',
+            'date_fin' => 'required|date|after_or_equal:date_debut',
+            'instructions' => 'nullable|string|max:1000',
+            'notifier_ecoles' => 'nullable',
+        ]);
+
+        AppSetting::set('depot_date_debut', $request->date_debut);
+        AppSetting::set('depot_date_fin', $request->date_fin);
+        AppSetting::set('depot_instructions', $request->instructions ?? '');
+        AppSetting::set('depot_dossiers_actif', '1');
+
+        $notifiedCount = 0;
+        if ($request->has('notifier_ecoles')) {
+            $ecoles = Ecole::all();
+            foreach ($ecoles as $ecole) {
+                $email = $ecole->email ?? $ecole->mail;
+                if ($email) {
+                    try {
+                        Mail::to($email)->send(new PeriodeDepotDossiersMail($ecole, $request->date_debut, $request->date_fin, $request->instructions));
+                        $notifiedCount++;
+                    } catch (\Exception $e) {
+                        Log::error("Erreur envoi notification période dépôt à l'école ID {$ecole->id_ecole}: " . $e->getMessage());
+                    }
+                }
+            }
+        }
+
+        $msg = "La période officielle de dépôt des dossiers a été configurée avec succès (du " . \Carbon\Carbon::parse($request->date_debut)->format('d/m/Y') . " au " . \Carbon\Carbon::parse($request->date_fin)->format('d/m/Y') . ").";
+        if ($notifiedCount > 0) {
+            $msg .= " Un email officiel a été envoyé à {$notifiedCount} établissement(s) partenaire(s).";
+        }
+
+        return redirect()->route('admin.dossiers.index')->with('success', $msg);
+    }
+
+    /**
+     * Activer ou désactiver rapidement les dépôts de dossiers
+     */
+    public function toggleDepots(Request $request)
+    {
+        $current = AppSetting::get('depot_dossiers_actif', '1');
+        $newStatus = $current === '1' ? '0' : '1';
+        AppSetting::set('depot_dossiers_actif', $newStatus);
+
+        $statusText = $newStatus === '1' ? 'ouverts (activés)' : 'désactivés (fermés)';
+        return redirect()->route('admin.dossiers.index')->with('success', "Les dépôts de dossiers sont désormais {$statusText}.");
     }
 
     /**

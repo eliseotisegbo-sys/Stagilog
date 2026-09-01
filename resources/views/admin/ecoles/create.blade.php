@@ -16,13 +16,37 @@
             </a>
             <div>
                 <h3 class="text-xl font-black text-[#0D1B4B]">Informations de l'Établissement</h3>
-                <p class="text-xs text-slate-500">Renseignez les coordonnées de l'école. Vous pourrez créer son compte d'accès depuis la liste.</p>
+                <p class="text-xs text-slate-500">Renseignez les coordonnées de l'école et ajoutez son logo officiel (optionnel). Vous pourrez créer son compte d'accès depuis la liste.</p>
             </div>
         </div>
 
-        <form method="POST" action="{{ route('admin.ecoles.store') }}" class="space-y-6">
+        <form method="POST" action="{{ route('admin.ecoles.store') }}" enctype="multipart/form-data" class="space-y-6">
             @csrf
             
+            <!-- Zone Upload Logo de l'École (Optionnel) -->
+            <div class="p-5 rounded-2xl bg-slate-50 border border-dashed border-slate-200 flex flex-col sm:flex-row items-center gap-5">
+                <div class="w-20 h-20 rounded-2xl bg-white border border-slate-200 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm relative group">
+                    <img id="logo-preview-img" src="" alt="Prévisualisation Logo" class="w-full h-full object-contain hidden p-1">
+                    <div id="logo-placeholder" class="text-center p-2">
+                        <svg class="w-7 h-7 text-slate-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <span class="text-[9px] font-bold text-slate-400 block mt-0.5">Logo</span>
+                    </div>
+                </div>
+                <div class="flex-1 text-center sm:text-left">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-[#0D1B4B] mb-1">
+                        Logo Officiel de l'Établissement <span class="text-slate-400 text-[11px] font-normal lowercase">(optionnel)</span>
+                    </label>
+                    <p class="text-[11px] text-slate-400 mb-3">Formats supportés : PNG, JPG, WEBP, SVG (Max 2 Mo). Vous pouvez l'ajouter maintenant ou laisser l'école le faire.</p>
+                    <label for="logo" class="inline-flex items-center space-x-2 px-3.5 py-2 bg-white border border-slate-200 hover:border-[#1B3A8C] text-[#1B3A8C] rounded-xl text-xs font-bold shadow-sm cursor-pointer hover:bg-blue-50/50 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                        <span id="logo-btn-text">Choisir un fichier</span>
+                    </label>
+                    <input type="file" name="logo" id="logo" accept="image/*" class="hidden" onchange="previewLogo(event)">
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <!-- Nom École -->
                 <div class="sm:col-span-2">
@@ -89,11 +113,31 @@
         </form>
     </div>
 </div>
-@endsection
 
+@push('scripts')
 <script>
     // Auto-uppercase le champ sigle
     document.getElementById('sigle').addEventListener('input', function() {
         this.value = this.value.toUpperCase();
     });
+
+    // Prévisualisation du logo
+    function previewLogo(event) {
+        const input = event.target;
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('logo-preview-img');
+                const placeholder = document.getElementById('logo-placeholder');
+                const btnText = document.getElementById('logo-btn-text');
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+                btnText.textContent = input.files[0].name;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
 </script>
+@endpush
+@endsection

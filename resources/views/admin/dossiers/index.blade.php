@@ -6,6 +6,70 @@
 @section('dashboard_content')
 <div class="space-y-6">
     
+    <!-- BANDEAU DE GESTION DE LA CAMPAGNE DE DÉPÔT DES DOSSIERS -->
+    <div class="bg-white rounded-3xl p-5 sm:p-6 border border-slate-100 shadow-card flex flex-col lg:flex-row lg:items-center justify-between gap-5 relative overflow-hidden">
+        <div class="absolute -right-12 -bottom-12 w-48 h-48 bg-gradient-to-br from-blue-50 to-transparent rounded-full pointer-events-none"></div>
+
+        <div class="flex items-start sm:items-center space-x-4">
+            <div class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 {{ $depotActif ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-red-50 text-red-600 border border-red-100' }}">
+                @if($depotActif)
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                @else
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                @endif
+            </div>
+
+            <div>
+                <div class="flex items-center gap-2.5 flex-wrap">
+                    <h3 class="text-sm font-extrabold text-[#0D1B4B] uppercase tracking-wider">Campagne de Dépôt des Dossiers</h3>
+                    @if($depotActif)
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Dépôts Ouverts
+                        </span>
+                    @else
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-red-100 text-red-800 border border-red-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                            Dépôts Fermés
+                        </span>
+                    @endif
+                </div>
+
+                <p class="text-xs text-slate-500 mt-1">
+                    @if($depotDebut && $depotFin)
+                        Période officielle fixée : <strong class="text-[#1B3A8C]">du {{ \Carbon\Carbon::parse($depotDebut)->locale('fr')->isoFormat('D MMMM YYYY') }} au {{ \Carbon\Carbon::parse($depotFin)->locale('fr')->isoFormat('D MMMM YYYY') }}</strong>
+                    @else
+                        Aucune restriction de dates active. Les écoles peuvent déposer leurs dossiers en continu.
+                    @endif
+                </p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2.5 flex-wrap z-10">
+            <!-- Bouton Toggle Activation / Désactivation -->
+            <form action="{{ route('admin.dossiers.toggle-depots') }}" method="POST" class="inline">
+                @csrf
+                <button type="submit" 
+                        class="px-4 py-2.5 rounded-2xl text-xs font-bold transition flex items-center space-x-2 {{ $depotActif ? 'bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md' }}">
+                    @if($depotActif)
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span>Désactiver les dépôts</span>
+                    @else
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span>Activer les dépôts</span>
+                    @endif
+                </button>
+            </form>
+
+            <!-- Bouton Définir la Période & Notifier -->
+            <button type="button" onclick="openModalPeriodeDepot()" 
+                    class="px-4 py-2.5 bg-[#1B3A8C] hover:bg-[#142B6B] text-white rounded-2xl text-xs font-bold shadow-md hover:shadow-lg transition flex items-center space-x-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                <span>Définir Période & Notifier Écoles</span>
+            </button>
+        </div>
+    </div>
+
     <!-- Filtres rapides par statut -->
     <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4">
         <a href="{{ route('admin.dossiers.index') }}" 
@@ -161,10 +225,98 @@
         {{ $dossiers->links() }}
     </div>
     @endif
+
+    <!-- MODAL DÉFINIR PÉRIODE DE DÉPÔT ET NOTIFIER LES ÉCOLES -->
+    <div id="modal-periode-depot" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden p-4">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full border border-slate-100 overflow-hidden transform transition-all">
+            <!-- Entête Modal -->
+            <div class="px-6 py-5 bg-gradient-to-r from-[#0D1B4B] to-[#1B3A8C] text-white flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-black uppercase tracking-wider">Campagne de Dépôt</h3>
+                        <p class="text-[11px] text-blue-200">Fixer les dates et notifier les établissements</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeModalPeriodeDepot()" class="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- Corps du formulaire -->
+            <form action="{{ route('admin.dossiers.configurer-depots') }}" method="POST" class="p-6 space-y-4">
+                @csrf
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="modal_date_debut" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                            Date de Début <span class="text-[#E8001D]">*</span>
+                        </label>
+                        <input type="date" name="date_debut" id="modal_date_debut" required
+                               value="{{ old('date_debut', $depotDebut ?? now()->format('Y-m-d')) }}"
+                               class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white">
+                    </div>
+
+                    <div>
+                        <label for="modal_date_fin" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                            Date Limite (Fin) <span class="text-[#E8001D]">*</span>
+                        </label>
+                        <input type="date" name="date_fin" id="modal_date_fin" required
+                               value="{{ old('date_fin', $depotFin ?? now()->addMonths(1)->format('Y-m-d')) }}"
+                               class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="modal_instructions" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                        Consignes ou Note particulière (Optionnel)
+                    </label>
+                    <textarea name="instructions" id="modal_instructions" rows="3"
+                              class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#1B3A8C] focus:bg-white resize-none"
+                              placeholder="Ex: Priorité accordée aux filières Réseaux & Télécoms et Génie Logiciel...">{{ old('instructions', $depotInstructions) }}</textarea>
+                </div>
+
+                <!-- Checkbox Notification Email -->
+                <div class="p-3.5 bg-blue-50/60 rounded-2xl border border-blue-100 flex items-start space-x-3">
+                    <input type="checkbox" name="notifier_ecoles" id="notifier_ecoles" value="1" checked
+                           class="mt-0.5 w-4 h-4 text-[#1B3A8C] rounded border-slate-300 focus:ring-[#1B3A8C]">
+                    <label for="notifier_ecoles" class="text-xs text-slate-700 cursor-pointer">
+                        <strong class="text-[#0D1B4B] block mb-0.5">Envoyer un email officiel à tous les établissements</strong>
+                        Un courrier électronique professionnel sera transmis à l'ensemble des écoles partenaires avec les dates de dépôt et les instructions de TFG SARL.
+                    </label>
+                </div>
+
+                <!-- Boutons d'action -->
+                <div class="pt-2 flex items-center justify-end space-x-3">
+                    <button type="button" onclick="closeModalPeriodeDepot()" 
+                            class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
+                        Annuler
+                    </button>
+                    <button type="submit" 
+                            class="px-5 py-2.5 rounded-xl bg-[#1B3A8C] hover:bg-[#142B6B] text-white text-xs font-bold shadow-md transition flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        <span>Enregistrer & Diffuser</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 @push('scripts')
 <script>
+function openModalPeriodeDepot() {
+    const modal = document.getElementById('modal-periode-depot');
+    modal.classList.remove('hidden');
+}
+
+function closeModalPeriodeDepot() {
+    const modal = document.getElementById('modal-periode-depot');
+    modal.classList.add('hidden');
+}
+
 document.getElementById('live-search-admin-dossiers').addEventListener('input', function(e) {
     const term = e.target.value.toLowerCase().trim();
     const rows = document.querySelectorAll('#admin-dossiers-table tbody tr.search-row');

@@ -6,6 +6,42 @@
 @section('dashboard_content')
 <div class="space-y-6">
     
+    <!-- BANDEAU DE STATUT DE LA CAMPAGNE DE DÉPÔT -->
+    <div class="p-4 sm:p-5 rounded-3xl border shadow-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 {{ $isDepotOpen ? 'bg-gradient-to-r from-blue-50/70 to-emerald-50/70 border-emerald-200' : 'bg-gradient-to-r from-amber-50 to-red-50 border-amber-200' }}">
+        <div class="flex items-center space-x-3.5">
+            <div class="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 {{ $isDepotOpen ? 'bg-emerald-500 text-white shadow-md' : 'bg-amber-500 text-white shadow-md' }}">
+                @if($isDepotOpen)
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                @else
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                @endif
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h4 class="text-xs font-black uppercase tracking-wider {{ $isDepotOpen ? 'text-[#0D1B4B]' : 'text-amber-900' }}">
+                        {{ $isDepotOpen ? 'Dépôts de Dossiers Ouverts' : 'Dépôts de Dossiers Actuellement Fermés' }}
+                    </h4>
+                    <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider {{ $isDepotOpen ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-900' }}">
+                        {{ $isDepotOpen ? 'En cours' : 'Fermé' }}
+                    </span>
+                </div>
+                <p class="text-xs {{ $isDepotOpen ? 'text-slate-600' : 'text-amber-800' }} mt-0.5">
+                    @if($depotDebut && $depotFin)
+                        Période officielle : <strong>du {{ \Carbon\Carbon::parse($depotDebut)->locale('fr')->isoFormat('D MMMM YYYY') }} au {{ \Carbon\Carbon::parse($depotFin)->locale('fr')->isoFormat('D MMMM YYYY') }}</strong>
+                    @else
+                        {{ $depotClosedReason ?: 'Dépôts autorisés en continu.' }}
+                    @endif
+                </p>
+            </div>
+        </div>
+
+        @if(!$isDepotOpen)
+        <span class="text-[11px] font-bold text-amber-800 bg-white/80 px-3 py-1.5 rounded-xl border border-amber-200 self-start sm:self-auto">
+            Mode Brouillon autorisé
+        </span>
+        @endif
+    </div>
+
     <!-- Filtres rapides par statut -->
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <a href="{{ route('ecole.dossiers.index') }}" 

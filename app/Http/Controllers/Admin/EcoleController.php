@@ -54,11 +54,22 @@ class EcoleController extends Controller
             'adresse_ecole' => 'nullable|string|max:255',
             'telephone' => 'nullable|string|max:50',
             'email' => 'required|email|max:255|unique:ecoles,email',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:4096',
         ], [
             'nom_ecole.unique' => 'Un établissement avec ce nom existe déjà.',
-            'sigle.required' => 'Le sigle de létablissement est obligatoire (ex: UCAD, ESP, ISM).',
+            'sigle.required' => 'Le sigle de l\'établissement est obligatoire (ex: UCAD, ESP, ISM).',
             'email.unique' => 'Cette adresse email est déjà enregistrée pour une autre école.',
         ]);
+
+        $logoName = null;
+        if ($request->hasFile('logo')) {
+            $logoDir = public_path('uploads/logos');
+            if (!\Illuminate\Support\Facades\File::isDirectory($logoDir)) {
+                \Illuminate\Support\Facades\File::makeDirectory($logoDir, 0755, true, true);
+            }
+            $logoName = 'logo_' . time() . '_' . \Illuminate\Support\Str::random(6) . '.' . $request->file('logo')->getClientOriginalExtension();
+            $request->file('logo')->move($logoDir, $logoName);
+        }
 
         $ecole = Ecole::create([
             'nom_ecole' => $request->nom_ecole,
@@ -68,6 +79,7 @@ class EcoleController extends Controller
             'telephone' => $request->telephone,
             'mail' => $request->email,
             'email' => $request->email,
+            'logo' => $logoName,
         ]);
 
         return redirect()->route('admin.ecoles.index')->with('success', "L'établissement {$ecole->nom_ecole} ({$ecole->sigle}) a été enregistré avec succès. Vous pouvez maintenant créer son compte d'accès depuis le tableau.");

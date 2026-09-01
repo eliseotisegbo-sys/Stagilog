@@ -36,7 +36,20 @@ class DashboardController extends Controller
             try {
                 $startDate = Carbon::createFromFormat('Y-m-d', $request->start_date)->startOfDay();
                 $endDate   = Carbon::createFromFormat('Y-m-d', $request->end_date)->endOfDay();
-                $periodLabel = 'Du ' . $startDate->locale('fr')->isoFormat('D MMM YYYY') . ' au ' . $endDate->locale('fr')->isoFormat('D MMM YYYY');
+                
+                // Ne jamais dépasser la fin de la journée actuelle
+                if ($endDate->isFuture()) {
+                    $endDate = now()->endOfDay();
+                }
+                if ($startDate->isFuture()) {
+                    $startDate = now()->startOfDay();
+                }
+
+                if ($startDate->isSameDay($endDate)) {
+                    $periodLabel = $startDate->isToday() ? "Aujourd'hui" : $startDate->locale('fr')->isoFormat('D MMMM YYYY');
+                } else {
+                    $periodLabel = 'Du ' . $startDate->locale('fr')->isoFormat('D MMM YYYY') . ' au ' . $endDate->locale('fr')->isoFormat('D MMM YYYY');
+                }
             } catch (\Exception $e) {
                 $startDate = null;
                 $endDate   = null;
@@ -143,7 +156,20 @@ class DashboardController extends Controller
             try {
                 $startDate = Carbon::createFromFormat('Y-m-d', $request->start_date)->startOfDay();
                 $endDate   = Carbon::createFromFormat('Y-m-d', $request->end_date)->endOfDay();
-                $periodLabel = 'Du ' . $startDate->locale('fr')->isoFormat('D MMM YYYY') . ' au ' . $endDate->locale('fr')->isoFormat('D MMM YYYY');
+                
+                // Ne jamais dépasser la fin de la journée actuelle
+                if ($endDate->isFuture()) {
+                    $endDate = now()->endOfDay();
+                }
+                if ($startDate->isFuture()) {
+                    $startDate = now()->startOfDay();
+                }
+
+                if ($startDate->isSameDay($endDate)) {
+                    $periodLabel = $startDate->isToday() ? "Aujourd'hui" : $startDate->locale('fr')->isoFormat('D MMMM YYYY');
+                } else {
+                    $periodLabel = 'Du ' . $startDate->locale('fr')->isoFormat('D MMM YYYY') . ' au ' . $endDate->locale('fr')->isoFormat('D MMM YYYY');
+                }
             } catch (\Exception $e) {
                 $startDate = null;
                 $endDate   = null;

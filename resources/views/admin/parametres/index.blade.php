@@ -184,8 +184,7 @@
         <!-- SECTION 2 : GESTION DES COMPTES ADMINISTRATEURS (5 cols) -->
         <div class="lg:col-span-5 space-y-6" id="section-admins">
             
-            @if($isSuperAdmin)
-            <!-- Formulaire Ajouter un Administrateur (Uniquement Super Admin) -->
+            <!-- Formulaire Ajouter un Administrateur (Accessible à tous les administrateurs) -->
             <div class="bg-white rounded-3xl shadow-card border border-slate-100 p-6 sm:p-8">
                 <h3 class="text-sm font-extrabold text-[#0D1B4B] uppercase tracking-wider mb-2 flex items-center space-x-2">
                     <span>Créer un Compte Administrateur</span>
@@ -230,8 +229,6 @@
                     </button>
                 </form>
             </div>
-            @else
-            @endif
 
             <!-- Liste des Administrateurs existants -->
             <div class="bg-white rounded-3xl shadow-card border border-slate-100 p-6 sm:p-8">
@@ -254,16 +251,13 @@
                             <div class="truncate">
                                 <div class="flex items-center gap-1.5">
                                     <span class="font-bold text-[#0D1B4B] truncate">{{ $adm->name }}</span>
-                                    @if($firstAdmin && $adm->id === $firstAdmin->id)
-                                    <span class="text-[9px] font-black uppercase text-[#E8001D] bg-red-50 px-1.5 py-0.2 rounded">Super Admin</span>
-                                    @endif
+                                    <span class="text-[9px] font-black uppercase text-[#1B3A8C] bg-blue-50 px-1.5 py-0.2 rounded">Admin TFG</span>
                                 </div>
                                 <span class="text-[10px] text-slate-400 block truncate">{{ $adm->email }}</span>
                             </div>
                         </div>
 
                         @if($adm->id !== $user->id)
-                            @if($isSuperAdmin)
                             <form action="{{ route('admin.parametres.admin-user.destroy', $adm->id) }}" method="POST" class="inline flex-shrink-0 ml-2" onsubmit="return confirm('Supprimer cet administrateur ?');">
                                 @csrf
                                 @method('DELETE')
@@ -271,7 +265,6 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                 </button>
                             </form>
-                            @endif
                         @else
                         <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100 flex-shrink-0">Vous</span>
                         @endif

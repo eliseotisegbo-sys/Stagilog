@@ -20,9 +20,9 @@ class ParametreController extends Controller
     {
         $user = auth()->user();
         
-        // Super Admin = premier compte admin créé
+        // Tous les administrateurs ont les mêmes droits complets
+        $isSuperAdmin = true;
         $firstAdmin = User::where('role', 'admin')->orderBy('id', 'asc')->first();
-        $isSuperAdmin = $firstAdmin && ($firstAdmin->id === $user->id);
 
         // Liste de tous les comptes Administrateurs TFG SARL
         $admins = User::where('role', 'admin')->latest()->get();
@@ -80,15 +80,10 @@ class ParametreController extends Controller
     }
 
     /**
-     * Créer un nouvel administrateur TFG SARL (Multi-comptes admin - réservé au Super Admin)
+     * Créer un nouvel administrateur TFG SARL (Accessible à tous les administrateurs)
      */
     public function storeAdminUser(Request $request)
     {
-        $firstAdmin = User::where('role', 'admin')->orderBy('id', 'asc')->first();
-        if (!$firstAdmin || $firstAdmin->id !== auth()->id()) {
-            return back()->with('error', 'Action non autorisée. Seul le Super Administrateur (premier compte créé) est habilité à créer de nouveaux comptes administrateurs.');
-        }
-
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
@@ -132,15 +127,11 @@ class ParametreController extends Controller
     }
 
     /**
-     * Supprimer un compte administrateur (réservé au Super Admin)
+     * Supprimer un compte administrateur (Accessible à tous les administrateurs sauf sur leur propre compte)
      */
     public function destroyAdminUser($id)
     {
         $current = auth()->user();
-        $firstAdmin = User::where('role', 'admin')->orderBy('id', 'asc')->first();
-        if (!$firstAdmin || $firstAdmin->id !== $current->id) {
-            return back()->with('error', 'Action non autorisée. Seul le Super Administrateur est habilité à supprimer des comptes administrateurs.');
-        }
 
         if ($current->id == $id) {
             return back()->with('error', 'Vous ne pouvez pas supprimer votre propre compte actif.');
@@ -161,7 +152,11 @@ class ParametreController extends Controller
         $user = auth()->user();
         $ecole = $user->ecole;
 
-        // Ne montrer que les connexions réussies (après validation du code 6 chiffres)
+        // Déterminer si l'utilisateur est le premier compte créé pour cet établissement
+        $firstEcoleUser = $ecole ? User::where('id_ecole', $ecole->id_ecole)->orderBy('id', 'asc')->first() : null;
+        $isPrimaryEcoleUser = $firstEcoleUser && ($firstEcoleUser->id === $user->id);
+
+        // Ne montrer que les connexions réussies
         $connexions = ConnexionHistorique::where('id_user', $user->id)
             ->where('statut', 'succes')
             ->orWhere(function($query) use ($user) {
@@ -172,7 +167,7 @@ class ParametreController extends Controller
             ->take(15)
             ->get();
 
-        return view('ecole.parametres.index', compact('user', 'ecole', 'connexions'));
+        return view('ecole.parametres.index', compact('user', 'ecole', 'connexions', 'isPrimaryEcoleUser'));
     }
 
     /**
@@ -182,6 +177,10 @@ class ParametreController extends Controller
     {
         $user = auth()->user();
         $ecole = $user->ecole;
+
+        // Déterminer si l'utilisateur est le premier compte créé pour cet établissement
+        $firstEcoleUser = $ecole ? User::where('id_ecole', $ecole->id_ecole)->orderBy('id', 'asc')->first() : null;
+        $isPrimaryEcoleUser = $firstEcoleUser && ($firstEcoleUser->id === $user->id);
 
         $request->validate([
             'nom_responsable' => 'required|string|max:255',
@@ -205,8 +204,11 @@ class ParametreController extends Controller
             $user->photo_profil = $avatarName;
         }
 
-        // 2. Upload Logo Officiel de l'Établissement
+        // 2. Upload Logo Officiel de l'Établissement (Réservé au premier utilisateur de l'école)
         if ($request->hasFile('logo') && $ecole) {
+            if (!$isPrimaryEcoleUser) {
+                return back()->with('error', 'Seul le premier utilisateur / compte principal de cet établissement est autorisé à modifier ou ajouter le logo officiel.');
+            }
             $logoDir = public_path('uploads/logos');
             if (!File::isDirectory($logoDir)) {
                 File::makeDirectory($logoDir, 0755, true, true);

@@ -8,6 +8,7 @@ use App\Models\Etudiant;
 use App\Models\Cycle;
 use App\Models\Filiere;
 use App\Models\AppNotification;
+use App\Models\AppSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -49,6 +50,28 @@ class DossierController extends Controller
         $countValide = Dossier::where('id_ecole', $idEcole)->where('statut_brouillon', 'soumis')->where('statut', 'valide')->count();
         $countRefuse = Dossier::where('id_ecole', $idEcole)->where('statut_brouillon', 'soumis')->where('statut', 'refuse')->count();
 
+        // Vérification de l'ouverture des dépôts
+        $depotActif = AppSetting::get('depot_dossiers_actif', '1') === '1';
+        $depotDebut = AppSetting::get('depot_date_debut');
+        $depotFin = AppSetting::get('depot_date_fin');
+        $depotInstructions = AppSetting::get('depot_instructions');
+
+        $isDepotOpen = true;
+        $depotClosedReason = '';
+
+        if (!$depotActif) {
+            $isDepotOpen = false;
+            $depotClosedReason = "Les dépôts de dossiers de stage sont actuellement suspendus par la direction de TFG SARL.";
+        } elseif ($depotDebut && $depotFin) {
+            $now = now()->startOfDay();
+            $dDebut = \Carbon\Carbon::parse($depotDebut)->startOfDay();
+            $dFin = \Carbon\Carbon::parse($depotFin)->endOfDay();
+            if ($now->lt($dDebut) || $now->gt($dFin)) {
+                $isDepotOpen = false;
+                $depotClosedReason = "La période officielle de dépôt des candidatures est fixée du " . $dDebut->locale('fr')->isoFormat('D MMMM YYYY') . " au " . $dFin->locale('fr')->isoFormat('D MMMM YYYY') . ".";
+            }
+        }
+
         return view('ecole.dossiers.index', compact(
             'dossiers', 
             'search', 
@@ -58,7 +81,12 @@ class DossierController extends Controller
             'countAttente',
             'countSousReserve',
             'countValide',
-            'countRefuse'
+            'countRefuse',
+            'isDepotOpen',
+            'depotClosedReason',
+            'depotDebut',
+            'depotFin',
+            'depotInstructions'
         ));
     }
 
@@ -67,10 +95,32 @@ class DossierController extends Controller
      */
     public function create()
     {
+        // Vérification statut dépôt
+        $depotActif = AppSetting::get('depot_dossiers_actif', '1') === '1';
+        $depotDebut = AppSetting::get('depot_date_debut');
+        $depotFin = AppSetting::get('depot_date_fin');
+        $depotInstructions = AppSetting::get('depot_instructions');
+
+        $isDepotOpen = true;
+        $depotClosedReason = '';
+
+        if (!$depotActif) {
+            $isDepotOpen = false;
+            $depotClosedReason = "Les dépôts de dossiers de stage sont actuellement suspendus par la direction de TFG SARL.";
+        } elseif ($depotDebut && $depotFin) {
+            $now = now()->startOfDay();
+            $dDebut = \Carbon\Carbon::parse($depotDebut)->startOfDay();
+            $dFin = \Carbon\Carbon::parse($depotFin)->endOfDay();
+            if ($now->lt($dDebut) || $now->gt($dFin)) {
+                $isDepotOpen = false;
+                $depotClosedReason = "La période officielle de dépôt des candidatures est fixée du " . $dDebut->locale('fr')->isoFormat('D MMMM YYYY') . " au " . $dFin->locale('fr')->isoFormat('D MMMM YYYY') . ".";
+            }
+        }
+
         $cycles = Cycle::all();
         $filieres = Filiere::where('actif', true)->get();
 
-        return view('ecole.dossiers.create', compact('cycles', 'filieres'));
+        return view('ecole.dossiers.create', compact('cycles', 'filieres', 'isDepotOpen', 'depotClosedReason', 'depotDebut', 'depotFin', 'depotInstructions'));
     }
 
     /**
@@ -82,6 +132,25 @@ class DossierController extends Controller
         $ecoleName = auth()->user()->ecole->nom_ecole ?? 'École Partenaire';
 
         $isSubmit = ($request->input('action') === 'soumettre');
+
+        // Vérification stricte si l'école tente de soumettre hors période
+        if ($isSubmit) {
+            $depotActif = AppSetting::get('depot_dossiers_actif', '1') === '1';
+            $depotDebut = AppSetting::get('depot_date_debut');
+            $depotFin = AppSetting::get('depot_date_fin');
+
+            if (!$depotActif) {
+                return back()->withInput()->with('error', 'Les dépôts de dossiers sont actuellement suspendus par TFG SARL. Vous pouvez toutefois enregistrer votre dossier en tant que Brouillon.');
+            } elseif ($depotDebut && $depotFin) {
+                $now = now()->startOfDay();
+                $dDebut = \Carbon\Carbon::parse($depotDebut)->startOfDay();
+                $dFin = \Carbon\Carbon::parse($depotFin)->endOfDay();
+                if ($now->lt($dDebut) || $now->gt($dFin)) {
+                    return back()->withInput()->with('error', "La période de dépôt officiel est du " . $dDebut->format('d/m/Y') . " au " . $dFin->format('d/m/Y') . ". Vous pouvez enregistrer ce dossier en tant que Brouillon en attendant l'ouverture.");
+                }
+            }
+        }
+
         $statutBrouillon = $isSubmit ? 'soumis' : 'brouillon';
         $statutGeneral = $isSubmit ? 'en_attente' : 'brouillon';
 

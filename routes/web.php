@@ -121,8 +121,10 @@ Route::middleware(['auth', 'first.login', 'role:admin'])->prefix('admin')->name(
     Route::delete('/ecoles/utilisateur/{id}', [AdminEcoleController::class, 'supprimerUtilisateur'])->name('ecoles.supprimer-utilisateur');
     Route::post('/ecoles/{id}/update-password', [AdminEcoleController::class, 'updatePassword'])->name('ecoles.update-password');
 
-    // Gestion des Dossiers de Stage
+    // Gestion des Dossiers de Stage & Période de Dépôt
     Route::get('/dossiers', [AdminDossierController::class, 'index'])->name('dossiers.index');
+    Route::post('/dossiers/configurer-depots', [AdminDossierController::class, 'configurerDepots'])->name('dossiers.configurer-depots');
+    Route::post('/dossiers/toggle-depots', [AdminDossierController::class, 'toggleDepots'])->name('dossiers.toggle-depots');
     Route::get('/dossiers/{id}', [AdminDossierController::class, 'show'])->name('dossiers.show');
     Route::post('/dossiers/{id}/modifier-periode', [AdminDossierController::class, 'modifierPeriode'])->name('dossiers.modifier-periode');
     Route::post('/dossiers/{id}/etudiants/{etudiantId}/modifier-periode', [AdminDossierController::class, 'modifierPeriodeEtudiant'])->name('dossiers.modifier-periode-etudiant');

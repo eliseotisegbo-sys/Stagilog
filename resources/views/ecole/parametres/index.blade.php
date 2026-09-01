@@ -129,15 +129,32 @@
                     @endif
                 </div>
 
-                <!-- Upload Logo Officiel Établissement -->
+                <!-- Upload Logo Officiel Établissement (Réservé au 1er utilisateur de l'école) -->
                 <div>
-                    <label for="logo" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                        Logo officiel de l'établissement ({{ $ecole->nom_ecole ?? 'École' }})
-                    </label>
-                    <input type="file" name="logo" id="logo" accept="image/png,image/jpeg,image/jpg,image/svg+xml,image/webp"
-                           class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-[#1B3A8C] hover:file:bg-blue-100 transition">
-                    @if($ecole && $ecole->logo)
-                    <p class="text-[10px] text-slate-400 mt-1">Logo actuel : <strong>{{ $ecole->logo }}</strong></p>
+                    <div class="flex items-center justify-between mb-2">
+                        <label for="logo" class="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                            Logo officiel de l'établissement ({{ $ecole->nom_ecole ?? 'École' }})
+                        </label>
+                        @if($isPrimaryEcoleUser ?? true)
+                            <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Compte Principal</span>
+                        @else
+                            <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">Lecture seule</span>
+                        @endif
+                    </div>
+
+                    @if($isPrimaryEcoleUser ?? true)
+                        <input type="file" name="logo" id="logo" accept="image/png,image/jpeg,image/jpg,image/svg+xml,image/webp"
+                               class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-[#1B3A8C] hover:file:bg-blue-100 transition">
+                        @if($ecole && $ecole->logo)
+                        <p class="text-[10px] text-slate-400 mt-1">Logo actuel : <strong>{{ $ecole->logo }}</strong></p>
+                        @endif
+                    @else
+                        <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-between">
+                            <span class="text-xs text-slate-500 font-medium">Seul le 1<sup>er</sup> compte utilisateur de l'établissement peut modifier le logo officiel.</span>
+                            @if($ecole && $ecole->logo)
+                            <img src="{{ asset('uploads/logos/' . $ecole->logo) }}" alt="Logo" class="w-8 h-8 object-contain rounded-lg border border-slate-200 bg-white">
+                            @endif
+                        </div>
                     @endif
                 </div>
             </div>
