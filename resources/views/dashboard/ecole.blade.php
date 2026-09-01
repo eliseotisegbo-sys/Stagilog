@@ -169,11 +169,11 @@
     </div>
 
     <!-- GRAPHIQUE & ACTIONS RAPIDES -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         <!-- Courbe Activité École Réelle (8 cols) -->
-        <div class="lg:col-span-8 bg-white p-8 rounded-3xl shadow-card border border-slate-100">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div class="lg:col-span-8 bg-white p-6 sm:p-8 rounded-3xl shadow-card border border-slate-100">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                 <div>
                     <h3 class="text-lg font-extrabold text-[#0D1B4B]">Activité des Soumissions</h3>
                     <p class="text-xs font-medium text-slate-400">
@@ -184,9 +184,13 @@
                         @endif
                     </p>
                 </div>
+                <div class="flex items-center space-x-2">
+                    <span class="inline-block w-3 h-3 rounded-full bg-[#10B981]"></span>
+                    <span class="text-xs font-bold text-slate-600">Dossiers</span>
+                </div>
             </div>
 
-            <div id="chart-ecole-timeline" class="w-full h-72"></div>
+            <div id="chart-ecole-timeline" class="w-full"></div>
         </div>
 
         <!-- Raccourcis & Assistance (4 cols) -->
