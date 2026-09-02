@@ -391,17 +391,42 @@ function applyDirectPreset(preset) {
 function applyInlineDates() {
     const startRaw = document.getElementById('inline_start_date').value.trim();
     const endRaw   = document.getElementById('inline_end_date').value.trim();
-    let startIso = '', endIso = '';
+    
+    let startIso = '';
+    let endIso   = '';
+    
+    // Si les dates sont saisies via le calendrier Flatpickr, elles seront déjà synchronisées
+    // Sinon, on les parse manuellement
     if (startRaw) {
         const d = parseDisplayDate(startRaw);
-        startIso = (d && !isNaN(d)) ? formatDate(d) : startRaw;
+        if (d && !isNaN(d)) {
+            startIso = formatDate(d);
+        } else {
+            // Peut-être déjà au format Y-m-d
+            startIso = startRaw;
+        }
     }
+    
     if (endRaw) {
         const d = parseDisplayDate(endRaw);
-        endIso = (d && !isNaN(d)) ? formatDate(d) : endRaw;
+        if (d && !isNaN(d)) {
+            endIso = formatDate(d);
+        } else {
+            endIso = endRaw;
+        }
     }
+    
+    // Vérifier que les dates sont valides avant de soumettre
+    if (!startIso && !endIso) {
+        alert('Veuillez sélectionner au moins une date.');
+        return;
+    }
+    
+    // Mettre à jour les champs hidden
     document.getElementById('start_date').value = startIso;
     document.getElementById('end_date').value   = endIso;
+    
+    // Soumettre le formulaire
     document.getElementById('period-form').submit();
 }
 
@@ -429,20 +454,41 @@ document.addEventListener('DOMContentLoaded', function() {
             maxDate: 'today',
             locale: 'fr',
             disableMobile: true,
+            altInput: false,
+            allowInput: true,
+            clickOpens: true,
         };
         window.fpStart = flatpickr('#inline_start_date', {
             ...commonOpts,
-            defaultDate: sVal || null,
-            onChange: function(dates) {
-                if (dates[0] && window.fpEnd) window.fpEnd.set('minDate', dates[0]);
+            defaultDate: sVal ? toDisplay(sVal) : null,
+            onChange: function(dates, dateStr, instance) {
+                if (dates[0]) {
+                    // Mettre à jour le champ hidden avec la date au format Y-m-d
+                    document.getElementById('start_date').value = formatDate(dates[0]);
+                    // Mettre à jour le champ visible avec la date au format d/m/Y
+                    document.getElementById('inline_start_date').value = dateStr;
+                    // Mettre à jour la date min du calendrier de fin
+                    if (window.fpEnd) {
+                        window.fpEnd.set('minDate', dates[0]);
+                    }
+                }
             }
         });
         window.fpEnd = flatpickr('#inline_end_date', {
             ...commonOpts,
-            defaultDate: eVal || null,
+            defaultDate: eVal ? toDisplay(eVal) : null,
             minDate: sVal || null,
-            onChange: function(dates) {
-                if (dates[0] && window.fpStart) window.fpStart.set('maxDate', dates[0]);
+            onChange: function(dates, dateStr, instance) {
+                if (dates[0]) {
+                    // Mettre à jour le champ hidden avec la date au format Y-m-d
+                    document.getElementById('end_date').value = formatDate(dates[0]);
+                    // Mettre à jour le champ visible avec la date au format d/m/Y
+                    document.getElementById('inline_end_date').value = dateStr;
+                    // Mettre à jour la date max du calendrier de début
+                    if (window.fpStart) {
+                        window.fpStart.set('maxDate', dates[0]);
+                    }
+                }
             }
         });
     }
